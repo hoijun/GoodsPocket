@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,9 +12,11 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -24,7 +27,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import goods.pocket.app.presentation.designsystem.GoodsPocketVisualTokens
+import goods.pocket.app.presentation.designsystem.goodsPocketChromeFor
 import goods.pocket.app.presentation.component.EventDetailSheet
 import goods.pocket.app.presentation.component.EventEditorSheet
 import goods.pocket.app.presentation.component.ItemDetailSheet
@@ -61,12 +67,19 @@ fun GoodsPocketApp(
     val uiState by appStateHolder.state.collectAsState()
 
     ProvideLocalizedResources(languageCode = uiState.appPreferences.languageCode) {
+        val chrome = goodsPocketChromeFor(uiState.currentDestination)
         Scaffold(
+            containerColor = MaterialTheme.colorScheme.background,
             topBar = {
                 TopAppBar(
                     navigationIcon = {
-                        if (uiState.currentDestination == AppDestination.Settings) {
-                            TextButton(onClick = appStateHolder::closeSettings) {
+                        if (chrome.showBackButton) {
+                            val onBack = if (uiState.currentDestination == AppDestination.Settings) {
+                                appStateHolder::closeSettings
+                            } else {
+                                { appStateHolder.selectDestination(uiState.selectedPrimaryDestination) }
+                            }
+                            TextButton(onClick = onBack) {
                                 Text(tr(Res.string.action_back))
                             }
                         }
@@ -78,26 +91,33 @@ fun GoodsPocketApp(
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
+                        containerColor = MaterialTheme.colorScheme.background,
+                        titleContentColor = MaterialTheme.colorScheme.onBackground,
+                        navigationIconContentColor = MaterialTheme.colorScheme.primary,
                     ),
                 )
             },
             bottomBar = {
-                NavigationBar {
-                    AppDestination.primaryDestinations.forEach { destination ->
-                        val label = destination.localizedLabel()
-                        NavigationBarItem(
-                            selected = destination.route == uiState.selectedPrimaryDestination.route,
-                            onClick = { appStateHolder.selectDestination(destination) },
-                            icon = { Text(label.take(1)) },
-                            label = { Text(label) },
-                        )
-                    }
+                if (chrome.showBottomBar) {
+                    GoodsPocketBottomBar(
+                        selectedPrimaryDestination = uiState.selectedPrimaryDestination,
+                        onSelectDestination = appStateHolder::selectDestination,
+                    )
                 }
             },
             floatingActionButton = {
-                FloatingActionButton(onClick = { appStateHolder.openQuickAdd() }) {
-                    Text("+")
+                if (chrome.showFab) {
+                    FloatingActionButton(
+                        onClick = { appStateHolder.openQuickAdd() },
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                    ) {
+                        Text(
+                            text = "+",
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    }
                 }
             },
         ) { innerPadding ->
@@ -131,6 +151,76 @@ fun GoodsPocketApp(
         PendingDeleteDialog(
             uiState = uiState,
             appStateHolder = appStateHolder,
+        )
+    }
+}
+
+@Composable
+private fun GoodsPocketBottomBar(
+    selectedPrimaryDestination: AppDestination,
+    onSelectDestination: (AppDestination) -> Unit,
+) {
+    Surface(
+        modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 12.dp,
+        tonalElevation = 2.dp,
+    ) {
+        NavigationBar(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ) {
+            AppDestination.primaryDestinations.forEach { destination ->
+                val label = destination.localizedLabel()
+                val selected = destination.route == selectedPrimaryDestination.route
+                NavigationBarItem(
+                    selected = selected,
+                    onClick = { onSelectDestination(destination) },
+                    icon = {
+                        BottomNavGlyph(
+                            label = label,
+                            selected = selected,
+                        )
+                    },
+                    label = { Text(label) },
+                    alwaysShowLabel = true,
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        indicatorColor = MaterialTheme.colorScheme.surface,
+                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    ),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BottomNavGlyph(
+    label: String,
+    selected: Boolean,
+) {
+    Surface(
+        modifier = Modifier.fillMaxHeight(),
+        shape = MaterialTheme.shapes.small,
+        color = if (selected) {
+            MaterialTheme.colorScheme.primary
+        } else {
+            MaterialTheme.colorScheme.surfaceContainerLow
+        },
+    ) {
+        Text(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+            text = label.take(1),
+            style = MaterialTheme.typography.labelLarge,
+            color = if (selected) {
+                MaterialTheme.colorScheme.onPrimary
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            },
+            textAlign = TextAlign.Center,
         )
     }
 }
@@ -358,11 +448,27 @@ private fun PendingDeleteDialog(
 
     AlertDialog(
         onDismissRequest = appStateHolder::dismissPendingDelete,
-        title = { Text(title) },
-        text = { Text(body) },
+        containerColor = MaterialTheme.colorScheme.surface,
+        iconContentColor = MaterialTheme.colorScheme.error,
+        titleContentColor = MaterialTheme.colorScheme.onSurface,
+        textContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+        },
+        text = { Text(body, style = MaterialTheme.typography.bodyMedium) },
         confirmButton = {
             TextButton(onClick = appStateHolder::confirmPendingDelete) {
-                Text(tr(Res.string.action_confirm))
+                Text(
+                    when (pendingDelete) {
+                        is PendingDelete.PreorderCancel -> tr(Res.string.action_cancel_preorder)
+                        else -> tr(Res.string.action_delete)
+                    },
+                    color = MaterialTheme.colorScheme.error,
+                )
             }
         },
         dismissButton = {

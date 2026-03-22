@@ -1,15 +1,13 @@
 package goods.pocket.app.presentation.component
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -20,13 +18,27 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import goods.pocket.app.domain.model.EventType
 import goods.pocket.app.domain.model.TransactionType
+import goods.pocket.app.presentation.designsystem.GoodsPocketFilterChip
+import goods.pocket.app.presentation.designsystem.goodsPocketOutlinedFieldColors
 import goods.pocket.app.presentation.i18n.localizedLabel
 import goods.pocket.app.presentation.i18n.tr
 import goods.pocket.app.presentation.state.QuickAddTarget
-import goodspocket.composeapp.generated.resources.*
+import goodspocket.composeapp.generated.resources.Res
+import goodspocket.composeapp.generated.resources.action_save
+import goodspocket.composeapp.generated.resources.field_amount
+import goodspocket.composeapp.generated.resources.field_category
+import goodspocket.composeapp.generated.resources.field_date
+import goodspocket.composeapp.generated.resources.field_event_title
+import goodspocket.composeapp.generated.resources.field_item_name
+import goodspocket.composeapp.generated.resources.field_preorder_name
+import goodspocket.composeapp.generated.resources.field_release_date
+import goodspocket.composeapp.generated.resources.field_store
+import goodspocket.composeapp.generated.resources.field_target_date
+import goodspocket.composeapp.generated.resources.quick_add_title
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,18 +55,20 @@ fun QuickAddSheet(
     var itemCategory by remember { mutableStateOf("") }
     var preorderName by remember { mutableStateOf("") }
     var preorderStore by remember { mutableStateOf("") }
-    var preorderReleaseDate by remember { mutableStateOf("2026-03-31") }
+    var preorderReleaseDate by remember { mutableStateOf("") }
     var transactionAmount by remember { mutableStateOf("") }
-    var transactionDate by remember { mutableStateOf("2026-03-15") }
+    var transactionDate by remember { mutableStateOf("") }
     var transactionType by remember { mutableStateOf(TransactionType.PURCHASE) }
     var eventTitle by remember { mutableStateOf("") }
-    var eventDate by remember { mutableStateOf("2026-03-25") }
+    var eventDate by remember { mutableStateOf("") }
     var eventType by remember { mutableStateOf(EventType.RELEASE) }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surface,
+        tonalElevation = 4.dp,
     ) {
-        Column(
+        androidx.compose.foundation.layout.Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 12.dp)
@@ -64,26 +78,33 @@ fun QuickAddSheet(
             Text(
                 text = tr(Res.string.quick_add_title),
                 style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
             )
 
-            TargetSelector(
-                selected = target,
-                onTargetChange = onTargetChange,
-            )
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                QuickAddTarget.entries.forEach { entry ->
+                    GoodsPocketFilterChip(
+                        selected = target == entry,
+                        onClick = { onTargetChange(entry) },
+                        label = entry.localizedLabel(),
+                    )
+                }
+            }
 
             when (target) {
                 QuickAddTarget.ITEM -> {
-                    OutlinedTextField(
+                    GoodsPocketInputField(
                         value = itemName,
                         onValueChange = { itemName = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text(tr(Res.string.field_item_name)) },
+                        label = tr(Res.string.field_item_name),
                     )
-                    OutlinedTextField(
+                    GoodsPocketInputField(
                         value = itemCategory,
                         onValueChange = { itemCategory = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text(tr(Res.string.field_category)) },
+                        label = tr(Res.string.field_category),
                     )
                     SubmitButton(
                         enabled = itemName.isNotBlank() && itemCategory.isNotBlank(),
@@ -92,23 +113,20 @@ fun QuickAddSheet(
                 }
 
                 QuickAddTarget.PREORDER -> {
-                    OutlinedTextField(
+                    GoodsPocketInputField(
                         value = preorderName,
                         onValueChange = { preorderName = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text(tr(Res.string.field_preorder_name)) },
+                        label = tr(Res.string.field_preorder_name),
                     )
-                    OutlinedTextField(
+                    GoodsPocketInputField(
                         value = preorderStore,
                         onValueChange = { preorderStore = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text(tr(Res.string.field_store)) },
+                        label = tr(Res.string.field_store),
                     )
-                    OutlinedTextField(
+                    GoodsPocketInputField(
                         value = preorderReleaseDate,
                         onValueChange = { preorderReleaseDate = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text(tr(Res.string.field_release_date)) },
+                        label = tr(Res.string.field_release_date),
                     )
                     SubmitButton(
                         enabled = preorderName.isNotBlank() && preorderStore.isNotBlank() && preorderReleaseDate.isNotBlank(),
@@ -117,22 +135,28 @@ fun QuickAddSheet(
                 }
 
                 QuickAddTarget.TRANSACTION -> {
-                    OutlinedTextField(
+                    GoodsPocketInputField(
                         value = transactionAmount,
                         onValueChange = { transactionAmount = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text(tr(Res.string.field_amount)) },
+                        label = tr(Res.string.field_amount),
                     )
-                    OutlinedTextField(
+                    GoodsPocketInputField(
                         value = transactionDate,
                         onValueChange = { transactionDate = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text(tr(Res.string.field_date)) },
+                        label = tr(Res.string.field_date),
                     )
-                    TransactionTypeSelector(
-                        selected = transactionType,
-                        onSelect = { transactionType = it },
-                    )
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        listOf(TransactionType.PURCHASE, TransactionType.DEPOSIT, TransactionType.BALANCE).forEach { type ->
+                            GoodsPocketFilterChip(
+                                selected = transactionType == type,
+                                onClick = { transactionType = type },
+                                label = type.localizedLabel(),
+                            )
+                        }
+                    }
                     SubmitButton(
                         enabled = transactionAmount.isNotBlank() && transactionDate.isNotBlank(),
                         onClick = { onSubmitTransaction(transactionAmount, transactionType, transactionDate) },
@@ -140,22 +164,28 @@ fun QuickAddSheet(
                 }
 
                 QuickAddTarget.EVENT -> {
-                    OutlinedTextField(
+                    GoodsPocketInputField(
                         value = eventTitle,
                         onValueChange = { eventTitle = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text(tr(Res.string.field_event_title)) },
+                        label = tr(Res.string.field_event_title),
                     )
-                    OutlinedTextField(
+                    GoodsPocketInputField(
                         value = eventDate,
                         onValueChange = { eventDate = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = { Text(tr(Res.string.field_target_date)) },
+                        label = tr(Res.string.field_target_date),
                     )
-                    EventTypeSelector(
-                        selected = eventType,
-                        onSelect = { eventType = it },
-                    )
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        listOf(EventType.RELEASE, EventType.PAYMENT_DUE, EventType.DELIVERY).forEach { type ->
+                            GoodsPocketFilterChip(
+                                selected = eventType == type,
+                                onClick = { eventType = type },
+                                label = type.localizedLabel(),
+                            )
+                        }
+                    }
                     SubmitButton(
                         enabled = eventTitle.isNotBlank() && eventDate.isNotBlank(),
                         onClick = { onSubmitEvent(eventTitle, eventDate, eventType) },
@@ -167,60 +197,20 @@ fun QuickAddSheet(
 }
 
 @Composable
-private fun TargetSelector(
-    selected: QuickAddTarget,
-    onTargetChange: (QuickAddTarget) -> Unit,
+private fun GoodsPocketInputField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
 ) {
-    Row(
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        QuickAddTarget.entries.forEach { target ->
-            FilterChip(
-                selected = target == selected,
-                onClick = { onTargetChange(target) },
-                label = { Text(target.localizedLabel()) },
-            )
-        }
-    }
-}
-
-@Composable
-private fun TransactionTypeSelector(
-    selected: TransactionType,
-    onSelect: (TransactionType) -> Unit,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        listOf(TransactionType.PURCHASE, TransactionType.DEPOSIT, TransactionType.BALANCE).forEach { type ->
-            FilterChip(
-                selected = selected == type,
-                onClick = { onSelect(type) },
-                label = { Text(type.localizedLabel()) },
-            )
-        }
-    }
-}
-
-@Composable
-private fun EventTypeSelector(
-    selected: EventType,
-    onSelect: (EventType) -> Unit,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        listOf(EventType.RELEASE, EventType.PAYMENT_DUE, EventType.DELIVERY).forEach { type ->
-            FilterChip(
-                selected = selected == type,
-                onClick = { onSelect(type) },
-                label = { Text(type.localizedLabel()) },
-            )
-        }
-    }
+        label = { Text(label) },
+        colors = goodsPocketOutlinedFieldColors(),
+        shape = MaterialTheme.shapes.medium,
+        singleLine = true,
+    )
 }
 
 @Composable
