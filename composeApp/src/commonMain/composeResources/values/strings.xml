@@ -3,6 +3,7 @@
     <string name="nav_home">홈</string>
     <string name="nav_collection">컬렉션</string>
     <string name="nav_preorders">예약</string>
+    <string name="nav_my">마이</string>
     <string name="nav_transactions">거래</string>
     <string name="nav_events">이벤트</string>
     <string name="nav_settings">설정</string>
@@ -55,6 +56,34 @@
 
     <string name="events_empty_filter">이 필터에 해당하는 일정이 없어요.</string>
     <string name="events_row_subtitle">%1$s · %2$s</string>
+
+    <string name="my_section_profile">프로필과 상태</string>
+    <string name="my_section_summary">내 요약</string>
+    <string name="my_section_tools">바로가기</string>
+    <string name="my_local_profile_label">로컬 프로필</string>
+    <string name="my_sync_not_connected">연결되지 않음</string>
+    <string name="my_notifications_enabled">알림 사용 중</string>
+    <string name="my_notifications_disabled">알림 꺼짐</string>
+    <string name="my_profile_hint">계정을 연결하지 않아도 로컬로 계속 사용할 수 있어요.</string>
+    <string name="my_summary_hint">보유 현황과 임박 일정을 한눈에 확인할 수 있어요.</string>
+    <string name="my_tools_hint">세부 화면과 개인 기능으로 바로 이동할 수 있어요.</string>
+    <string name="my_summary_owned_items">보유 굿즈</string>
+    <string name="my_summary_active_preorders">활성 예약</string>
+    <string name="my_summary_monthly_spend">이번 달 지출</string>
+    <string name="my_summary_upcoming_events">임박 일정</string>
+    <string name="my_utility_recent_activity">최근 활동</string>
+    <string name="my_utility_recent_activity_empty">최근 활동이 아직 없어요.</string>
+    <string name="my_utility_recent_activity_count">최근 활동 %1$s건</string>
+    <string name="my_utility_upcoming_events">다가오는 일정</string>
+    <string name="my_utility_upcoming_events_empty">예정된 일정이 없어요.</string>
+    <string name="my_utility_upcoming_events_count">임박한 일정 %1$s건</string>
+    <string name="my_utility_spending_report">지출 리포트</string>
+    <string name="my_utility_spending_report_subtitle">이번 달 지출 흐름을 확인할 수 있어요.</string>
+    <string name="my_utility_sync_backup">동기화 및 백업</string>
+    <string name="my_utility_sync_backup_subtitle">나중에 계정 연결과 백업을 설정할 수 있어요.</string>
+    <string name="my_utility_notifications">알림</string>
+    <string name="my_utility_settings">설정</string>
+    <string name="my_utility_settings_subtitle">앱 설정과 기본 시작 탭을 관리해요.</string>
 
     <string name="settings_app_preferences">앱 설정</string>
     <string name="settings_currency">통화: %1$s</string>

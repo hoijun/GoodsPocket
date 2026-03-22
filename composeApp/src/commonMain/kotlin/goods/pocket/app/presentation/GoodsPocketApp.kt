@@ -41,6 +41,7 @@ import goods.pocket.app.presentation.navigation.AppDestination
 import goods.pocket.app.presentation.screen.CollectionScreen
 import goods.pocket.app.presentation.screen.EventsScreen
 import goods.pocket.app.presentation.screen.HomeScreen
+import goods.pocket.app.presentation.screen.MyScreen
 import goods.pocket.app.presentation.screen.PreordersScreen
 import goods.pocket.app.presentation.screen.SettingsScreen
 import goods.pocket.app.presentation.screen.TransactionsScreen
@@ -75,13 +76,6 @@ fun GoodsPocketApp(
                             text = uiState.currentDestination.localizedLabel(),
                             fontWeight = FontWeight.SemiBold,
                         )
-                    },
-                    actions = {
-                        if (uiState.currentDestination != AppDestination.Settings) {
-                            TextButton(onClick = appStateHolder::openSettings) {
-                                Text(tr(Res.string.action_settings))
-                            }
-                        }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.surface,
@@ -173,12 +167,14 @@ private fun GoodsPocketNavHost(
                 onStatusChange = appStateHolder::updatePreorderStatusFilter,
                 onPreorderClick = appStateHolder::openPreorderDetail,
             )
-            AppDestination.My -> Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(uiState.currentDestination.label)
-            }
+            AppDestination.My -> MyScreen(
+                myPage = uiState.myPage,
+                recentActivities = uiState.homeSummary.recentActivities,
+                upcomingEvents = uiState.upcomingEvents,
+                onOpenTransactions = appStateHolder::openTransactionsOverview,
+                onOpenEvents = appStateHolder::openEventsOverview,
+                onOpenSettings = appStateHolder::openSettings,
+            )
             AppDestination.Transactions -> TransactionsScreen(
                 transactions = uiState.transactions,
                 selectedType = uiState.transactionTypeFilter,

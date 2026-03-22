@@ -58,6 +58,17 @@ class GoodsPocketAppStateHolderTest {
     }
 
     @Test
+    fun `my screen can open settings without using the global app bar action`() {
+        val stateHolder = newStateHolder()
+
+        stateHolder.selectDestination(AppDestination.My)
+        stateHolder.openSettings()
+
+        assertEquals(AppDestination.Settings, stateHolder.state.value.currentDestination)
+        assertEquals(AppDestination.My, stateHolder.state.value.selectedPrimaryDestination)
+    }
+
+    @Test
     fun `reload exposes my page summary from existing app state`() {
         val stateHolder = newStateHolder()
 

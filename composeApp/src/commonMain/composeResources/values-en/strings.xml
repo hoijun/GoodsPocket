@@ -3,6 +3,7 @@
     <string name="nav_home">Home</string>
     <string name="nav_collection">Collection</string>
     <string name="nav_preorders">Preorders</string>
+    <string name="nav_my">My</string>
     <string name="nav_transactions">Transactions</string>
     <string name="nav_events">Events</string>
     <string name="nav_settings">Settings</string>
@@ -55,6 +56,34 @@
 
     <string name="events_empty_filter">No events for this filter.</string>
     <string name="events_row_subtitle">%1$s · %2$s</string>
+
+    <string name="my_section_profile">Profile &amp; status</string>
+    <string name="my_section_summary">My summary</string>
+    <string name="my_section_tools">Quick links</string>
+    <string name="my_local_profile_label">Local Profile</string>
+    <string name="my_sync_not_connected">Not connected</string>
+    <string name="my_notifications_enabled">Notifications on</string>
+    <string name="my_notifications_disabled">Notifications off</string>
+    <string name="my_profile_hint">You can keep using the app locally without connecting an account.</string>
+    <string name="my_summary_hint">Review your collection status and due-soon events at a glance.</string>
+    <string name="my_tools_hint">Jump to detailed views and personal utilities.</string>
+    <string name="my_summary_owned_items">Owned items</string>
+    <string name="my_summary_active_preorders">Active preorders</string>
+    <string name="my_summary_monthly_spend">Monthly spend</string>
+    <string name="my_summary_upcoming_events">Due soon</string>
+    <string name="my_utility_recent_activity">Recent activity</string>
+    <string name="my_utility_recent_activity_empty">No recent activity yet.</string>
+    <string name="my_utility_recent_activity_count">%1$s recent activities</string>
+    <string name="my_utility_upcoming_events">Upcoming events</string>
+    <string name="my_utility_upcoming_events_empty">No scheduled events yet.</string>
+    <string name="my_utility_upcoming_events_count">%1$s events due soon</string>
+    <string name="my_utility_spending_report">Spending report</string>
+    <string name="my_utility_spending_report_subtitle">Review this month's spending flow.</string>
+    <string name="my_utility_sync_backup">Sync &amp; backup</string>
+    <string name="my_utility_sync_backup_subtitle">You can connect an account or set up backup later.</string>
+    <string name="my_utility_notifications">Notifications</string>
+    <string name="my_utility_settings">Settings</string>
+    <string name="my_utility_settings_subtitle">Manage app settings and the default start tab.</string>
 
     <string name="settings_app_preferences">App Preferences</string>
     <string name="settings_currency">Currency: %1$s</string>

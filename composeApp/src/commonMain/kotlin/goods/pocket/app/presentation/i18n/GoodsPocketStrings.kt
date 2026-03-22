@@ -63,7 +63,7 @@ fun AppDestination.localizedLabel(): String {
         AppDestination.Home -> tr(Res.string.nav_home)
         AppDestination.Collection -> tr(Res.string.nav_collection)
         AppDestination.Preorders -> tr(Res.string.nav_preorders)
-        AppDestination.My -> label
+        AppDestination.My -> tr(Res.string.nav_my)
         AppDestination.Transactions -> tr(Res.string.nav_transactions)
         AppDestination.Events -> tr(Res.string.nav_events)
         AppDestination.Settings -> tr(Res.string.nav_settings)
