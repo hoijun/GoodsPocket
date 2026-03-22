@@ -1,15 +1,13 @@
 package goods.pocket.app.presentation.component
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -27,6 +25,26 @@ import goods.pocket.app.domain.model.Item
 import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.Transaction
 import goods.pocket.app.domain.model.TransactionType
+import goods.pocket.app.presentation.designsystem.GoodsPocketFilterChip
+import goods.pocket.app.presentation.designsystem.goodsPocketOutlinedFieldColors
+import goods.pocket.app.presentation.i18n.localizedLabel
+import goods.pocket.app.presentation.i18n.tr
+import goodspocket.composeapp.generated.resources.Res
+import goodspocket.composeapp.generated.resources.action_save_changes
+import goodspocket.composeapp.generated.resources.editor_event_title
+import goodspocket.composeapp.generated.resources.editor_item_title
+import goodspocket.composeapp.generated.resources.editor_preorder_title
+import goodspocket.composeapp.generated.resources.editor_transaction_title
+import goodspocket.composeapp.generated.resources.field_amount
+import goodspocket.composeapp.generated.resources.field_category
+import goodspocket.composeapp.generated.resources.field_character
+import goodspocket.composeapp.generated.resources.field_date
+import goodspocket.composeapp.generated.resources.field_name
+import goodspocket.composeapp.generated.resources.field_release_date
+import goodspocket.composeapp.generated.resources.field_series
+import goodspocket.composeapp.generated.resources.field_store
+import goodspocket.composeapp.generated.resources.field_target_date
+import goodspocket.composeapp.generated.resources.field_title
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,12 +59,12 @@ fun ItemEditorSheet(
     var characterName by remember(item.id) { mutableStateOf(item.characterName.orEmpty()) }
     var purchaseStore by remember(item.id) { mutableStateOf(item.purchaseStore.orEmpty()) }
 
-    EditorSheetContainer(title = "Edit Item", onDismiss = onDismiss) {
-        OutlinedTextField(value = name, onValueChange = { name = it }, modifier = Modifier.fillMaxWidth(), label = { Text("Name") })
-        OutlinedTextField(value = category, onValueChange = { category = it }, modifier = Modifier.fillMaxWidth(), label = { Text("Category") })
-        OutlinedTextField(value = seriesName, onValueChange = { seriesName = it }, modifier = Modifier.fillMaxWidth(), label = { Text("Series") })
-        OutlinedTextField(value = characterName, onValueChange = { characterName = it }, modifier = Modifier.fillMaxWidth(), label = { Text("Character") })
-        OutlinedTextField(value = purchaseStore, onValueChange = { purchaseStore = it }, modifier = Modifier.fillMaxWidth(), label = { Text("Store") })
+    EditorSheetContainer(title = tr(Res.string.editor_item_title), onDismiss = onDismiss) {
+        GoodsPocketEditorField(name, { name = it }, tr(Res.string.field_name))
+        GoodsPocketEditorField(category, { category = it }, tr(Res.string.field_category))
+        GoodsPocketEditorField(seriesName, { seriesName = it }, tr(Res.string.field_series))
+        GoodsPocketEditorField(characterName, { characterName = it }, tr(Res.string.field_character))
+        GoodsPocketEditorField(purchaseStore, { purchaseStore = it }, tr(Res.string.field_store))
         SaveButton(enabled = name.isNotBlank() && category.isNotBlank()) {
             onSave(name, category, seriesName, characterName, purchaseStore)
         }
@@ -64,10 +82,10 @@ fun PreorderEditorSheet(
     var storeName by remember(preorder.id) { mutableStateOf(preorder.storeName) }
     var releaseDate by remember(preorder.id) { mutableStateOf(preorder.releaseDate) }
 
-    EditorSheetContainer(title = "Edit Preorder", onDismiss = onDismiss) {
-        OutlinedTextField(value = name, onValueChange = { name = it }, modifier = Modifier.fillMaxWidth(), label = { Text("Name") })
-        OutlinedTextField(value = storeName, onValueChange = { storeName = it }, modifier = Modifier.fillMaxWidth(), label = { Text("Store") })
-        OutlinedTextField(value = releaseDate, onValueChange = { releaseDate = it }, modifier = Modifier.fillMaxWidth(), label = { Text("Release date") })
+    EditorSheetContainer(title = tr(Res.string.editor_preorder_title), onDismiss = onDismiss) {
+        GoodsPocketEditorField(name, { name = it }, tr(Res.string.field_name))
+        GoodsPocketEditorField(storeName, { storeName = it }, tr(Res.string.field_store))
+        GoodsPocketEditorField(releaseDate, { releaseDate = it }, tr(Res.string.field_release_date))
         SaveButton(enabled = name.isNotBlank() && storeName.isNotBlank() && releaseDate.isNotBlank()) {
             onSave(name, storeName, releaseDate)
         }
@@ -85,10 +103,21 @@ fun TransactionEditorSheet(
     var transactionDate by remember(transaction.id) { mutableStateOf(transaction.transactionDate) }
     var transactionType by remember(transaction.id) { mutableStateOf(transaction.type) }
 
-    EditorSheetContainer(title = "Edit Transaction", onDismiss = onDismiss) {
-        OutlinedTextField(value = amount, onValueChange = { amount = it }, modifier = Modifier.fillMaxWidth(), label = { Text("Amount") })
-        OutlinedTextField(value = transactionDate, onValueChange = { transactionDate = it }, modifier = Modifier.fillMaxWidth(), label = { Text("Date") })
-        TransactionTypeSelector(selected = transactionType, onSelect = { transactionType = it })
+    EditorSheetContainer(title = tr(Res.string.editor_transaction_title), onDismiss = onDismiss) {
+        GoodsPocketEditorField(amount, { amount = it }, tr(Res.string.field_amount))
+        GoodsPocketEditorField(transactionDate, { transactionDate = it }, tr(Res.string.field_date))
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            listOf(TransactionType.PURCHASE, TransactionType.DEPOSIT, TransactionType.BALANCE).forEach { type ->
+                GoodsPocketFilterChip(
+                    selected = transactionType == type,
+                    onClick = { transactionType = type },
+                    label = type.localizedLabel(),
+                )
+            }
+        }
         SaveButton(enabled = amount.isNotBlank() && transactionDate.isNotBlank()) {
             onSave(amount, transactionType, transactionDate)
         }
@@ -106,10 +135,21 @@ fun EventEditorSheet(
     var targetDate by remember(event.id) { mutableStateOf(event.targetDate) }
     var eventType by remember(event.id) { mutableStateOf(event.eventType) }
 
-    EditorSheetContainer(title = "Edit Event", onDismiss = onDismiss) {
-        OutlinedTextField(value = title, onValueChange = { title = it }, modifier = Modifier.fillMaxWidth(), label = { Text("Title") })
-        OutlinedTextField(value = targetDate, onValueChange = { targetDate = it }, modifier = Modifier.fillMaxWidth(), label = { Text("Target date") })
-        EventTypeSelector(selected = eventType, onSelect = { eventType = it })
+    EditorSheetContainer(title = tr(Res.string.editor_event_title), onDismiss = onDismiss) {
+        GoodsPocketEditorField(title, { title = it }, tr(Res.string.field_title))
+        GoodsPocketEditorField(targetDate, { targetDate = it }, tr(Res.string.field_target_date))
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            listOf(EventType.RELEASE, EventType.PAYMENT_DUE, EventType.DELIVERY).forEach { type ->
+                GoodsPocketFilterChip(
+                    selected = eventType == type,
+                    onClick = { eventType = type },
+                    label = type.localizedLabel(),
+                )
+            }
+        }
         SaveButton(enabled = title.isNotBlank() && targetDate.isNotBlank()) {
             onSave(title, targetDate, eventType)
         }
@@ -123,8 +163,12 @@ private fun EditorSheetContainer(
     onDismiss: () -> Unit,
     content: @Composable () -> Unit,
 ) {
-    ModalBottomSheet(onDismissRequest = onDismiss) {
-        Column(
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surface,
+        tonalElevation = 4.dp,
+    ) {
+        androidx.compose.foundation.layout.Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 12.dp)
@@ -138,6 +182,23 @@ private fun EditorSheetContainer(
 }
 
 @Composable
+private fun GoodsPocketEditorField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = Modifier.fillMaxWidth(),
+        label = { Text(label) },
+        colors = goodsPocketOutlinedFieldColors(),
+        shape = MaterialTheme.shapes.medium,
+        singleLine = true,
+    )
+}
+
+@Composable
 private fun SaveButton(
     enabled: Boolean,
     onClick: () -> Unit,
@@ -147,44 +208,6 @@ private fun SaveButton(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Text("Save Changes")
-    }
-}
-
-@Composable
-private fun TransactionTypeSelector(
-    selected: TransactionType,
-    onSelect: (TransactionType) -> Unit,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        listOf(TransactionType.PURCHASE, TransactionType.DEPOSIT, TransactionType.BALANCE).forEach { type ->
-            FilterChip(
-                selected = selected == type,
-                onClick = { onSelect(type) },
-                label = { Text(type.name) },
-            )
-        }
-    }
-}
-
-@Composable
-private fun EventTypeSelector(
-    selected: EventType,
-    onSelect: (EventType) -> Unit,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        listOf(EventType.RELEASE, EventType.PAYMENT_DUE, EventType.DELIVERY).forEach { type ->
-            FilterChip(
-                selected = selected == type,
-                onClick = { onSelect(type) },
-                label = { Text(type.name) },
-            )
-        }
+        Text(tr(Res.string.action_save_changes))
     }
 }

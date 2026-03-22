@@ -2,6 +2,7 @@ package goods.pocket.app.presentation.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -11,6 +12,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -21,6 +23,36 @@ import goods.pocket.app.domain.model.Item
 import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.PreorderStatus
 import goods.pocket.app.domain.model.Transaction
+import goods.pocket.app.presentation.i18n.formatCurrency
+import goods.pocket.app.presentation.i18n.localizedLabel
+import goods.pocket.app.presentation.i18n.tr
+import goodspocket.composeapp.generated.resources.Res
+import goodspocket.composeapp.generated.resources.action_cancel_preorder
+import goodspocket.composeapp.generated.resources.action_delete
+import goodspocket.composeapp.generated.resources.action_edit
+import goodspocket.composeapp.generated.resources.action_mark_received
+import goodspocket.composeapp.generated.resources.common_none
+import goodspocket.composeapp.generated.resources.common_not_set
+import goodspocket.composeapp.generated.resources.common_unknown
+import goodspocket.composeapp.generated.resources.detail_category
+import goodspocket.composeapp.generated.resources.detail_character
+import goodspocket.composeapp.generated.resources.detail_date
+import goodspocket.composeapp.generated.resources.detail_deposit
+import goodspocket.composeapp.generated.resources.detail_linked_preorder
+import goodspocket.composeapp.generated.resources.detail_linked_transactions
+import goodspocket.composeapp.generated.resources.detail_location
+import goodspocket.composeapp.generated.resources.detail_no_linked_transactions
+import goodspocket.composeapp.generated.resources.detail_place
+import goodspocket.composeapp.generated.resources.detail_related_item
+import goodspocket.composeapp.generated.resources.detail_related_preorder
+import goodspocket.composeapp.generated.resources.detail_release_date
+import goodspocket.composeapp.generated.resources.detail_remaining
+import goodspocket.composeapp.generated.resources.detail_reservation_number
+import goodspocket.composeapp.generated.resources.detail_series
+import goodspocket.composeapp.generated.resources.detail_status
+import goodspocket.composeapp.generated.resources.detail_store
+import goodspocket.composeapp.generated.resources.detail_target_date
+import goodspocket.composeapp.generated.resources.detail_type
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,29 +67,37 @@ fun ItemDetailSheet(
         title = item.name,
         onDismiss = onDismiss,
     ) {
-        DetailLine("Category", item.category)
-        DetailLine("Status", item.status.name)
-        DetailLine("Series", item.seriesName ?: "Unknown")
-        DetailLine("Character", item.characterName ?: "Unknown")
-        DetailLine("Store", item.purchaseStore ?: "Unknown")
-        DetailLine("Linked preorder", item.linkedPreorderId ?: "None")
+        DetailLine(tr(Res.string.detail_category), item.category)
+        DetailLine(tr(Res.string.detail_status), item.status.localizedLabel())
+        DetailLine(tr(Res.string.detail_series), item.seriesName ?: tr(Res.string.common_unknown))
+        DetailLine(tr(Res.string.detail_character), item.characterName ?: tr(Res.string.common_unknown))
+        DetailLine(tr(Res.string.detail_store), item.purchaseStore ?: tr(Res.string.common_unknown))
+        DetailLine(tr(Res.string.detail_linked_preorder), item.linkedPreorderId ?: tr(Res.string.common_none))
         Text(
-            text = "Linked transactions",
-            style = MaterialTheme.typography.titleMedium,
+            text = tr(Res.string.detail_linked_transactions),
+            style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.SemiBold,
         )
         if (linkedTransactions.isEmpty()) {
-            Text("No linked transactions yet.")
+            Text(
+                text = tr(Res.string.detail_no_linked_transactions),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         } else {
             linkedTransactions.forEach { transaction ->
-                Text("${transaction.transactionDate} · ${transaction.type} · ${transaction.amount} KRW")
+                DetailLine(
+                    label = transaction.type.localizedLabel(),
+                    value = "${transaction.transactionDate} · ${formatCurrency(transaction.amount)}",
+                )
             }
         }
         SheetActionRow(
-            primaryLabel = "Edit",
+            primaryLabel = tr(Res.string.action_edit),
             onPrimary = onEdit,
-            secondaryLabel = "Delete",
+            secondaryLabel = tr(Res.string.action_delete),
             onSecondary = onDelete,
+            destructive = true,
         )
     }
 }
@@ -75,25 +115,26 @@ fun PreorderDetailSheet(
         title = preorder.name,
         onDismiss = onDismiss,
     ) {
-        DetailLine("Store", preorder.storeName)
-        DetailLine("Release date", preorder.releaseDate)
-        DetailLine("Status", preorder.status.name)
-        DetailLine("Deposit", "${preorder.depositPrice ?: 0} KRW")
-        DetailLine("Remaining", "${preorder.remainingPrice ?: 0} KRW")
-        DetailLine("Reservation no.", preorder.reservationNumber ?: "Not set")
+        DetailLine(tr(Res.string.detail_store), preorder.storeName)
+        DetailLine(tr(Res.string.detail_release_date), preorder.releaseDate)
+        DetailLine(tr(Res.string.detail_status), preorder.status.localizedLabel())
+        DetailLine(tr(Res.string.detail_deposit), formatCurrency(preorder.depositPrice ?: 0))
+        DetailLine(tr(Res.string.detail_remaining), formatCurrency(preorder.remainingPrice ?: 0))
+        DetailLine(tr(Res.string.detail_reservation_number), preorder.reservationNumber ?: tr(Res.string.common_not_set))
         if (preorder.status != PreorderStatus.RECEIVED && preorder.status != PreorderStatus.CANCELED) {
             Button(
                 onClick = onMarkReceived,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Mark As Received")
+                Text(tr(Res.string.action_mark_received))
             }
         }
         SheetActionRow(
-            primaryLabel = "Edit",
+            primaryLabel = tr(Res.string.action_edit),
             onPrimary = onEdit,
-            secondaryLabel = "Cancel Preorder",
+            secondaryLabel = tr(Res.string.action_cancel_preorder),
             onSecondary = onCancel,
+            destructive = true,
         )
     }
 }
@@ -107,19 +148,20 @@ fun TransactionDetailSheet(
     onDelete: () -> Unit,
 ) {
     DetailSheetContainer(
-        title = "${transaction.amount} KRW",
+        title = formatCurrency(transaction.amount),
         onDismiss = onDismiss,
     ) {
-        DetailLine("Type", transaction.type.name)
-        DetailLine("Date", transaction.transactionDate)
-        DetailLine("Place", transaction.placeName ?: "Unknown")
-        DetailLine("Related item", transaction.relatedItemId ?: "None")
-        DetailLine("Related preorder", transaction.relatedPreorderId ?: "None")
+        DetailLine(tr(Res.string.detail_type), transaction.type.localizedLabel())
+        DetailLine(tr(Res.string.detail_date), transaction.transactionDate)
+        DetailLine(tr(Res.string.detail_place), transaction.placeName ?: tr(Res.string.common_unknown))
+        DetailLine(tr(Res.string.detail_related_item), transaction.relatedItemId ?: tr(Res.string.common_none))
+        DetailLine(tr(Res.string.detail_related_preorder), transaction.relatedPreorderId ?: tr(Res.string.common_none))
         SheetActionRow(
-            primaryLabel = "Edit",
+            primaryLabel = tr(Res.string.action_edit),
             onPrimary = onEdit,
-            secondaryLabel = "Delete",
+            secondaryLabel = tr(Res.string.action_delete),
             onSecondary = onDelete,
+            destructive = true,
         )
     }
 }
@@ -136,16 +178,17 @@ fun EventDetailSheet(
         title = event.title,
         onDismiss = onDismiss,
     ) {
-        DetailLine("Type", event.eventType.name)
-        DetailLine("Target date", event.targetDate)
-        DetailLine("Linked preorder", event.relatedPreorderId ?: "None")
-        DetailLine("Linked item", event.relatedItemId ?: "None")
-        DetailLine("Location", event.locationOrStore ?: "Unknown")
+        DetailLine(tr(Res.string.detail_type), event.eventType.localizedLabel())
+        DetailLine(tr(Res.string.detail_target_date), event.targetDate)
+        DetailLine(tr(Res.string.detail_related_preorder), event.relatedPreorderId ?: tr(Res.string.common_none))
+        DetailLine(tr(Res.string.detail_related_item), event.relatedItemId ?: tr(Res.string.common_none))
+        DetailLine(tr(Res.string.detail_location), event.locationOrStore ?: tr(Res.string.common_unknown))
         SheetActionRow(
-            primaryLabel = "Edit",
+            primaryLabel = tr(Res.string.action_edit),
             onPrimary = onEdit,
-            secondaryLabel = "Delete",
+            secondaryLabel = tr(Res.string.action_delete),
             onSecondary = onDelete,
+            destructive = true,
         )
     }
 }
@@ -159,13 +202,15 @@ private fun DetailSheetContainer(
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surface,
+        tonalElevation = 4.dp,
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 12.dp)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             Text(
                 text = title,
@@ -182,16 +227,25 @@ private fun DetailLine(
     label: String,
     value: String,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.primary,
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyLarge,
-        )
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyLarge,
+            )
+        }
     }
 }
 
@@ -201,6 +255,7 @@ private fun SheetActionRow(
     onPrimary: () -> Unit,
     secondaryLabel: String,
     onSecondary: () -> Unit,
+    destructive: Boolean,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -216,7 +271,10 @@ private fun SheetActionRow(
             onClick = onSecondary,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text(secondaryLabel)
+            Text(
+                text = secondaryLabel,
+                color = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+            )
         }
     }
 }
