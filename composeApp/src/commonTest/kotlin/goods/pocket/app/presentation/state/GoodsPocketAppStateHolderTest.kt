@@ -104,6 +104,19 @@ class GoodsPocketAppStateHolderTest {
     }
 
     @Test
+    fun `home and my still provide access to secondary screens`() {
+        val stateHolder = newStateHolder()
+
+        stateHolder.openTransactionsOverview()
+        assertEquals(AppDestination.Transactions, stateHolder.state.value.currentDestination)
+
+        stateHolder.selectDestination(AppDestination.My)
+        stateHolder.openEventsOverview()
+        assertEquals(AppDestination.Events, stateHolder.state.value.currentDestination)
+        assertEquals(AppDestination.My, stateHolder.state.value.selectedPrimaryDestination)
+    }
+
+    @Test
     fun quickAddItemUpdatesCollectionAndDashboard() {
         val stateHolder = newStateHolder()
         val before = stateHolder.state.value
