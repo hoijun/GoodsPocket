@@ -1,0 +1,239 @@
+CREATE TABLE items (
+  id TEXT NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL,
+  category TEXT NOT NULL,
+  status TEXT NOT NULL,
+  series_name TEXT,
+  character_name TEXT,
+  quantity INTEGER NOT NULL DEFAULT 1,
+  purchase_price INTEGER,
+  purchase_date TEXT,
+  purchase_store TEXT,
+  storage_location_id TEXT,
+  linked_preorder_id TEXT,
+  note TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE preorders (
+  id TEXT NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL,
+  store_name TEXT NOT NULL,
+  release_date TEXT NOT NULL,
+  status TEXT NOT NULL,
+  series_name TEXT,
+  character_name TEXT,
+  total_price INTEGER,
+  deposit_price INTEGER,
+  remaining_price INTEGER,
+  shipping_fee INTEGER,
+  order_date TEXT,
+  payment_due_date TEXT,
+  receive_date TEXT,
+  reservation_number TEXT,
+  note TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE transactions (
+  id TEXT NOT NULL PRIMARY KEY,
+  type TEXT NOT NULL,
+  amount INTEGER NOT NULL,
+  transaction_date TEXT NOT NULL,
+  related_item_id TEXT,
+  related_preorder_id TEXT,
+  payment_method TEXT,
+  place_name TEXT,
+  note TEXT,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE events (
+  id TEXT NOT NULL PRIMARY KEY,
+  title TEXT NOT NULL,
+  event_type TEXT NOT NULL,
+  target_date TEXT NOT NULL,
+  related_item_id TEXT,
+  related_preorder_id TEXT,
+  location_or_store TEXT,
+  memo TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE storage_locations (
+  id TEXT NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL,
+  parent_id TEXT,
+  memo TEXT,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE app_preferences (
+  id TEXT NOT NULL PRIMARY KEY,
+  currency_code TEXT NOT NULL,
+  date_format TEXT NOT NULL,
+  start_tab_route TEXT NOT NULL,
+  language_code TEXT NOT NULL
+);
+
+selectAllItems:
+SELECT * FROM items
+ORDER BY updated_at DESC, created_at DESC;
+
+selectItemsByFilter:
+SELECT * FROM items
+WHERE :filter IS NULL
+   OR :filter = ''
+   OR LOWER(name) LIKE '%' || LOWER(:filter) || '%'
+   OR LOWER(COALESCE(series_name, '')) LIKE '%' || LOWER(:filter) || '%'
+ORDER BY updated_at DESC, created_at DESC;
+
+selectItemById:
+SELECT * FROM items
+WHERE id = ?;
+
+upsertItem:
+INSERT OR REPLACE INTO items (
+  id, name, category, status, series_name, character_name, quantity, purchase_price,
+  purchase_date, purchase_store, storage_location_id, linked_preorder_id, note, created_at, updated_at
+) VALUES (
+  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+);
+
+deleteItemById:
+DELETE FROM items
+WHERE id = ?;
+
+selectItemTransactions:
+SELECT * FROM transactions
+WHERE related_item_id = ?
+ORDER BY transaction_date DESC, created_at DESC;
+
+countOwnedItems:
+SELECT COUNT(*) FROM items
+WHERE status = 'OWNED';
+
+selectAllPreorders:
+SELECT * FROM preorders
+ORDER BY release_date ASC, updated_at DESC;
+
+selectPreordersByStatus:
+SELECT * FROM preorders
+WHERE status = ?
+ORDER BY release_date ASC, updated_at DESC;
+
+selectPreorderById:
+SELECT * FROM preorders
+WHERE id = ?;
+
+upsertPreorder:
+INSERT OR REPLACE INTO preorders (
+  id, name, store_name, release_date, status, series_name, character_name, total_price,
+  deposit_price, remaining_price, shipping_fee, order_date, payment_due_date, receive_date,
+  reservation_number, note, created_at, updated_at
+) VALUES (
+  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+);
+
+markPreorderReceived:
+UPDATE preorders
+SET status = 'RECEIVED',
+    receive_date = ?,
+    updated_at = ?
+WHERE id = ?;
+
+cancelPreorder:
+UPDATE preorders
+SET status = 'CANCELED',
+    updated_at = ?
+WHERE id = ?;
+
+countActivePreorders:
+SELECT COUNT(*) FROM preorders
+WHERE status IN ('ACTIVE', 'PAYMENT_PENDING');
+
+selectAllTransactions:
+SELECT * FROM transactions
+ORDER BY transaction_date DESC, created_at DESC;
+
+selectTransactionsByMonth:
+SELECT * FROM transactions
+WHERE transaction_date LIKE ? || '%'
+ORDER BY transaction_date DESC, created_at DESC;
+
+selectTransactionsByItemId:
+SELECT * FROM transactions
+WHERE related_item_id = ?
+ORDER BY transaction_date DESC, created_at DESC;
+
+monthlySummary:
+SELECT COALESCE(SUM(amount), 0) FROM transactions
+WHERE transaction_date LIKE ? || '%'
+  AND type NOT IN ('REFUND', 'TRANSFER_INCOME');
+
+upsertTransaction:
+INSERT OR REPLACE INTO transactions (
+  id, type, amount, transaction_date, related_item_id, related_preorder_id,
+  payment_method, place_name, note, created_at
+) VALUES (
+  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+);
+
+deleteTransactionById:
+DELETE FROM transactions
+WHERE id = ?;
+
+selectAllEvents:
+SELECT * FROM events
+ORDER BY target_date ASC, updated_at DESC;
+
+selectEventsByType:
+SELECT * FROM events
+WHERE event_type = ?
+ORDER BY target_date ASC, updated_at DESC;
+
+selectUpcomingEvents:
+SELECT * FROM events
+ORDER BY target_date ASC, updated_at DESC
+LIMIT ?;
+
+upsertEvent:
+INSERT OR REPLACE INTO events (
+  id, title, event_type, target_date, related_item_id, related_preorder_id,
+  location_or_store, memo, created_at, updated_at
+) VALUES (
+  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+);
+
+deleteEventById:
+DELETE FROM events
+WHERE id = ?;
+
+selectAllStorageLocations:
+SELECT * FROM storage_locations
+ORDER BY name ASC;
+
+upsertStorageLocation:
+INSERT OR REPLACE INTO storage_locations (
+  id, name, parent_id, memo, created_at
+) VALUES (
+  ?, ?, ?, ?, ?
+);
+
+deleteStorageLocationById:
+DELETE FROM storage_locations
+WHERE id = ?;
+
+selectAppPreferences:
+SELECT * FROM app_preferences
+WHERE id = 'default';
+
+upsertAppPreferences:
+INSERT OR REPLACE INTO app_preferences (id, currency_code, date_format, start_tab_route, language_code)
+VALUES ('default', ?, ?, ?, ?);
+
+deleteAllAppPreferences:
+DELETE FROM app_preferences;

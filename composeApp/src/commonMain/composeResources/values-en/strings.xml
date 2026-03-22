@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nav_home">Home</string>
+    <string name="nav_collection">Collection</string>
+    <string name="nav_preorders">Preorders</string>
+    <string name="nav_transactions">Transactions</string>
+    <string name="nav_events">Events</string>
+    <string name="nav_settings">Settings</string>
+
+    <string name="action_back">Back</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_confirm">Confirm</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_save">Save</string>
+    <string name="action_save_changes">Save Changes</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_mark_received">Mark as Received</string>
+    <string name="action_cancel_preorder">Cancel Preorder</string>
+
+    <string name="common_all">All</string>
+    <string name="common_unknown">Unknown</string>
+    <string name="common_none">None</string>
+    <string name="common_not_set">Not set</string>
+    <string name="common_no_place">No place</string>
+    <string name="common_no_linked_place">No linked place</string>
+
+    <string name="home_monthly_overview">Monthly overview</string>
+    <string name="home_monthly_summary_hint">Tap to inspect the current month summary.</string>
+    <string name="home_stat_owned">Owned</string>
+    <string name="home_stat_active_preorder">Active preorder</string>
+    <string name="home_stat_recent">Recent</string>
+    <string name="home_upcoming">Upcoming</string>
+    <string name="home_upcoming_subtitle">Tap any event to inspect its detail.</string>
+    <string name="home_no_upcoming_events">No upcoming events yet.</string>
+    <string name="home_recent_activity">Recent activity</string>
+    <string name="home_recent_activity_subtitle">Tap any activity to continue where you left off.</string>
+    <string name="home_no_recent_activity">No recent activity yet.</string>
+
+    <string name="collection_search_label">Search collection</string>
+    <string name="collection_search_placeholder">Name or series</string>
+    <string name="collection_empty_search">No collection items match this search.</string>
+    <string name="collection_series_category">%1$s · %2$s</string>
+    <string name="collection_status_qty">Status: %1$s / Qty: %2$s</string>
+
+    <string name="preorders_status_filter">Status filter</string>
+    <string name="preorders_empty_filter">No preorders in this status.</string>
+    <string name="preorders_store_release">%1$s · release %2$s</string>
+    <string name="preorders_status_remaining">Status: %1$s / Remaining: %2$s</string>
+
+    <string name="transactions_month_summary">Month Summary</string>
+    <string name="transactions_visible_total">Visible total: %1$s</string>
+    <string name="transactions_empty_filter">No transactions for this filter.</string>
+    <string name="transactions_row_subtitle">%1$s · %2$s</string>
+
+    <string name="events_empty_filter">No events for this filter.</string>
+    <string name="events_row_subtitle">%1$s · %2$s</string>
+
+    <string name="settings_app_preferences">App Preferences</string>
+    <string name="settings_currency">Currency: %1$s</string>
+    <string name="settings_date_format">Date format: %1$s</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_korean">Korean</string>
+    <string name="settings_language_english">English</string>
+    <string name="settings_default_start_tab">Default start tab</string>
+    <string name="settings_storage_presets">Storage presets</string>
+    <string name="settings_storage_preset_fallback">Reusable storage location preset</string>
+
+    <string name="quick_add_title">Quick Add</string>
+    <string name="field_item_name">Item name</string>
+    <string name="field_preorder_name">Preorder name</string>
+    <string name="field_event_title">Event title</string>
+    <string name="field_category">Category</string>
+    <string name="field_store">Store</string>
+    <string name="field_release_date">Release date</string>
+    <string name="field_amount">Amount</string>
+    <string name="field_date">Date</string>
+    <string name="field_target_date">Target date</string>
+    <string name="field_name">Name</string>
+    <string name="field_series">Series</string>
+    <string name="field_character">Character</string>
+    <string name="field_title">Title</string>
+
+    <string name="editor_item_title">Edit Item</string>
+    <string name="editor_preorder_title">Edit Preorder</string>
+    <string name="editor_transaction_title">Edit Transaction</string>
+    <string name="editor_event_title">Edit Event</string>
+
+    <string name="detail_category">Category</string>
+    <string name="detail_status">Status</string>
+    <string name="detail_series">Series</string>
+    <string name="detail_character">Character</string>
+    <string name="detail_store">Store</string>
+    <string name="detail_linked_preorder">Linked preorder</string>
+    <string name="detail_linked_transactions">Linked transactions</string>
+    <string name="detail_no_linked_transactions">No linked transactions yet.</string>
+    <string name="detail_release_date">Release date</string>
+    <string name="detail_deposit">Deposit</string>
+    <string name="detail_remaining">Remaining</string>
+    <string name="detail_reservation_number">Reservation no.</string>
+    <string name="detail_type">Type</string>
+    <string name="detail_date">Date</string>
+    <string name="detail_place">Place</string>
+    <string name="detail_related_item">Related item</string>
+    <string name="detail_related_preorder">Related preorder</string>
+    <string name="detail_target_date">Target date</string>
+    <string name="detail_location">Location</string>
+
+    <string name="dialog_delete_item_title">Delete item?</string>
+    <string name="dialog_delete_item_body_linked">This item has %1$s linked transactions. Delete anyway?</string>
+    <string name="dialog_delete_item_body">This action permanently removes the item from your collection.</string>
+    <string name="dialog_cancel_preorder_title">Cancel preorder?</string>
+    <string name="dialog_cancel_preorder_body">The preorder status will change to canceled and remain in the preorder list.</string>
+    <string name="dialog_delete_transaction_title">Delete transaction?</string>
+    <string name="dialog_delete_transaction_body">This action permanently removes the transaction record.</string>
+    <string name="dialog_delete_event_title">Delete event?</string>
+    <string name="dialog_delete_event_body">This action permanently removes the event.</string>
+
+    <string name="target_item">Item</string>
+    <string name="target_preorder">Preorder</string>
+    <string name="target_transaction">Transaction</string>
+    <string name="target_event">Event</string>
+
+    <string name="item_status_owned">Owned</string>
+    <string name="item_status_waiting_delivery">Waiting Delivery</string>
+    <string name="item_status_planned_transfer">Planned Transfer</string>
+    <string name="item_status_lost">Lost</string>
+
+    <string name="preorder_status_active">Active</string>
+    <string name="preorder_status_payment_pending">Payment Pending</string>
+    <string name="preorder_status_received">Received</string>
+    <string name="preorder_status_canceled">Canceled</string>
+
+    <string name="transaction_type_deposit">Deposit</string>
+    <string name="transaction_type_balance">Balance</string>
+    <string name="transaction_type_purchase">Purchase</string>
+    <string name="transaction_type_shipping">Shipping</string>
+    <string name="transaction_type_refund">Refund</string>
+    <string name="transaction_type_transfer_income">Transfer Income</string>
+
+    <string name="event_type_release">Release</string>
+    <string name="event_type_payment_due">Payment Due</string>
+    <string name="event_type_delivery">Delivery</string>
+    <string name="event_type_offline_event">Offline Event</string>
+</resources>

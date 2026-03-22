@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nav_home">홈</string>
+    <string name="nav_collection">컬렉션</string>
+    <string name="nav_preorders">예약</string>
+    <string name="nav_transactions">거래</string>
+    <string name="nav_events">이벤트</string>
+    <string name="nav_settings">설정</string>
+
+    <string name="action_back">뒤로</string>
+    <string name="action_settings">설정</string>
+    <string name="action_confirm">확인</string>
+    <string name="action_cancel">취소</string>
+    <string name="action_save">저장</string>
+    <string name="action_save_changes">변경 저장</string>
+    <string name="action_edit">수정</string>
+    <string name="action_delete">삭제</string>
+    <string name="action_mark_received">수령 완료 처리</string>
+    <string name="action_cancel_preorder">예약 취소</string>
+
+    <string name="common_all">전체</string>
+    <string name="common_unknown">알 수 없음</string>
+    <string name="common_none">없음</string>
+    <string name="common_not_set">미설정</string>
+    <string name="common_no_place">장소 없음</string>
+    <string name="common_no_linked_place">연결된 장소 없음</string>
+
+    <string name="home_monthly_overview">이번 달 요약</string>
+    <string name="home_monthly_summary_hint">이번 달 요약을 확인하려면 탭하세요.</string>
+    <string name="home_stat_owned">보유</string>
+    <string name="home_stat_active_preorder">활성 예약</string>
+    <string name="home_stat_recent">최근</string>
+    <string name="home_upcoming">다가오는 일정</string>
+    <string name="home_upcoming_subtitle">이벤트를 탭하면 상세를 볼 수 있어요.</string>
+    <string name="home_no_upcoming_events">다가오는 일정이 아직 없어요.</string>
+    <string name="home_recent_activity">최근 활동</string>
+    <string name="home_recent_activity_subtitle">활동을 탭하면 이어서 확인할 수 있어요.</string>
+    <string name="home_no_recent_activity">최근 활동이 아직 없어요.</string>
+
+    <string name="collection_search_label">컬렉션 검색</string>
+    <string name="collection_search_placeholder">이름 또는 시리즈</string>
+    <string name="collection_empty_search">검색과 일치하는 컬렉션이 없어요.</string>
+    <string name="collection_series_category">%1$s · %2$s</string>
+    <string name="collection_status_qty">상태: %1$s / 수량: %2$s</string>
+
+    <string name="preorders_status_filter">상태 필터</string>
+    <string name="preorders_empty_filter">이 상태의 예약이 없어요.</string>
+    <string name="preorders_store_release">%1$s · 발매 %2$s</string>
+    <string name="preorders_status_remaining">상태: %1$s / 잔액: %2$s</string>
+
+    <string name="transactions_month_summary">이번 달 요약</string>
+    <string name="transactions_visible_total">표시 합계: %1$s</string>
+    <string name="transactions_empty_filter">이 필터에 해당하는 거래가 없어요.</string>
+    <string name="transactions_row_subtitle">%1$s · %2$s</string>
+
+    <string name="events_empty_filter">이 필터에 해당하는 일정이 없어요.</string>
+    <string name="events_row_subtitle">%1$s · %2$s</string>
+
+    <string name="settings_app_preferences">앱 설정</string>
+    <string name="settings_currency">통화: %1$s</string>
+    <string name="settings_date_format">날짜 형식: %1$s</string>
+    <string name="settings_language">언어</string>
+    <string name="settings_language_korean">한국어</string>
+    <string name="settings_language_english">영어</string>
+    <string name="settings_default_start_tab">기본 시작 탭</string>
+    <string name="settings_storage_presets">보관 위치 프리셋</string>
+    <string name="settings_storage_preset_fallback">재사용 가능한 보관 위치 프리셋</string>
+
+    <string name="quick_add_title">빠른 추가</string>
+    <string name="field_item_name">굿즈 이름</string>
+    <string name="field_preorder_name">예약 이름</string>
+    <string name="field_event_title">이벤트 제목</string>
+    <string name="field_category">카테고리</string>
+    <string name="field_store">스토어</string>
+    <string name="field_release_date">발매일</string>
+    <string name="field_amount">금액</string>
+    <string name="field_date">날짜</string>
+    <string name="field_target_date">목표 날짜</string>
+    <string name="field_name">이름</string>
+    <string name="field_series">시리즈</string>
+    <string name="field_character">캐릭터</string>
+    <string name="field_title">제목</string>
+
+    <string name="editor_item_title">굿즈 수정</string>
+    <string name="editor_preorder_title">예약 수정</string>
+    <string name="editor_transaction_title">거래 수정</string>
+    <string name="editor_event_title">이벤트 수정</string>
+
+    <string name="detail_category">카테고리</string>
+    <string name="detail_status">상태</string>
+    <string name="detail_series">시리즈</string>
+    <string name="detail_character">캐릭터</string>
+    <string name="detail_store">스토어</string>
+    <string name="detail_linked_preorder">연결된 예약</string>
+    <string name="detail_linked_transactions">연결된 거래</string>
+    <string name="detail_no_linked_transactions">연결된 거래가 아직 없어요.</string>
+    <string name="detail_release_date">발매일</string>
+    <string name="detail_deposit">예약금</string>
+    <string name="detail_remaining">잔액</string>
+    <string name="detail_reservation_number">예약 번호</string>
+    <string name="detail_type">유형</string>
+    <string name="detail_date">날짜</string>
+    <string name="detail_place">장소</string>
+    <string name="detail_related_item">연결된 굿즈</string>
+    <string name="detail_related_preorder">연결된 예약</string>
+    <string name="detail_target_date">목표 날짜</string>
+    <string name="detail_location">위치</string>
+
+    <string name="dialog_delete_item_title">굿즈를 삭제할까요?</string>
+    <string name="dialog_delete_item_body_linked">이 굿즈에는 연결된 거래가 %1$s건 있어요. 그래도 삭제할까요?</string>
+    <string name="dialog_delete_item_body">이 작업은 컬렉션에서 굿즈를 영구적으로 삭제합니다.</string>
+    <string name="dialog_cancel_preorder_title">예약을 취소할까요?</string>
+    <string name="dialog_cancel_preorder_body">예약 상태가 취소로 변경되고 예약 목록에는 남아 있어요.</string>
+    <string name="dialog_delete_transaction_title">거래를 삭제할까요?</string>
+    <string name="dialog_delete_transaction_body">이 작업은 거래 기록을 영구적으로 삭제합니다.</string>
+    <string name="dialog_delete_event_title">이벤트를 삭제할까요?</string>
+    <string name="dialog_delete_event_body">이 작업은 이벤트를 영구적으로 삭제합니다.</string>
+
+    <string name="target_item">굿즈</string>
+    <string name="target_preorder">예약</string>
+    <string name="target_transaction">거래</string>
+    <string name="target_event">이벤트</string>
+
+    <string name="item_status_owned">보유 중</string>
+    <string name="item_status_waiting_delivery">배송 대기</string>
+    <string name="item_status_planned_transfer">양도 예정</string>
+    <string name="item_status_lost">분실</string>
+
+    <string name="preorder_status_active">진행 중</string>
+    <string name="preorder_status_payment_pending">잔금 대기</string>
+    <string name="preorder_status_received">수령 완료</string>
+    <string name="preorder_status_canceled">취소됨</string>
+
+    <string name="transaction_type_deposit">예약금</string>
+    <string name="transaction_type_balance">잔금</string>
+    <string name="transaction_type_purchase">구매</string>
+    <string name="transaction_type_shipping">배송비</string>
+    <string name="transaction_type_refund">환불</string>
+    <string name="transaction_type_transfer_income">양도 수입</string>
+
+    <string name="event_type_release">발매</string>
+    <string name="event_type_payment_due">결제 마감</string>
+    <string name="event_type_delivery">배송</string>
+    <string name="event_type_offline_event">오프라인 행사</string>
+</resources>
