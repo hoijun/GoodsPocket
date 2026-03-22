@@ -173,6 +173,12 @@ private fun GoodsPocketNavHost(
                 onStatusChange = appStateHolder::updatePreorderStatusFilter,
                 onPreorderClick = appStateHolder::openPreorderDetail,
             )
+            AppDestination.My -> Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(uiState.currentDestination.label)
+            }
             AppDestination.Transactions -> TransactionsScreen(
                 transactions = uiState.transactions,
                 selectedType = uiState.transactionTypeFilter,

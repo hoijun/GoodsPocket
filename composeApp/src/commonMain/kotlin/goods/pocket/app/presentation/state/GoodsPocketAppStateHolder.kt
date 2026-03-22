@@ -6,6 +6,7 @@ import goods.pocket.app.domain.model.Item
 import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.PreorderStatus
+import goods.pocket.app.domain.model.AppPreference
 import goods.pocket.app.domain.model.Transaction
 import goods.pocket.app.domain.model.TransactionType
 import goods.pocket.app.domain.usecase.CancelPreorderUseCase
@@ -129,7 +130,10 @@ class GoodsPocketAppStateHolder(
                 _state.update { current ->
                     current.copy(
                         currentDestination = AppDestination.Transactions,
-                        selectedPrimaryDestination = AppDestination.Transactions,
+                        selectedPrimaryDestination = selectedPrimaryDestinationFor(
+                            destination = AppDestination.Transactions,
+                            fallback = current.selectedPrimaryDestination,
+                        ),
                         activeDetail = ActiveDetail.TransactionDetail(activityId),
                     )
                 }
@@ -501,7 +505,10 @@ class GoodsPocketAppStateHolder(
                     current.copy(
                         pendingDelete = null,
                         currentDestination = AppDestination.Transactions,
-                        selectedPrimaryDestination = AppDestination.Transactions,
+                        selectedPrimaryDestination = selectedPrimaryDestinationFor(
+                            destination = AppDestination.Transactions,
+                            fallback = current.selectedPrimaryDestination,
+                        ),
                     )
                 }
             }
@@ -558,7 +565,11 @@ class GoodsPocketAppStateHolder(
 
     private fun reload() {
         val recentActivities = getRecentActivitiesUseCase(limit = 5)
-        val appPreferences = getAppPreferencesUseCase()
+        val storedAppPreferences = getAppPreferencesUseCase()
+        val appPreferences = migrateLegacyStartTabPreference(storedAppPreferences)
+        if (appPreferences != storedAppPreferences) {
+            updateAppPreferencesUseCase(appPreferences)
+        }
         _state.update { current ->
             val initialDestination = primaryDestinationForRoute(appPreferences.startTabRoute)
             val shouldRedirectFromEmptyHome =
@@ -620,6 +631,20 @@ class GoodsPocketAppStateHolder(
         fallback: AppDestination,
     ): AppDestination {
         return AppDestination.primaryDestinations.firstOrNull { it.route == destination.route } ?: fallback
+    }
+
+    private fun migrateLegacyStartTabPreference(
+        appPreference: AppPreference,
+    ): AppPreference {
+        val migratedStartTabRoute = when (appPreference.startTabRoute) {
+            AppDestination.Transactions.route -> AppDestination.Home.route
+            else -> appPreference.startTabRoute
+        }
+        return if (migratedStartTabRoute == appPreference.startTabRoute) {
+            appPreference
+        } else {
+            appPreference.copy(startTabRoute = migratedStartTabRoute)
+        }
     }
 
     companion object {

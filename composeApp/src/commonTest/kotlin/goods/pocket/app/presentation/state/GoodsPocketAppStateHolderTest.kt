@@ -1,6 +1,7 @@
 package goods.pocket.app.presentation.state
 
 import goods.pocket.app.data.InMemoryGoodsPocketRepository
+import goods.pocket.app.domain.model.AppPreference
 import goods.pocket.app.presentation.navigation.AppDestination
 import goods.pocket.app.domain.model.PreorderStatus
 import goods.pocket.app.domain.usecase.CancelPreorderUseCase
@@ -29,6 +30,31 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class GoodsPocketAppStateHolderTest {
+
+    @Test
+    fun `primary destinations expose my instead of transactions`() {
+        assertEquals(
+            listOf(
+                AppDestination.Home,
+                AppDestination.Collection,
+                AppDestination.Preorders,
+                AppDestination.My,
+            ),
+            AppDestination.primaryDestinations,
+        )
+    }
+
+    @Test
+    fun `closing settings always returns to my after opening from my`() {
+        val stateHolder = newStateHolder()
+
+        stateHolder.selectDestination(AppDestination.My)
+        stateHolder.openSettings()
+        stateHolder.closeSettings()
+
+        assertEquals(AppDestination.My, stateHolder.state.value.currentDestination)
+        assertEquals(AppDestination.My, stateHolder.state.value.selectedPrimaryDestination)
+    }
 
     @Test
     fun quickAddItemUpdatesCollectionAndDashboard() {
@@ -139,11 +165,29 @@ class GoodsPocketAppStateHolderTest {
     fun startTabPreferenceUpdatesCurrentDestination() {
         val stateHolder = newStateHolder()
 
-        stateHolder.updateStartTab("transaction/list")
+        stateHolder.updateStartTab("my")
 
         val state = stateHolder.state.value
-        assertEquals("transaction/list", state.appPreferences.startTabRoute)
-        assertEquals("transaction/list", state.currentDestination.route)
+        assertEquals("my", state.appPreferences.startTabRoute)
+        assertEquals("my", state.currentDestination.route)
+    }
+
+    @Test
+    fun legacyTransactionStartTabIsRewrittenToHomeOnInit() {
+        val repository = InMemoryGoodsPocketRepository()
+        UpdateAppPreferencesUseCase(repository)(
+            AppPreference(startTabRoute = AppDestination.Transactions.route),
+        )
+
+        val stateHolder = newStateHolder(repository)
+        val state = stateHolder.state.value
+
+        assertEquals(AppDestination.Home.route, state.appPreferences.startTabRoute)
+        assertEquals(AppDestination.Home.route, state.currentDestination.route)
+        assertEquals(
+            AppDestination.Home.route,
+            GetAppPreferencesUseCase(repository)().startTabRoute,
+        )
     }
 
     @Test
@@ -160,8 +204,9 @@ class GoodsPocketAppStateHolderTest {
         assertTrue(after.collectionItems.any { it.linkedPreorderId == "pre-1" })
     }
 
-    private fun newStateHolder(): GoodsPocketAppStateHolder {
-        val repository = InMemoryGoodsPocketRepository()
+    private fun newStateHolder(
+        repository: InMemoryGoodsPocketRepository = InMemoryGoodsPocketRepository(),
+    ): GoodsPocketAppStateHolder {
         return GoodsPocketAppStateHolder(
             getCollectionItemsUseCase = GetCollectionItemsUseCase(repository),
             getAppPreferencesUseCase = GetAppPreferencesUseCase(repository),

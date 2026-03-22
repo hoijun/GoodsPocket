@@ -7,6 +7,7 @@ sealed class AppDestination(
     data object Home : AppDestination("home", "Home")
     data object Collection : AppDestination("collection/list", "Collection")
     data object Preorders : AppDestination("preorder/list", "Preorders")
+    data object My : AppDestination("my", "My")
     data object Transactions : AppDestination("transaction/list", "Transactions")
     data object Events : AppDestination("event/list", "Events")
     data object Settings : AppDestination("settings", "Settings")
@@ -17,11 +18,12 @@ sealed class AppDestination(
                 Home,
                 Collection,
                 Preorders,
-                Transactions,
+                My,
             )
 
         val allDestinations: List<AppDestination>
             get() = primaryDestinations + listOf(
+                Transactions,
                 Events,
                 Settings,
             )
