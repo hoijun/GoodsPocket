@@ -2,8 +2,9 @@ package goods.pocket.app.presentation.state
 
 import goods.pocket.app.data.InMemoryGoodsPocketRepository
 import goods.pocket.app.domain.model.AppPreference
-import goods.pocket.app.presentation.navigation.AppDestination
+import goods.pocket.app.domain.model.EventType
 import goods.pocket.app.domain.model.PreorderStatus
+import goods.pocket.app.presentation.navigation.AppDestination
 import goods.pocket.app.domain.usecase.CancelPreorderUseCase
 import goods.pocket.app.domain.usecase.DeleteCollectionItemUseCase
 import goods.pocket.app.domain.usecase.DeleteEventUseCase
@@ -54,6 +55,41 @@ class GoodsPocketAppStateHolderTest {
 
         assertEquals(AppDestination.My, stateHolder.state.value.currentDestination)
         assertEquals(AppDestination.My, stateHolder.state.value.selectedPrimaryDestination)
+    }
+
+    @Test
+    fun `reload exposes my page summary from existing app state`() {
+        val stateHolder = newStateHolder()
+
+        val myPage = stateHolder.state.value.myPage
+
+        assertEquals("Local Profile", myPage.displayName)
+        assertEquals("Not connected", myPage.syncStatusLabel)
+        assertTrue(myPage.notificationsEnabled)
+        assertEquals(2, myPage.ownedItemCount)
+        assertEquals(2, myPage.activePreorderCount)
+        assertEquals(60_000L, myPage.monthlySpend)
+        assertEquals(3, myPage.upcomingEventCount)
+    }
+
+    @Test
+    fun `my page upcoming count is not capped by preview limit`() {
+        val stateHolder = newStateHolder()
+
+        stateHolder.submitEvent(
+            title = "Extra delivery 1",
+            targetDate = "2026-03-28",
+            eventType = EventType.DELIVERY,
+        )
+        stateHolder.submitEvent(
+            title = "Extra delivery 2",
+            targetDate = "2026-03-29",
+            eventType = EventType.DELIVERY,
+        )
+
+        val state = stateHolder.state.value
+        assertEquals(3, state.upcomingEvents.size)
+        assertEquals(5, state.myPage.upcomingEventCount)
     }
 
     @Test

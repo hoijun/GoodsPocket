@@ -2,6 +2,7 @@ package goods.pocket.app.presentation.state
 
 import goods.pocket.app.domain.model.Event
 import goods.pocket.app.domain.model.EventType
+import goods.pocket.app.domain.model.HomeSummary
 import goods.pocket.app.domain.model.Item
 import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.Preorder
@@ -567,6 +568,11 @@ class GoodsPocketAppStateHolder(
         val recentActivities = getRecentActivitiesUseCase(limit = 5)
         val storedAppPreferences = getAppPreferencesUseCase()
         val appPreferences = migrateLegacyStartTabPreference(storedAppPreferences)
+        val homeSummary = getDashboardSummaryUseCase(
+            monthFilter = CURRENT_MONTH,
+            recentActivities = recentActivities,
+        )
+        val allUpcomingEvents = getUpcomingEventsUseCase(limit = Int.MAX_VALUE)
         if (appPreferences != storedAppPreferences) {
             updateAppPreferencesUseCase(appPreferences)
         }
@@ -584,11 +590,12 @@ class GoodsPocketAppStateHolder(
                 current.currentDestination
             }
             current.copy(
-                homeSummary = getDashboardSummaryUseCase(
-                    monthFilter = CURRENT_MONTH,
-                    recentActivities = recentActivities,
+                myPage = homeSummary.toMyPageUiModel(
+                    upcomingEventCount = allUpcomingEvents.size,
+                    appPreferences = appPreferences,
                 ),
-                upcomingEvents = getUpcomingEventsUseCase(limit = 3),
+                homeSummary = homeSummary,
+                upcomingEvents = allUpcomingEvents.take(UPCOMING_EVENT_PREVIEW_LIMIT),
                 collectionItems = getCollectionItemsUseCase(current.collectionQuery),
                 preorders = getPreorderListUseCase(current.preorderStatusFilter),
                 transactions = getMonthlyTransactionsUseCase(CURRENT_MONTH)
@@ -647,8 +654,22 @@ class GoodsPocketAppStateHolder(
         }
     }
 
+    private fun HomeSummary.toMyPageUiModel(
+        upcomingEventCount: Int,
+        appPreferences: AppPreference,
+    ): MyPageUiModel {
+        return MyPageUiModel(
+            notificationsEnabled = appPreferences.languageCode.isNotBlank(),
+            ownedItemCount = ownedItemCount,
+            activePreorderCount = activePreorderCount,
+            monthlySpend = monthlySpend,
+            upcomingEventCount = upcomingEventCount,
+        )
+    }
+
     companion object {
         const val CURRENT_DATE = "2026-03-15"
         const val CURRENT_MONTH = "2026-03"
+        private const val UPCOMING_EVENT_PREVIEW_LIMIT = 3
     }
 }

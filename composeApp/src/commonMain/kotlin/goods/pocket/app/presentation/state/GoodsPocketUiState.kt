@@ -15,6 +15,7 @@ import goods.pocket.app.presentation.navigation.AppDestination
 data class GoodsPocketUiState(
     val currentDestination: AppDestination = AppDestination.Home,
     val selectedPrimaryDestination: AppDestination = AppDestination.Home,
+    val myPage: MyPageUiModel = MyPageUiModel(),
     val collectionQuery: String = "",
     val preorderStatusFilter: PreorderStatus? = null,
     val transactionTypeFilter: TransactionType? = null,
