@@ -2,6 +2,13 @@ This is a Kotlin Multiplatform project targeting Android, iOS.
 
 Project documents used as implementation references are in [docs/README.md](./docs/README.md).
 
+### Current App Navigation
+
+- Bottom tabs: `Home`, `Collection`, `Preorders`, `My`
+- Secondary screens: `Transactions`, `Events`
+- `Settings` is nested under `My` and is no longer exposed as a global app-bar action
+- Detail and edit flows are primarily presented as bottom sheets instead of standalone pages
+
 * [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
   It contains several subfolders:
   - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
