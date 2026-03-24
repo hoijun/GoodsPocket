@@ -8,13 +8,21 @@ import goods.pocket.app.domain.model.TransactionType
 import goods.pocket.app.domain.repository.CollectionRepository
 import goods.pocket.app.domain.repository.PreorderRepository
 import goods.pocket.app.domain.repository.TransactionRepository
+import goods.pocket.app.i18n.DEFAULT_LANGUAGE_CODE
+import goods.pocket.app.i18n.localizedReceivedItemCategory
 
 class MarkPreorderReceivedUseCase(
     private val preorderRepository: PreorderRepository,
     private val collectionRepository: CollectionRepository,
     private val transactionRepository: TransactionRepository,
 ) {
-    operator fun invoke(preorderId: String, receiveDate: String, newItemId: String, transactionId: String) {
+    operator fun invoke(
+        preorderId: String,
+        receiveDate: String,
+        newItemId: String,
+        transactionId: String,
+        languageCode: String = DEFAULT_LANGUAGE_CODE,
+    ) {
         val preorder = preorderRepository.getPreorder(preorderId) ?: return
         if (preorder.status == PreorderStatus.RECEIVED || preorder.status == PreorderStatus.CANCELED) return
 
@@ -24,7 +32,7 @@ class MarkPreorderReceivedUseCase(
             Item(
                 id = newItemId,
                 name = preorder.name,
-                category = "Preorder Item",
+                category = localizedReceivedItemCategory(languageCode),
                 status = ItemStatus.OWNED,
                 seriesName = preorder.seriesName,
                 characterName = preorder.characterName,

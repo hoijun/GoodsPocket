@@ -9,13 +9,18 @@ import kotlin.test.assertTrue
 class GoodsPocketVisualContractTest {
 
     @Test
-    fun `stitch palette tokens stay aligned with the approved light theme`() {
-        assertEquals(0xFFF6FAFBL, GoodsPocketVisualTokens.Background)
+    fun `design md palette tokens stay aligned with the approved light theme`() {
+        assertEquals(0xFFFFF9FCL, GoodsPocketVisualTokens.Background)
         assertEquals(0xFFFFFFFFL, GoodsPocketVisualTokens.Surface)
-        assertEquals(0xFFEFF5F6L, GoodsPocketVisualTokens.SurfaceLow)
-        assertEquals(0xFF1E6876L, GoodsPocketVisualTokens.Primary)
-        assertEquals(0xFF2A3437L, GoodsPocketVisualTokens.Ink)
-        assertEquals(0xFFA83836L, GoodsPocketVisualTokens.Danger)
+        assertEquals(0xFFF8F2F7L, GoodsPocketVisualTokens.SurfaceLow)
+        assertEquals(0xFFEDE6EEL, GoodsPocketVisualTokens.SurfaceHigh)
+        assertEquals(0xFFF26CA7L, GoodsPocketVisualTokens.Primary)
+        assertEquals(0xFF87DCCBL, GoodsPocketVisualTokens.Secondary)
+        assertEquals(0xFFFFD46FL, GoodsPocketVisualTokens.Tertiary)
+        assertEquals(0xFF2B2530L, GoodsPocketVisualTokens.Ink)
+        assertEquals(0xFF665D6DL, GoodsPocketVisualTokens.MutedInk)
+        assertEquals(0xFFE2D5E3L, GoodsPocketVisualTokens.Outline)
+        assertEquals(0xFFE07A94L, GoodsPocketVisualTokens.Danger)
     }
 
     @Test

@@ -2,12 +2,10 @@ package goods.pocket.app.presentation.state
 
 import goods.pocket.app.domain.model.Event
 import goods.pocket.app.domain.model.EventType
-import goods.pocket.app.domain.model.HomeSummary
 import goods.pocket.app.domain.model.Item
 import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.PreorderStatus
-import goods.pocket.app.domain.model.AppPreference
 import goods.pocket.app.domain.model.Transaction
 import goods.pocket.app.domain.model.TransactionType
 import goods.pocket.app.domain.usecase.CancelPreorderUseCase
@@ -536,6 +534,7 @@ class GoodsPocketAppStateHolder(
             receiveDate = CURRENT_DATE,
             newItemId = newItemId,
             transactionId = generateId("tx"),
+            languageCode = _state.value.appPreferences.languageCode,
         )
         reload()
         _state.update { current ->
@@ -565,106 +564,25 @@ class GoodsPocketAppStateHolder(
     }
 
     private fun reload() {
-        val recentActivities = getRecentActivitiesUseCase(limit = 5)
-        val storedAppPreferences = getAppPreferencesUseCase()
-        val appPreferences = migrateLegacyStartTabPreference(storedAppPreferences)
-        val homeSummary = getDashboardSummaryUseCase(
-            monthFilter = CURRENT_MONTH,
-            recentActivities = recentActivities,
+        reloadState(
+            state = _state,
+            getCollectionItemsUseCase = getCollectionItemsUseCase,
+            getAppPreferencesUseCase = getAppPreferencesUseCase,
+            getDashboardSummaryUseCase = getDashboardSummaryUseCase,
+            getEventListUseCase = getEventListUseCase,
+            getMonthlyTransactionsUseCase = getMonthlyTransactionsUseCase,
+            getPreorderListUseCase = getPreorderListUseCase,
+            getRecentActivitiesUseCase = getRecentActivitiesUseCase,
+            getStorageLocationsUseCase = getStorageLocationsUseCase,
+            getUpcomingEventsUseCase = getUpcomingEventsUseCase,
+            updateAppPreferencesUseCase = updateAppPreferencesUseCase,
+            currentMonth = CURRENT_MONTH,
+            upcomingEventPreviewLimit = UPCOMING_EVENT_PREVIEW_LIMIT,
         )
-        val allUpcomingEvents = getUpcomingEventsUseCase(limit = Int.MAX_VALUE)
-        if (appPreferences != storedAppPreferences) {
-            updateAppPreferencesUseCase(appPreferences)
-        }
-        _state.update { current ->
-            val initialDestination = primaryDestinationForRoute(appPreferences.startTabRoute)
-            val shouldRedirectFromEmptyHome =
-                current.currentDestination == AppDestination.Home &&
-                    current.collectionItems.isEmpty() &&
-                    current.preorders.isEmpty() &&
-                    current.transactions.isEmpty() &&
-                    current.events.isEmpty()
-            val nextDestination = if (shouldRedirectFromEmptyHome) {
-                initialDestination
-            } else {
-                current.currentDestination
-            }
-            current.copy(
-                myPage = homeSummary.toMyPageUiModel(
-                    upcomingEventCount = allUpcomingEvents.size,
-                    appPreferences = appPreferences,
-                ),
-                homeSummary = homeSummary,
-                upcomingEvents = allUpcomingEvents.take(UPCOMING_EVENT_PREVIEW_LIMIT),
-                collectionItems = getCollectionItemsUseCase(current.collectionQuery),
-                preorders = getPreorderListUseCase(current.preorderStatusFilter),
-                transactions = getMonthlyTransactionsUseCase(CURRENT_MONTH)
-                    .filter { current.transactionTypeFilter == null || it.type == current.transactionTypeFilter },
-                events = getEventListUseCase(current.eventTypeFilter),
-                storageLocations = getStorageLocationsUseCase(),
-                appPreferences = appPreferences,
-                currentDestination = nextDestination,
-                selectedPrimaryDestination = selectedPrimaryDestinationFor(
-                    destination = nextDestination,
-                    fallback = current.selectedPrimaryDestination,
-                ),
-                collectionQuery = current.collectionQuery,
-                preorderStatusFilter = current.preorderStatusFilter,
-                transactionTypeFilter = current.transactionTypeFilter,
-                eventTypeFilter = current.eventTypeFilter,
-                isQuickAddOpen = current.isQuickAddOpen,
-                quickAddTarget = current.quickAddTarget,
-                activeDetail = current.activeDetail,
-                activeEditor = current.activeEditor,
-                pendingDelete = current.pendingDelete,
-            )
-        }
     }
 
     private fun generateId(prefix: String): String {
         return "$prefix-${Random.nextInt(100_000, 999_999)}"
-    }
-
-    private fun destinationForRoute(route: String): AppDestination {
-        return AppDestination.allDestinations.firstOrNull { it.route == route } ?: AppDestination.Home
-    }
-
-    private fun primaryDestinationForRoute(route: String): AppDestination {
-        return AppDestination.primaryDestinations.firstOrNull { it.route == route } ?: AppDestination.Home
-    }
-
-    private fun selectedPrimaryDestinationFor(
-        destination: AppDestination,
-        fallback: AppDestination,
-    ): AppDestination {
-        return AppDestination.primaryDestinations.firstOrNull { it.route == destination.route } ?: fallback
-    }
-
-    private fun migrateLegacyStartTabPreference(
-        appPreference: AppPreference,
-    ): AppPreference {
-        val migratedStartTabRoute = when (appPreference.startTabRoute) {
-            AppDestination.Transactions.route -> AppDestination.Home.route
-            else -> appPreference.startTabRoute
-        }
-        return if (migratedStartTabRoute == appPreference.startTabRoute) {
-            appPreference
-        } else {
-            appPreference.copy(startTabRoute = migratedStartTabRoute)
-        }
-    }
-
-    private fun HomeSummary.toMyPageUiModel(
-        upcomingEventCount: Int,
-        appPreferences: AppPreference,
-    ): MyPageUiModel {
-        return MyPageUiModel(
-            notificationsEnabled = appPreferences.languageCode.isNotBlank(),
-            ownedItemCount = ownedItemCount,
-            activePreorderCount = activePreorderCount,
-            monthlySpend = monthlySpend,
-            upcomingEventCount = upcomingEventCount,
-        )
     }
 
     companion object {

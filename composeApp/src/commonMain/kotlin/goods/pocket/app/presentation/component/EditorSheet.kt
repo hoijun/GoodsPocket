@@ -165,17 +165,20 @@ private fun EditorSheetContainer(
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = MaterialTheme.colorScheme.surface,
-        tonalElevation = 4.dp,
+        containerColor = MaterialTheme.colorScheme.background,
+        tonalElevation = 0.dp,
     ) {
         androidx.compose.foundation.layout.Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 12.dp)
+                .padding(horizontal = 18.dp, vertical = 10.dp)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            Text(text = title, style = MaterialTheme.typography.titleLarge)
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+            )
             content()
         }
     }
@@ -193,7 +196,7 @@ private fun GoodsPocketEditorField(
         modifier = Modifier.fillMaxWidth(),
         label = { Text(label) },
         colors = goodsPocketOutlinedFieldColors(),
-        shape = MaterialTheme.shapes.medium,
+        shape = MaterialTheme.shapes.small,
         singleLine = true,
     )
 }

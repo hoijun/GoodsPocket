@@ -17,6 +17,8 @@ import goods.pocket.app.domain.model.StorageLocation
 import goods.pocket.app.presentation.designsystem.GoodsPocketFilterChip
 import goods.pocket.app.presentation.designsystem.GoodsPocketListRow
 import goods.pocket.app.presentation.designsystem.GoodsPocketSectionCard
+import goods.pocket.app.presentation.designsystem.GoodsPocketSectionHeader
+import goods.pocket.app.presentation.designsystem.goodsPocketScreenModifier
 import goods.pocket.app.presentation.i18n.AppLanguage
 import goods.pocket.app.presentation.i18n.localizedLabel
 import goods.pocket.app.presentation.i18n.tr
@@ -40,15 +42,14 @@ fun SettingsScreen(
     onLanguageChange: (String) -> Unit,
 ) {
     LazyColumn(
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+        modifier = goodsPocketScreenModifier(),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {
             GoodsPocketSectionCard(containerColor = MaterialTheme.colorScheme.surface) {
-                Text(
-                    text = tr(Res.string.settings_app_preferences),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
+                GoodsPocketSectionHeader(
+                    title = tr(Res.string.settings_app_preferences),
+                    subtitle = tr(Res.string.settings_default_start_tab),
                 )
                 Text(
                     text = tr(Res.string.settings_currency, appPreferences.currencyCode),
@@ -98,17 +99,18 @@ fun SettingsScreen(
             }
         }
         item {
-            Text(
-                text = tr(Res.string.settings_storage_presets),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
-        }
-        items(storageLocations, key = StorageLocation::id) { location ->
-            GoodsPocketListRow(
-                title = location.name,
-                subtitle = location.memo ?: tr(Res.string.settings_storage_preset_fallback),
-            )
+            GoodsPocketSectionCard(containerColor = MaterialTheme.colorScheme.surface) {
+                GoodsPocketSectionHeader(
+                    title = tr(Res.string.settings_storage_presets),
+                    subtitle = tr(Res.string.settings_storage_preset_fallback),
+                )
+                storageLocations.forEach { location ->
+                    GoodsPocketListRow(
+                        title = location.name,
+                        subtitle = location.memo ?: tr(Res.string.settings_storage_preset_fallback),
+                    )
+                }
+            }
         }
     }
 }

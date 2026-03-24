@@ -1,21 +1,25 @@
 package goods.pocket.app.presentation.component
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import goods.pocket.app.domain.model.Event
@@ -23,6 +27,7 @@ import goods.pocket.app.domain.model.Item
 import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.PreorderStatus
 import goods.pocket.app.domain.model.Transaction
+import goods.pocket.app.presentation.designsystem.GoodsPocketTonalBadge
 import goods.pocket.app.presentation.i18n.formatCurrency
 import goods.pocket.app.presentation.i18n.localizedLabel
 import goods.pocket.app.presentation.i18n.tr
@@ -67,6 +72,7 @@ fun ItemDetailSheet(
         title = item.name,
         onDismiss = onDismiss,
     ) {
+        ItemDetailHero(item = item)
         DetailLine(tr(Res.string.detail_category), item.category)
         DetailLine(tr(Res.string.detail_status), item.status.localizedLabel())
         DetailLine(tr(Res.string.detail_series), item.seriesName ?: tr(Res.string.common_unknown))
@@ -86,10 +92,7 @@ fun ItemDetailSheet(
             )
         } else {
             linkedTransactions.forEach { transaction ->
-                DetailLine(
-                    label = transaction.type.localizedLabel(),
-                    value = "${transaction.transactionDate} · ${formatCurrency(transaction.amount)}",
-                )
+                LinkedTransactionRow(transaction)
             }
         }
         SheetActionRow(
@@ -99,6 +102,74 @@ fun ItemDetailSheet(
             onSecondary = onDelete,
             destructive = true,
         )
+    }
+}
+
+@Composable
+private fun ItemDetailHero(
+    item: Item,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Surface(
+            modifier = Modifier.size(112.dp),
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.surfaceContainerLow,
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Text(
+                    text = item.name.take(1),
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+        }
+        GoodsPocketTonalBadge(
+            text = item.status.localizedLabel(),
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        )
+    }
+}
+
+@Composable
+private fun LinkedTransactionRow(
+    transaction: Transaction,
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.small,
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    text = transaction.type.localizedLabel(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    text = transaction.transactionDate,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Text(
+                text = formatCurrency(transaction.amount),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
     }
 }
 
@@ -202,20 +273,20 @@ private fun DetailSheetContainer(
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        containerColor = MaterialTheme.colorScheme.surface,
-        tonalElevation = 4.dp,
+        containerColor = MaterialTheme.colorScheme.background,
+        tonalElevation = 0.dp,
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 12.dp)
+                .padding(horizontal = 18.dp, vertical = 10.dp)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.SemiBold,
             )
             content()
         }
@@ -239,7 +310,7 @@ private fun DetailLine(
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
                 text = value,
@@ -267,7 +338,7 @@ private fun SheetActionRow(
         ) {
             Text(primaryLabel)
         }
-        OutlinedButton(
+        TextButton(
             onClick = onSecondary,
             modifier = Modifier.fillMaxWidth(),
         ) {

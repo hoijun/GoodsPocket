@@ -3,18 +3,24 @@ package goods.pocket.app.presentation.designsystem
 import goods.pocket.app.presentation.navigation.AppDestination
 
 object GoodsPocketVisualTokens {
-    const val Background = 0xFFF6FAFBL
+    const val Background = 0xFFFFF9FCL
     const val Surface = 0xFFFFFFFFL
-    const val SurfaceLow = 0xFFEFF5F6L
-    const val SurfaceHigh = 0xFFE1EAECL
-    const val SurfaceTint = 0xFFDAE4E7L
-    const val Primary = 0xFF1E6876L
-    const val PrimaryDim = 0xFF085B69L
-    const val PrimaryContainer = 0xFFA5E7F8L
-    const val Ink = 0xFF2A3437L
-    const val MutedInk = 0xFF576163L
-    const val Outline = 0xFFAAB4B7L
-    const val Danger = 0xFFA83836L
+    const val SurfaceLow = 0xFFF8F2F7L
+    const val SurfaceHigh = 0xFFEDE6EEL
+    const val SurfaceTint = 0xFFFBEFF5L
+    const val Primary = 0xFFF26CA7L
+    const val PrimaryDim = 0xFFD95C91L
+    const val PrimaryContainer = 0xFFFFE1EDL
+    const val Secondary = 0xFF87DCCBL
+    const val SecondaryContainer = 0xFFE3F7F1L
+    const val Tertiary = 0xFFFFD46FL
+    const val TertiaryContainer = 0xFFFFF1C6L
+    const val Ink = 0xFF2B2530L
+    const val MutedInk = 0xFF665D6DL
+    const val Outline = 0xFFE2D5E3L
+    const val Success = 0xFF73C7A5L
+    const val Warning = 0xFFF3B85AL
+    const val Danger = 0xFFE07A94L
 }
 
 data class GoodsPocketChrome(

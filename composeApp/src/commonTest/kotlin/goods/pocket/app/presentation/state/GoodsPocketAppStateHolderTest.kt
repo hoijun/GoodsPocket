@@ -74,8 +74,8 @@ class GoodsPocketAppStateHolderTest {
 
         val myPage = stateHolder.state.value.myPage
 
-        assertEquals("Local Profile", myPage.displayName)
-        assertEquals("Not connected", myPage.syncStatusLabel)
+        assertEquals("로컬 프로필", myPage.displayName)
+        assertEquals("연결되지 않음", myPage.syncStatusLabel)
         assertTrue(myPage.notificationsEnabled)
         assertEquals(2, myPage.ownedItemCount)
         assertEquals(2, myPage.activePreorderCount)
@@ -203,7 +203,7 @@ class GoodsPocketAppStateHolderTest {
     fun collectionQueryFiltersItems() {
         val stateHolder = newStateHolder()
 
-        stateHolder.updateCollectionQuery("Blue Archive")
+        stateHolder.updateCollectionQuery("블루 아카이브")
 
         val items = stateHolder.state.value.collectionItems
         assertEquals(1, items.size)
@@ -258,10 +258,24 @@ class GoodsPocketAppStateHolderTest {
         stateHolder.markPreorderReceived("pre-1")
 
         val after = stateHolder.state.value
+        val receivedItem = after.collectionItems.first { it.linkedPreorderId == "pre-1" }
         assertEquals(before.homeSummary.ownedItemCount + 1, after.homeSummary.ownedItemCount)
         assertEquals(AppDestination.Collection.route, after.currentDestination.route)
         assertEquals(ActiveDetail.ItemDetail::class, after.activeDetail!!::class)
+        assertEquals("예약 굿즈", receivedItem.category)
         assertTrue(after.collectionItems.any { it.linkedPreorderId == "pre-1" })
+    }
+
+    @Test
+    fun `recent activities are localized for the default korean app language`() {
+        val stateHolder = newStateHolder()
+
+        val recentActivities = stateHolder.state.value.homeSummary.recentActivities
+
+        assertEquals("프로젝트 세카이 한정 태피스트리", recentActivities[0].title)
+        assertEquals("멜론북스 예약 추적", recentActivities[0].subtitle)
+        assertEquals("10,000원", recentActivities[2].title)
+        assertEquals("예약금 거래 기록", recentActivities[2].subtitle)
     }
 
     private fun newStateHolder(

@@ -6,8 +6,11 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -18,10 +21,10 @@ import goods.pocket.app.domain.model.Event
 import goods.pocket.app.domain.model.HomeSummary
 import goods.pocket.app.presentation.designsystem.GoodsPocketHeroCard
 import goods.pocket.app.presentation.designsystem.GoodsPocketListRow
-import goods.pocket.app.presentation.designsystem.GoodsPocketMetricPill
 import goods.pocket.app.presentation.designsystem.GoodsPocketSectionCard
 import goods.pocket.app.presentation.designsystem.GoodsPocketSectionHeader
 import goods.pocket.app.presentation.designsystem.GoodsPocketTonalBadge
+import goods.pocket.app.presentation.designsystem.goodsPocketScreenModifier
 import goods.pocket.app.presentation.i18n.formatCurrency
 import goods.pocket.app.presentation.i18n.localizedLabel
 import goods.pocket.app.presentation.i18n.tr
@@ -30,11 +33,12 @@ import goodspocket.composeapp.generated.resources.home_monthly_overview
 import goodspocket.composeapp.generated.resources.home_monthly_summary_hint
 import goodspocket.composeapp.generated.resources.home_no_recent_activity
 import goodspocket.composeapp.generated.resources.home_no_upcoming_events
+import goodspocket.composeapp.generated.resources.home_owned_count_unit
 import goodspocket.composeapp.generated.resources.home_recent_activity
 import goodspocket.composeapp.generated.resources.home_recent_activity_subtitle
+import goodspocket.composeapp.generated.resources.home_stat_active_preorder_subtitle
 import goodspocket.composeapp.generated.resources.home_stat_active_preorder
 import goodspocket.composeapp.generated.resources.home_stat_owned
-import goodspocket.composeapp.generated.resources.home_stat_recent
 import goodspocket.composeapp.generated.resources.home_upcoming
 import goodspocket.composeapp.generated.resources.home_upcoming_subtitle
 
@@ -49,13 +53,21 @@ fun HomeScreen(
     onRecentActivityClick: (String) -> Unit = {},
 ) {
     LazyColumn(
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = goodsPocketScreenModifier(),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {
-            DashboardHeroCard(
+            SummaryOverviewRow(
                 dashboardSummary = dashboardSummary,
                 onClick = onMonthlySummaryClick,
+            )
+        }
+        item {
+            PlannerBoardCard(
+                dashboardSummary = dashboardSummary,
+                upcomingEvents = upcomingEvents,
+                onMonthlySummaryClick = onMonthlySummaryClick,
+                onUpcomingEventsClick = onUpcomingEventsClick,
             )
         }
         item {
@@ -76,47 +88,135 @@ fun HomeScreen(
 }
 
 @Composable
-private fun DashboardHeroCard(
+private fun SummaryOverviewRow(
     dashboardSummary: HomeSummary,
     onClick: () -> Unit,
 ) {
-    GoodsPocketHeroCard(onClick = onClick) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        GoodsPocketHeroCard(
+            modifier = Modifier.weight(1.15f),
+            onClick = onClick,
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                GoodsPocketTonalBadge(
+                    text = tr(Res.string.home_stat_owned),
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                )
+                Text(
+                    text = dashboardSummary.ownedItemCount.toString(),
+                    style = MaterialTheme.typography.displayLarge,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    text = tr(Res.string.home_owned_count_unit),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+        GoodsPocketSectionCard(
+            modifier = Modifier.weight(1f),
+            onClick = onClick,
+            containerColor = MaterialTheme.colorScheme.surface,
         ) {
             GoodsPocketTonalBadge(
                 text = tr(Res.string.home_monthly_overview),
-                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.14f),
-                contentColor = MaterialTheme.colorScheme.onPrimary,
+                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
             )
             Text(
                 text = formatCurrency(dashboardSummary.monthlySpend),
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold,
             )
             Text(
                 text = tr(Res.string.home_monthly_summary_hint),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.82f),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                GoodsPocketMetricPill(
-                    label = tr(Res.string.home_stat_owned),
-                    value = dashboardSummary.ownedItemCount.toString(),
-                )
-                GoodsPocketMetricPill(
-                    label = tr(Res.string.home_stat_active_preorder),
-                    value = dashboardSummary.activePreorderCount.toString(),
-                )
-                GoodsPocketMetricPill(
-                    label = tr(Res.string.home_stat_recent),
-                    value = dashboardSummary.recentActivities.size.toString(),
-                )
-            }
+        }
+    }
+}
+
+@Composable
+private fun PlannerBoardCard(
+    dashboardSummary: HomeSummary,
+    upcomingEvents: List<Event>,
+    onMonthlySummaryClick: () -> Unit,
+    onUpcomingEventsClick: () -> Unit,
+) {
+    GoodsPocketSectionCard(containerColor = MaterialTheme.colorScheme.surface) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            GoodsPocketSectionHeader(
+                title = tr(Res.string.home_stat_active_preorder),
+                subtitle = tr(
+                    Res.string.home_stat_active_preorder_subtitle,
+                    dashboardSummary.activePreorderCount,
+                ),
+            )
+            GoodsPocketTonalBadge(
+                text = dashboardSummary.activePreorderCount.toString(),
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            )
+        }
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        )
+        {
+            PlannerMiniCard(
+                title = "수령 대기",
+                subtitle = "${dashboardSummary.activePreorderCount}건",
+            )
+            PlannerMiniCard(
+                title = "지출 보기",
+                subtitle = formatCurrency(dashboardSummary.monthlySpend),
+                onClick = onMonthlySummaryClick,
+            )
+            PlannerMiniCard(
+                title = "일정 보기",
+                subtitle = "${upcomingEvents.size}건",
+                onClick = onUpcomingEventsClick,
+            )
+            PlannerMiniCard(
+                title = "빠른 추가",
+                subtitle = "+",
+            )
+        }
+    }
+}
+
+@Composable
+private fun PlannerMiniCard(
+    title: String,
+    subtitle: String,
+    onClick: (() -> Unit)? = null,
+) {
+    GoodsPocketSectionCard(
+        modifier = Modifier.widthIn(min = 132.dp),
+        onClick = onClick,
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Surface(
+            color = MaterialTheme.colorScheme.surface,
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Text(
+                modifier = Modifier.padding(horizontal = 14.dp, vertical = 14.dp),
+                text = subtitle,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
         }
     }
 }
@@ -141,9 +241,9 @@ private fun UpcomingEventsCard(
             events.take(3).forEach { event ->
                 GoodsPocketListRow(
                     title = event.title,
-                    subtitle = "${event.targetDate} · ${event.eventType.localizedLabel()}",
+                    subtitle = event.eventType.localizedLabel(),
                     onClick = { onEventClick(event.id) },
-                    trailing = null,
+                    trailing = event.targetDate,
                 )
             }
         }
@@ -170,8 +270,9 @@ private fun RecentActivityCard(
             activities.take(4).forEach { activity ->
                 GoodsPocketListRow(
                     title = activity.title,
-                    subtitle = "${activity.happenedAt} · ${activity.subtitle}",
+                    subtitle = activity.subtitle,
                     onClick = { onActivityClick(activity.id) },
+                    trailing = activity.happenedAt,
                 )
             }
         }

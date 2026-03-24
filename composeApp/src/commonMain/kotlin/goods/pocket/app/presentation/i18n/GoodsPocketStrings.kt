@@ -8,6 +8,8 @@ import goods.pocket.app.domain.model.EventType
 import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.PreorderStatus
 import goods.pocket.app.domain.model.TransactionType
+import goods.pocket.app.i18n.formatCurrencyByLanguage
+import goods.pocket.app.i18n.localizedTransactionTypeLabel
 import goods.pocket.app.presentation.navigation.AppDestination
 import goods.pocket.app.presentation.state.QuickAddTarget
 import goodspocket.composeapp.generated.resources.*
@@ -49,12 +51,7 @@ fun tr(
 
 @Composable
 fun formatCurrency(amount: Long): String {
-    val grouped = amount.toString().reversed().chunked(3).joinToString(",").reversed()
-    return if (LocalAppLanguageCode.current == AppLanguage.KOREAN.code) {
-        "${grouped}원"
-    } else {
-        "$grouped KRW"
-    }
+    return formatCurrencyByLanguage(amount, LocalAppLanguageCode.current)
 }
 
 @Composable
@@ -102,14 +99,7 @@ fun PreorderStatus.localizedLabel(): String {
 
 @Composable
 fun TransactionType.localizedLabel(): String {
-    return when (this) {
-        TransactionType.DEPOSIT -> tr(Res.string.transaction_type_deposit)
-        TransactionType.BALANCE -> tr(Res.string.transaction_type_balance)
-        TransactionType.PURCHASE -> tr(Res.string.transaction_type_purchase)
-        TransactionType.SHIPPING -> tr(Res.string.transaction_type_shipping)
-        TransactionType.REFUND -> tr(Res.string.transaction_type_refund)
-        TransactionType.TRANSFER_INCOME -> tr(Res.string.transaction_type_transfer_income)
-    }
+    return localizedTransactionTypeLabel(this, LocalAppLanguageCode.current)
 }
 
 @Composable

@@ -1,18 +1,21 @@
 package goods.pocket.app.presentation
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Scaffold
@@ -24,12 +27,14 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import goods.pocket.app.presentation.designsystem.GoodsPocketVisualTokens
 import goods.pocket.app.presentation.designsystem.goodsPocketChromeFor
 import goods.pocket.app.presentation.component.EventDetailSheet
 import goods.pocket.app.presentation.component.EventEditorSheet
@@ -109,12 +114,13 @@ fun GoodsPocketApp(
                 if (chrome.showFab) {
                     FloatingActionButton(
                         onClick = { appStateHolder.openQuickAdd() },
+                        shape = MaterialTheme.shapes.large,
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary,
                     ) {
                         Text(
                             text = "+",
-                            style = MaterialTheme.typography.headlineMedium,
+                            style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.SemiBold,
                         )
                     }
@@ -161,39 +167,63 @@ private fun GoodsPocketBottomBar(
     onSelectDestination: (AppDestination) -> Unit,
 ) {
     Surface(
-        modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
-        shape = MaterialTheme.shapes.large,
+        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
         color = MaterialTheme.colorScheme.surface,
-        shadowElevation = 12.dp,
-        tonalElevation = 2.dp,
+        tonalElevation = 0.dp,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
         NavigationBar(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = Color.Transparent,
+            tonalElevation = 0.dp,
         ) {
             AppDestination.primaryDestinations.forEach { destination ->
                 val label = destination.localizedLabel()
                 val selected = destination.route == selectedPrimaryDestination.route
-                NavigationBarItem(
+                GoodsPocketBottomBarItem(
+                    label = label,
                     selected = selected,
                     onClick = { onSelectDestination(destination) },
-                    icon = {
-                        BottomNavGlyph(
-                            label = label,
-                            selected = selected,
-                        )
-                    },
-                    label = { Text(label) },
-                    alwaysShowLabel = true,
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                        selectedTextColor = MaterialTheme.colorScheme.primary,
-                        indicatorColor = MaterialTheme.colorScheme.surface,
-                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    ),
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun RowScope.GoodsPocketBottomBarItem(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+
+    Column(
+        modifier = Modifier
+            .weight(1f)
+            .selectable(
+                selected = selected,
+                onClick = onClick,
+                role = Role.Tab,
+                interactionSource = interactionSource,
+                indication = null,
+            )
+            .padding(vertical = 10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        BottomNavGlyph(
+            label = label,
+            selected = selected,
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = if (selected) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            },
+        )
     }
 }
 
@@ -203,20 +233,19 @@ private fun BottomNavGlyph(
     selected: Boolean,
 ) {
     Surface(
-        modifier = Modifier.fillMaxHeight(),
-        shape = MaterialTheme.shapes.small,
+        shape = CircleShape,
         color = if (selected) {
-            MaterialTheme.colorScheme.primary
+            MaterialTheme.colorScheme.primaryContainer
         } else {
             MaterialTheme.colorScheme.surfaceContainerLow
         },
     ) {
         Text(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp),
             text = label.take(1),
-            style = MaterialTheme.typography.labelLarge,
+            style = MaterialTheme.typography.labelMedium,
             color = if (selected) {
-                MaterialTheme.colorScheme.onPrimary
+                MaterialTheme.colorScheme.primary
             } else {
                 MaterialTheme.colorScheme.onSurfaceVariant
             },

@@ -9,7 +9,6 @@
     <string name="nav_settings">설정</string>
 
     <string name="action_back">뒤로</string>
-    <string name="action_settings">설정</string>
     <string name="action_confirm">확인</string>
     <string name="action_cancel">취소</string>
     <string name="action_save">저장</string>
@@ -30,7 +29,9 @@
     <string name="home_monthly_summary_hint">이번 달 요약을 확인하려면 탭하세요.</string>
     <string name="home_stat_owned">보유</string>
     <string name="home_stat_active_preorder">활성 예약</string>
+    <string name="home_stat_active_preorder_subtitle">진행 중 %1$s건</string>
     <string name="home_stat_recent">최근</string>
+    <string name="home_owned_count_unit">개</string>
     <string name="home_upcoming">다가오는 일정</string>
     <string name="home_upcoming_subtitle">이벤트를 탭하면 상세를 볼 수 있어요.</string>
     <string name="home_no_upcoming_events">다가오는 일정이 아직 없어요.</string>
@@ -41,25 +42,40 @@
     <string name="collection_search_label">컬렉션 검색</string>
     <string name="collection_search_placeholder">이름 또는 시리즈</string>
     <string name="collection_empty_search">검색과 일치하는 컬렉션이 없어요.</string>
+    <string name="collection_badge_total">전체 %1$s건</string>
+    <string name="collection_badge_query">검색어 "%1$s"</string>
+    <string name="collection_quantity_badge">%1$s개</string>
     <string name="collection_series_category">%1$s · %2$s</string>
-    <string name="collection_status_qty">상태: %1$s / 수량: %2$s</string>
+    <string name="collection_metric_total_items">전체 굿즈</string>
+    <string name="collection_metric_monthly_spend">이번 달 지출</string>
+    <string name="collection_metric_waiting">배송 대기</string>
 
     <string name="preorders_status_filter">상태 필터</string>
     <string name="preorders_empty_filter">이 상태의 예약이 없어요.</string>
     <string name="preorders_store_release">%1$s · 발매 %2$s</string>
-    <string name="preorders_status_remaining">상태: %1$s / 잔액: %2$s</string>
+    <string name="preorders_tracker_summary">예약 현황</string>
+    <string name="preorders_tracking_items">추적 항목</string>
+    <string name="preorders_arriving">도착 예정</string>
+    <string name="preorders_visible_remaining">표시 잔액</string>
+    <string name="preorders_next_release">다음 발매</string>
+    <string name="preorders_pending_payment_short">결제 대기</string>
 
     <string name="transactions_month_summary">이번 달 요약</string>
     <string name="transactions_visible_total">표시 합계: %1$s</string>
     <string name="transactions_empty_filter">이 필터에 해당하는 거래가 없어요.</string>
-    <string name="transactions_row_subtitle">%1$s · %2$s</string>
+    <string name="transactions_outgoing_total">지출</string>
+    <string name="transactions_incoming_total">유입</string>
+    <string name="transactions_visible_entries">항목 수</string>
 
     <string name="events_empty_filter">이 필터에 해당하는 일정이 없어요.</string>
-    <string name="events_row_subtitle">%1$s · %2$s</string>
+    <string name="events_highlight">다가오는 하이라이트</string>
+    <string name="events_timeline">타임라인</string>
 
     <string name="my_section_profile">프로필과 상태</string>
     <string name="my_section_summary">내 요약</string>
     <string name="my_section_tools">바로가기</string>
+    <string name="my_activity_insights">활동과 인사이트</string>
+    <string name="my_account_management">계정 관리</string>
     <string name="my_local_profile_label">로컬 프로필</string>
     <string name="my_sync_not_connected">연결되지 않음</string>
     <string name="my_notifications_enabled">알림 사용 중</string>

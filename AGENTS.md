@@ -33,6 +33,10 @@
 ## Time
 - Do not keep hardcoded date or month values in production logic.
 
+## File Size
+- Keep source files at 600 lines or fewer.
+- When a file grows beyond 600 lines, split it by responsibility.
+
 ## Tests
 - Use `InMemoryGoodsPocketRepository` for common tests unless the test explicitly targets SQLDelight behavior.
 - If DI definitions change, keep KSP configuration check passing.

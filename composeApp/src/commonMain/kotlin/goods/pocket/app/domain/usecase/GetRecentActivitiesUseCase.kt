@@ -7,45 +7,50 @@ import goods.pocket.app.domain.model.Transaction
 import goods.pocket.app.domain.repository.CollectionRepository
 import goods.pocket.app.domain.repository.PreorderRepository
 import goods.pocket.app.domain.repository.TransactionRepository
+import goods.pocket.app.i18n.DEFAULT_LANGUAGE_CODE
+import goods.pocket.app.i18n.localizedRecentItemAddedSubtitle
+import goods.pocket.app.i18n.localizedRecentPreorderTrackedSubtitle
+import goods.pocket.app.i18n.localizedRecentTransactionSubtitle
+import goods.pocket.app.i18n.localizedRecentTransactionTitle
 
 class GetRecentActivitiesUseCase(
     private val collectionRepository: CollectionRepository,
     private val preorderRepository: PreorderRepository,
     private val transactionRepository: TransactionRepository,
 ) {
-    operator fun invoke(limit: Int): List<ActivityRecord> {
-        val itemActivities = collectionRepository.getItems().map(Item::toActivityRecord)
-        val preorderActivities = preorderRepository.getPreorders().map(Preorder::toActivityRecord)
-        val transactionActivities = transactionRepository.getTransactions().map(Transaction::toActivityRecord)
+    operator fun invoke(limit: Int, languageCode: String = DEFAULT_LANGUAGE_CODE): List<ActivityRecord> {
+        val itemActivities = collectionRepository.getItems().map { it.toActivityRecord(languageCode) }
+        val preorderActivities = preorderRepository.getPreorders().map { it.toActivityRecord(languageCode) }
+        val transactionActivities = transactionRepository.getTransactions().map { it.toActivityRecord(languageCode) }
         return (itemActivities + preorderActivities + transactionActivities)
             .sortedByDescending(ActivityRecord::happenedAt)
             .take(limit)
     }
 }
 
-private fun Item.toActivityRecord(): ActivityRecord {
+private fun Item.toActivityRecord(languageCode: String): ActivityRecord {
     return ActivityRecord(
         id = id,
         title = name,
-        subtitle = "Collection item added",
+        subtitle = localizedRecentItemAddedSubtitle(languageCode),
         happenedAt = updatedAt,
     )
 }
 
-private fun Preorder.toActivityRecord(): ActivityRecord {
+private fun Preorder.toActivityRecord(languageCode: String): ActivityRecord {
     return ActivityRecord(
         id = id,
         title = name,
-        subtitle = "Preorder tracked at $storeName",
+        subtitle = localizedRecentPreorderTrackedSubtitle(languageCode, storeName),
         happenedAt = updatedAt,
     )
 }
 
-private fun Transaction.toActivityRecord(): ActivityRecord {
+private fun Transaction.toActivityRecord(languageCode: String): ActivityRecord {
     return ActivityRecord(
         id = id,
-        title = "${amount} spent",
-        subtitle = "Transaction recorded as $type",
+        title = localizedRecentTransactionTitle(languageCode, amount),
+        subtitle = localizedRecentTransactionSubtitle(languageCode, type),
         happenedAt = createdAt,
     )
 }
