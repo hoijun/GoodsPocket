@@ -38,9 +38,6 @@ internal data class EventJournalOverview(
 )
 
 internal enum class MyHubAction {
-    RECENT_ACTIVITY,
-    UPCOMING_EVENTS,
-    SPENDING_REPORT,
     SYNC_BACKUP,
     NOTIFICATIONS,
     SETTINGS,
@@ -113,15 +110,6 @@ internal fun buildMyHubQuickLinks(
     upcomingEvents: List<Event>,
 ): List<MyHubQuickLinkModel> {
     return listOf(
-        MyHubQuickLinkModel(
-            action = MyHubAction.RECENT_ACTIVITY,
-            badgeCount = recentActivities.size.takeIf { it > 0 },
-        ),
-        MyHubQuickLinkModel(
-            action = MyHubAction.UPCOMING_EVENTS,
-            badgeCount = upcomingEvents.size.takeIf { it > 0 } ?: myPage.upcomingEventCount.takeIf { it > 0 },
-        ),
-        MyHubQuickLinkModel(action = MyHubAction.SPENDING_REPORT),
         MyHubQuickLinkModel(action = MyHubAction.SYNC_BACKUP),
         MyHubQuickLinkModel(action = MyHubAction.NOTIFICATIONS),
         MyHubQuickLinkModel(action = MyHubAction.SETTINGS),

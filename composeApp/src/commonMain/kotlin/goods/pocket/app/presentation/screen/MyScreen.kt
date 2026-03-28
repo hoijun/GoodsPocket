@@ -19,17 +19,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import goods.pocket.app.domain.model.ActivityRecord
-import goods.pocket.app.domain.model.Event
 import goods.pocket.app.presentation.designsystem.GoodsPocketSectionCard
 import goods.pocket.app.presentation.designsystem.GoodsPocketSectionHeader
 import goods.pocket.app.presentation.designsystem.goodsPocketScreenModifier
-import goods.pocket.app.presentation.i18n.formatCurrency
 import goods.pocket.app.presentation.i18n.tr
 import goods.pocket.app.presentation.state.MyPageUiModel
 import goodspocket.composeapp.generated.resources.Res
 import goodspocket.composeapp.generated.resources.my_account_management
-import goodspocket.composeapp.generated.resources.my_activity_insights
 import goodspocket.composeapp.generated.resources.my_local_profile_label
 import goodspocket.composeapp.generated.resources.my_notifications_disabled
 import goodspocket.composeapp.generated.resources.my_notifications_enabled
@@ -38,25 +34,14 @@ import goodspocket.composeapp.generated.resources.my_summary_active_preorders
 import goodspocket.composeapp.generated.resources.my_summary_owned_items
 import goodspocket.composeapp.generated.resources.my_sync_not_connected
 import goodspocket.composeapp.generated.resources.my_utility_notifications
-import goodspocket.composeapp.generated.resources.my_utility_recent_activity
-import goodspocket.composeapp.generated.resources.my_utility_recent_activity_count
-import goodspocket.composeapp.generated.resources.my_utility_recent_activity_empty
 import goodspocket.composeapp.generated.resources.my_utility_settings
 import goodspocket.composeapp.generated.resources.my_utility_settings_subtitle
-import goodspocket.composeapp.generated.resources.my_utility_spending_report
 import goodspocket.composeapp.generated.resources.my_utility_sync_backup
 import goodspocket.composeapp.generated.resources.my_utility_sync_backup_subtitle
-import goodspocket.composeapp.generated.resources.my_utility_upcoming_events
-import goodspocket.composeapp.generated.resources.my_utility_upcoming_events_count
-import goodspocket.composeapp.generated.resources.my_utility_upcoming_events_empty
 
 @Composable
 fun MyScreen(
     myPage: MyPageUiModel,
-    recentActivities: List<ActivityRecord>,
-    upcomingEvents: List<Event>,
-    onOpenTransactions: () -> Unit,
-    onOpenEvents: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
     val notificationsLabel = if (myPage.notificationsEnabled) {
@@ -66,8 +51,8 @@ fun MyScreen(
     }
     val quickLinks = buildMyHubQuickLinks(
         myPage = myPage,
-        recentActivities = recentActivities,
-        upcomingEvents = upcomingEvents,
+        recentActivities = emptyList(),
+        upcomingEvents = emptyList(),
     )
 
     LazyColumn(
@@ -135,38 +120,13 @@ fun MyScreen(
         }
         item {
             GoodsPocketSectionCard(containerColor = MaterialTheme.colorScheme.surface) {
-                GoodsPocketSectionHeader(title = tr(Res.string.my_activity_insights))
-                quickLinks.take(3).forEach { link ->
-                    MyHubQuickLinkRow(
-                        link = link,
-                        subtitle = quickLinkSubtitle(
-                            link = link,
-                            myPage = myPage,
-                            recentActivities = recentActivities,
-                            upcomingEvents = upcomingEvents,
-                            notificationsLabel = notificationsLabel,
-                        ),
-                        accentColor = quickLinkAccentColor(link.action),
-                        onClick = when (link.action) {
-                            MyHubAction.UPCOMING_EVENTS -> onOpenEvents
-                            MyHubAction.SPENDING_REPORT -> onOpenTransactions
-                            else -> null
-                        },
-                    )
-                }
-            }
-        }
-        item {
-            GoodsPocketSectionCard(containerColor = MaterialTheme.colorScheme.surface) {
                 GoodsPocketSectionHeader(title = tr(Res.string.my_account_management))
-                quickLinks.drop(3).forEach { link ->
+                quickLinks.forEach { link ->
                     MyHubQuickLinkRow(
                         link = link,
                         subtitle = quickLinkSubtitle(
                             link = link,
                             myPage = myPage,
-                            recentActivities = recentActivities,
-                            upcomingEvents = upcomingEvents,
                             notificationsLabel = notificationsLabel,
                         ),
                         accentColor = quickLinkAccentColor(link.action),
@@ -272,9 +232,6 @@ private fun MyHubQuickLinkRow(
 @Composable
 private fun quickLinkTitle(action: MyHubAction): String {
     return when (action) {
-        MyHubAction.RECENT_ACTIVITY -> tr(Res.string.my_utility_recent_activity)
-        MyHubAction.UPCOMING_EVENTS -> tr(Res.string.my_utility_upcoming_events)
-        MyHubAction.SPENDING_REPORT -> tr(Res.string.my_utility_spending_report)
         MyHubAction.SYNC_BACKUP -> tr(Res.string.my_utility_sync_backup)
         MyHubAction.NOTIFICATIONS -> tr(Res.string.my_utility_notifications)
         MyHubAction.SETTINGS -> tr(Res.string.my_utility_settings)
@@ -285,24 +242,9 @@ private fun quickLinkTitle(action: MyHubAction): String {
 private fun quickLinkSubtitle(
     link: MyHubQuickLinkModel,
     myPage: MyPageUiModel,
-    recentActivities: List<ActivityRecord>,
-    upcomingEvents: List<Event>,
     notificationsLabel: String,
 ): String {
     return when (link.action) {
-        MyHubAction.RECENT_ACTIVITY -> if (recentActivities.isEmpty()) {
-            tr(Res.string.my_utility_recent_activity_empty)
-        } else {
-            tr(Res.string.my_utility_recent_activity_count, recentActivities.size)
-        }
-
-        MyHubAction.UPCOMING_EVENTS -> if (upcomingEvents.isEmpty()) {
-            tr(Res.string.my_utility_upcoming_events_empty)
-        } else {
-            tr(Res.string.my_utility_upcoming_events_count, upcomingEvents.size)
-        }
-
-        MyHubAction.SPENDING_REPORT -> formatCurrency(myPage.monthlySpend)
         MyHubAction.SYNC_BACKUP -> if (localizedSyncStatusLabel(myPage) == tr(Res.string.my_sync_not_connected)) {
             tr(Res.string.my_utility_sync_backup_subtitle)
         } else {
@@ -317,9 +259,6 @@ private fun quickLinkSubtitle(
 @Composable
 private fun quickLinkAccentColor(action: MyHubAction): Color {
     return when (action) {
-        MyHubAction.RECENT_ACTIVITY -> MaterialTheme.colorScheme.secondaryContainer
-        MyHubAction.UPCOMING_EVENTS -> MaterialTheme.colorScheme.primaryContainer
-        MyHubAction.SPENDING_REPORT -> MaterialTheme.colorScheme.tertiaryContainer
         MyHubAction.SYNC_BACKUP -> MaterialTheme.colorScheme.surfaceContainerHigh
         MyHubAction.NOTIFICATIONS -> MaterialTheme.colorScheme.surfaceContainerHigh
         MyHubAction.SETTINGS -> MaterialTheme.colorScheme.surfaceContainerHigh

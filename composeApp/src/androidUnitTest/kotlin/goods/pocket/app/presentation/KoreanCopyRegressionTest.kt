@@ -23,6 +23,9 @@ class KoreanCopyRegressionTest {
 
         assertFalse(mySource.contains("\"Local Profile\""))
         assertFalse(mySource.contains("\"Not connected\""))
+        assertFalse(mySource.contains("MyHubAction.RECENT_ACTIVITY"))
+        assertFalse(mySource.contains("MyHubAction.UPCOMING_EVENTS"))
+        assertFalse(mySource.contains("MyHubAction.SPENDING_REPORT"))
         assertFalse(mySource.contains("-> \"R\""))
         assertFalse(mySource.contains("-> \"E\""))
         assertFalse(mySource.contains("-> \"W\""))
