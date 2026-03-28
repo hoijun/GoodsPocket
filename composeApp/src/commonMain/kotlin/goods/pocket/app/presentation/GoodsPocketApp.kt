@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -76,32 +77,38 @@ fun GoodsPocketApp(
         Scaffold(
             containerColor = MaterialTheme.colorScheme.background,
             topBar = {
-                TopAppBar(
-                    expandedHeight = 56.dp,
-                    navigationIcon = {
-                        if (chrome.showBackButton) {
-                            val onBack = if (uiState.currentDestination == AppDestination.Settings) {
-                                appStateHolder::closeSettings
-                            } else {
-                                { appStateHolder.selectDestination(uiState.selectedPrimaryDestination) }
+                Column {
+                    TopAppBar(
+                        expandedHeight = 56.dp,
+                        navigationIcon = {
+                            if (chrome.showBackButton) {
+                                val onBack = if (uiState.currentDestination == AppDestination.Settings) {
+                                    appStateHolder::closeSettings
+                                } else {
+                                    { appStateHolder.selectDestination(uiState.selectedPrimaryDestination) }
+                                }
+                                TextButton(onClick = onBack) {
+                                    Text(tr(Res.string.action_back))
+                                }
                             }
-                            TextButton(onClick = onBack) {
-                                Text(tr(Res.string.action_back))
-                            }
-                        }
-                    },
-                    title = {
-                        Text(
-                            text = uiState.currentDestination.localizedLabel(),
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                        titleContentColor = MaterialTheme.colorScheme.onBackground,
-                        navigationIconContentColor = MaterialTheme.colorScheme.primary,
-                    ),
-                )
+                        },
+                        title = {
+                            Text(
+                                text = uiState.currentDestination.localizedLabel(),
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.background,
+                            titleContentColor = MaterialTheme.colorScheme.onBackground,
+                            navigationIconContentColor = MaterialTheme.colorScheme.primary,
+                        ),
+                    )
+                    HorizontalDivider(
+                        thickness = 1.dp,
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                    )
+                }
             },
             bottomBar = {
                 if (chrome.showBottomBar) {

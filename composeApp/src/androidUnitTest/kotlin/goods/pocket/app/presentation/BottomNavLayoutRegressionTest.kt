@@ -67,6 +67,14 @@ class BottomNavLayoutRegressionTest {
     }
 
     @Test
+    fun `top app bar includes one dp divider before content`() {
+        val source = goodsPocketAppSource()
+
+        assertTrue(source.contains("HorizontalDivider("))
+        assertTrue(source.contains("thickness = 1.dp"))
+    }
+
+    @Test
     fun `android preview is not kept for the bottom navigation`() {
         assertFalse(bottomNavPreviewFile().exists())
         assertFalse(goodsPocketAppSource().contains("BottomNavPreviewContent("))
