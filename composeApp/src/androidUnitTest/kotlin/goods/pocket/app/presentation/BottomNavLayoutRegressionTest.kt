@@ -59,6 +59,14 @@ class BottomNavLayoutRegressionTest {
     }
 
     @Test
+    fun `top app bar uses compact custom height`() {
+        val source = goodsPocketAppSource()
+
+        assertTrue(source.contains("TopAppBar("))
+        assertTrue(source.contains("expandedHeight = 56.dp"))
+    }
+
+    @Test
     fun `android preview is not kept for the bottom navigation`() {
         assertFalse(bottomNavPreviewFile().exists())
         assertFalse(goodsPocketAppSource().contains("BottomNavPreviewContent("))

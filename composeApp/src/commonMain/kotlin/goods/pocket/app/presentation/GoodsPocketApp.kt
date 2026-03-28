@@ -77,6 +77,7 @@ fun GoodsPocketApp(
             containerColor = MaterialTheme.colorScheme.background,
             topBar = {
                 TopAppBar(
+                    expandedHeight = 56.dp,
                     navigationIcon = {
                         if (chrome.showBackButton) {
                             val onBack = if (uiState.currentDestination == AppDestination.Settings) {
