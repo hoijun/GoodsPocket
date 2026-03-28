@@ -53,7 +53,7 @@
     <string name="collection_quantity_badge">%1$s개</string>
     <string name="collection_series_category">%1$s · %2$s</string>
     <string name="collection_metric_total_items">전체 굿즈</string>
-    <string name="collection_metric_monthly_spend">이번 달 지출</string>
+    <string name="collection_metric_monthly_spend">총 구매액</string>
     <string name="collection_metric_waiting">배송 대기</string>
 
     <string name="preorders_status_filter">상태 필터</string>
