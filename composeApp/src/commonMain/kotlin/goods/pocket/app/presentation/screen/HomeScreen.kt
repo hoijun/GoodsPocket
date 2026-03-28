@@ -34,6 +34,12 @@ import goodspocket.composeapp.generated.resources.home_monthly_summary_hint
 import goodspocket.composeapp.generated.resources.home_no_recent_activity
 import goodspocket.composeapp.generated.resources.home_no_upcoming_events
 import goodspocket.composeapp.generated.resources.home_owned_count_unit
+import goodspocket.composeapp.generated.resources.home_planner_events
+import goodspocket.composeapp.generated.resources.home_planner_events_count
+import goodspocket.composeapp.generated.resources.home_planner_preorders
+import goodspocket.composeapp.generated.resources.home_planner_preorders_count
+import goodspocket.composeapp.generated.resources.home_planner_quick_add
+import goodspocket.composeapp.generated.resources.home_planner_transactions
 import goodspocket.composeapp.generated.resources.home_recent_activity
 import goodspocket.composeapp.generated.resources.home_recent_activity_subtitle
 import goodspocket.composeapp.generated.resources.home_stat_active_preorder_subtitle
@@ -51,6 +57,8 @@ fun HomeScreen(
     onRecentActivitiesClick: () -> Unit = {},
     onUpcomingEventClick: (String) -> Unit = {},
     onRecentActivityClick: (String) -> Unit = {},
+    onPreordersClick: () -> Unit = {},
+    onQuickAddClick: () -> Unit = {},
 ) {
     LazyColumn(
         modifier = goodsPocketScreenModifier(),
@@ -68,6 +76,8 @@ fun HomeScreen(
                 upcomingEvents = upcomingEvents,
                 onMonthlySummaryClick = onMonthlySummaryClick,
                 onUpcomingEventsClick = onUpcomingEventsClick,
+                onPreordersClick = onPreordersClick,
+                onQuickAddClick = onQuickAddClick,
             )
         }
         item {
@@ -145,6 +155,8 @@ private fun PlannerBoardCard(
     upcomingEvents: List<Event>,
     onMonthlySummaryClick: () -> Unit,
     onUpcomingEventsClick: () -> Unit,
+    onPreordersClick: () -> Unit,
+    onQuickAddClick: () -> Unit,
 ) {
     GoodsPocketSectionCard(containerColor = MaterialTheme.colorScheme.surface) {
         Row(
@@ -170,22 +182,27 @@ private fun PlannerBoardCard(
         )
         {
             PlannerMiniCard(
-                title = "수령 대기",
-                subtitle = "${dashboardSummary.activePreorderCount}건",
+                title = tr(Res.string.home_planner_preorders),
+                subtitle = tr(
+                    Res.string.home_planner_preorders_count,
+                    dashboardSummary.activePreorderCount,
+                ),
+                onClick = onPreordersClick,
             )
             PlannerMiniCard(
-                title = "지출 보기",
+                title = tr(Res.string.home_planner_transactions),
                 subtitle = formatCurrency(dashboardSummary.monthlySpend),
                 onClick = onMonthlySummaryClick,
             )
             PlannerMiniCard(
-                title = "일정 보기",
-                subtitle = "${upcomingEvents.size}건",
+                title = tr(Res.string.home_planner_events),
+                subtitle = tr(Res.string.home_planner_events_count, upcomingEvents.size),
                 onClick = onUpcomingEventsClick,
             )
             PlannerMiniCard(
-                title = "빠른 추가",
+                title = tr(Res.string.home_planner_quick_add),
                 subtitle = "+",
+                onClick = onQuickAddClick,
             )
         }
     }
