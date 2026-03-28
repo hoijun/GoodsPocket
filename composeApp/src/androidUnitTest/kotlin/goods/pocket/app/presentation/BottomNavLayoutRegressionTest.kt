@@ -65,16 +65,24 @@ class BottomNavLayoutRegressionTest {
     }
 
     @Test
-    fun `screen lists use shared top only padding to avoid a bottom bar gap`() {
+    fun `primary screen lists keep top only outer padding and use shared scroll bottom spacing`() {
         val layoutSource = screenLayoutSource()
 
         assertTrue(layoutSource.contains("fun goodsPocketScreenModifier()"))
         assertTrue(layoutSource.contains("top = 12.dp"))
         assertFalse(layoutSource.contains("bottom = 12.dp"))
+        assertTrue(layoutSource.contains("fun goodsPocketPrimaryScrollContentPadding()"))
+        assertTrue(layoutSource.contains("PaddingValues(bottom = 28.dp)"))
 
-        screenSources().forEach { source ->
+        primaryScreenSources().forEach { source ->
             assertTrue(source.contains("goodsPocketScreenModifier()"))
+            assertTrue(source.contains("contentPadding = goodsPocketPrimaryScrollContentPadding()"))
             assertFalse(source.contains("padding(horizontal = 16.dp, vertical = 12.dp)"))
+        }
+
+        secondaryScreenSources().forEach { source ->
+            assertTrue(source.contains("goodsPocketScreenModifier()"))
+            assertFalse(source.contains("contentPadding = goodsPocketPrimaryScrollContentPadding()"))
         }
     }
 
@@ -116,7 +124,7 @@ class BottomNavLayoutRegressionTest {
         return sourceFile.readText()
     }
 
-    private fun screenSources(): List<String> {
+    private fun primaryScreenSources(): List<String> {
         val startingDirectory = File(checkNotNull(System.getProperty("user.dir")))
         val rootDirectory = generateSequence(startingDirectory) { it.parentFile }
             .firstOrNull { File(it, "composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/screen").exists() }
@@ -127,6 +135,18 @@ class BottomNavLayoutRegressionTest {
             "CollectionScreen.kt",
             "PreordersScreen.kt",
             "MyScreen.kt",
+        ).map { name ->
+            File(rootDirectory, "composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/screen/$name").readText()
+        }
+    }
+
+    private fun secondaryScreenSources(): List<String> {
+        val startingDirectory = File(checkNotNull(System.getProperty("user.dir")))
+        val rootDirectory = generateSequence(startingDirectory) { it.parentFile }
+            .firstOrNull { File(it, "composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/screen").exists() }
+            ?: error("Could not locate presentation/screen directory from ${startingDirectory.absolutePath}")
+
+        return listOf(
             "TransactionsScreen.kt",
             "EventsScreen.kt",
             "SettingsScreen.kt",

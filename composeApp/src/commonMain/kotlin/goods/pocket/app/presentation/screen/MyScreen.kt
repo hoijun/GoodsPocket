@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import goods.pocket.app.presentation.designsystem.GoodsPocketSectionCard
 import goods.pocket.app.presentation.designsystem.GoodsPocketSectionHeader
+import goods.pocket.app.presentation.designsystem.goodsPocketPrimaryScrollContentPadding
 import goods.pocket.app.presentation.designsystem.goodsPocketScreenModifier
 import goods.pocket.app.presentation.i18n.tr
 import goods.pocket.app.presentation.state.MyPageUiModel
@@ -57,6 +58,7 @@ fun MyScreen(
 
     LazyColumn(
         modifier = goodsPocketScreenModifier(),
+        contentPadding = goodsPocketPrimaryScrollContentPadding(),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         item {

@@ -24,6 +24,7 @@ import goods.pocket.app.presentation.designsystem.GoodsPocketListRow
 import goods.pocket.app.presentation.designsystem.GoodsPocketSectionCard
 import goods.pocket.app.presentation.designsystem.GoodsPocketSectionHeader
 import goods.pocket.app.presentation.designsystem.GoodsPocketTonalBadge
+import goods.pocket.app.presentation.designsystem.goodsPocketPrimaryScrollContentPadding
 import goods.pocket.app.presentation.designsystem.goodsPocketScreenModifier
 import goods.pocket.app.presentation.i18n.formatCurrency
 import goods.pocket.app.presentation.i18n.localizedLabel
@@ -62,6 +63,7 @@ fun HomeScreen(
 ) {
     LazyColumn(
         modifier = goodsPocketScreenModifier(),
+        contentPadding = goodsPocketPrimaryScrollContentPadding(),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {

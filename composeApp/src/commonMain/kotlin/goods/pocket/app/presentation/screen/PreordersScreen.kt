@@ -27,6 +27,7 @@ import goods.pocket.app.domain.model.PreorderStatus
 import goods.pocket.app.presentation.designsystem.GoodsPocketFilterChip
 import goods.pocket.app.presentation.designsystem.GoodsPocketSectionCard
 import goods.pocket.app.presentation.designsystem.GoodsPocketTonalBadge
+import goods.pocket.app.presentation.designsystem.goodsPocketPrimaryScrollContentPadding
 import goods.pocket.app.presentation.designsystem.goodsPocketScreenModifier
 import goods.pocket.app.presentation.i18n.formatCurrency
 import goods.pocket.app.presentation.i18n.localizedLabel
@@ -58,6 +59,7 @@ fun PreordersScreen(
 
     LazyColumn(
         modifier = goodsPocketScreenModifier(),
+        contentPadding = goodsPocketPrimaryScrollContentPadding(),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {
