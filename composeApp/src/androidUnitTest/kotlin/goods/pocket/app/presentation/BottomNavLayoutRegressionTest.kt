@@ -81,14 +81,23 @@ class BottomNavLayoutRegressionTest {
     }
 
     @Test
-    fun `primary screen lists keep top only outer padding and use shared scroll bottom spacing`() {
+    fun `screen lists keep horizontal outer padding and move top spacing into scroll content`() {
         val layoutSource = screenLayoutSource()
+        val screenModifierBlock = layoutSource.substringAfter("fun goodsPocketScreenModifier(): Modifier {")
+            .substringBefore("fun goodsPocketPrimaryScrollContentPadding()")
+        val primaryPaddingBlock = layoutSource.substringAfter("fun goodsPocketPrimaryScrollContentPadding(): PaddingValues {")
+            .substringBefore("fun goodsPocketSecondaryScrollContentPadding()")
+        val secondaryPaddingBlock = layoutSource.substringAfter("fun goodsPocketSecondaryScrollContentPadding(): PaddingValues {")
 
         assertTrue(layoutSource.contains("fun goodsPocketScreenModifier()"))
-        assertTrue(layoutSource.contains("top = 12.dp"))
-        assertFalse(layoutSource.contains("bottom = 12.dp"))
+        assertTrue(screenModifierBlock.contains("start = 16.dp"))
+        assertTrue(screenModifierBlock.contains("end = 16.dp"))
+        assertFalse(screenModifierBlock.contains("top = 12.dp"))
+        assertFalse(screenModifierBlock.contains("bottom = 12.dp"))
         assertTrue(layoutSource.contains("fun goodsPocketPrimaryScrollContentPadding()"))
-        assertTrue(layoutSource.contains("PaddingValues(bottom = 28.dp)"))
+        assertTrue(primaryPaddingBlock.contains("PaddingValues(top = 12.dp, bottom = 28.dp)"))
+        assertTrue(layoutSource.contains("fun goodsPocketSecondaryScrollContentPadding()"))
+        assertTrue(secondaryPaddingBlock.contains("PaddingValues(top = 12.dp)"))
 
         primaryScreenSources().forEach { source ->
             assertTrue(source.contains("goodsPocketScreenModifier()"))
@@ -98,7 +107,7 @@ class BottomNavLayoutRegressionTest {
 
         secondaryScreenSources().forEach { source ->
             assertTrue(source.contains("goodsPocketScreenModifier()"))
-            assertFalse(source.contains("contentPadding = goodsPocketPrimaryScrollContentPadding()"))
+            assertTrue(source.contains("contentPadding = goodsPocketSecondaryScrollContentPadding()"))
         }
     }
 

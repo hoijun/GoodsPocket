@@ -23,6 +23,7 @@ import goods.pocket.app.presentation.designsystem.GoodsPocketFilterChip
 import goods.pocket.app.presentation.designsystem.GoodsPocketSectionCard
 import goods.pocket.app.presentation.designsystem.GoodsPocketTonalBadge
 import goods.pocket.app.presentation.designsystem.goodsPocketScreenModifier
+import goods.pocket.app.presentation.designsystem.goodsPocketSecondaryScrollContentPadding
 import goods.pocket.app.presentation.i18n.formatCurrency
 import goods.pocket.app.presentation.i18n.localizedLabel
 import goods.pocket.app.presentation.i18n.tr
@@ -50,6 +51,7 @@ fun TransactionsScreen(
 
     LazyColumn(
         modifier = goodsPocketScreenModifier(),
+        contentPadding = goodsPocketSecondaryScrollContentPadding(),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {
