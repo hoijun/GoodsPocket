@@ -138,17 +138,14 @@ class JournalScreenModelsTest {
 
         assertEquals(
             listOf(
-                MyHubAction.RECENT_ACTIVITY,
-                MyHubAction.UPCOMING_EVENTS,
-                MyHubAction.SPENDING_REPORT,
                 MyHubAction.SYNC_BACKUP,
                 MyHubAction.NOTIFICATIONS,
                 MyHubAction.SETTINGS,
             ),
             links.map(MyHubQuickLinkModel::action),
         )
-        assertEquals(2, links.first().badgeCount)
-        assertEquals(1, links[1].badgeCount)
+        assertEquals(null, links.first().badgeCount)
+        assertEquals(null, links[1].badgeCount)
     }
 
     private fun preorder(

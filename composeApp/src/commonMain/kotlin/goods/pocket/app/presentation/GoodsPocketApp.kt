@@ -288,10 +288,6 @@ private fun GoodsPocketNavHost(
             )
             AppDestination.My -> MyScreen(
                 myPage = uiState.myPage,
-                recentActivities = uiState.homeSummary.recentActivities,
-                upcomingEvents = uiState.upcomingEvents,
-                onOpenTransactions = appStateHolder::openTransactionsOverview,
-                onOpenEvents = appStateHolder::openEventsOverview,
                 onOpenSettings = appStateHolder::openSettings,
             )
             AppDestination.Transactions -> TransactionsScreen(
