@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -55,6 +56,8 @@ fun CollectionScreen(
     val totalSpend = items.sumOf { it.purchasePrice ?: 0L }
     val waitingCount = items.count { it.status == ItemStatus.WAITING_DELIVERY }
     val highlightedCategories = items.map(Item::category).distinct().take(4)
+    val summaryMetricShape = RoundedCornerShape(14.dp)
+    val summaryMetricPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
 
     LazyColumn(
         modifier = goodsPocketScreenModifier(),
@@ -179,18 +182,24 @@ fun CollectionScreen(
                     GoodsPocketMetricPill(
                         label = tr(Res.string.collection_metric_total_items),
                         value = items.size.toString(),
+                        shape = summaryMetricShape,
+                        contentPadding = summaryMetricPadding,
                     )
                     GoodsPocketMetricPill(
                         label = tr(Res.string.collection_metric_monthly_spend),
                         value = formatCurrency(totalSpend),
                         containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                         contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                        shape = summaryMetricShape,
+                        contentPadding = summaryMetricPadding,
                     )
                     GoodsPocketMetricPill(
                         label = tr(Res.string.collection_metric_waiting),
                         value = waitingCount.toString(),
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        shape = summaryMetricShape,
+                        contentPadding = summaryMetricPadding,
                     )
                 }
             }

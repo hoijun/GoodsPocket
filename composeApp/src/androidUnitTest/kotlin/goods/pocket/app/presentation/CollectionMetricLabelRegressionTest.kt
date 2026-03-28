@@ -19,6 +19,19 @@ class CollectionMetricLabelRegressionTest {
         assertTrue(englishStrings.contains("<string name=\"collection_metric_monthly_spend\">Total purchase amount</string>"))
     }
 
+    @Test
+    fun `collection summary metrics use wider padding and reduced rounding`() {
+        val collectionScreen = source("composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/screen/CollectionScreen.kt")
+        val surfaceSource = source("composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/designsystem/GoodsPocketSurface.kt")
+
+        assertTrue(surfaceSource.contains("shape: Shape = CircleShape"))
+        assertTrue(surfaceSource.contains("contentPadding: PaddingValues = PaddingValues(horizontal = 12.dp, vertical = 10.dp)"))
+        assertTrue(collectionScreen.contains("val summaryMetricShape = RoundedCornerShape(14.dp)"))
+        assertTrue(collectionScreen.contains("val summaryMetricPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)"))
+        assertTrue(collectionScreen.contains("shape = summaryMetricShape"))
+        assertTrue(collectionScreen.contains("contentPadding = summaryMetricPadding"))
+    }
+
     private fun source(path: String): String {
         val startingDirectory = File(checkNotNull(System.getProperty("user.dir")))
         val sourceFile = generateSequence(startingDirectory) { it.parentFile }
