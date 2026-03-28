@@ -37,6 +37,20 @@
 - Keep source files at 600 lines or fewer.
 - When a file grows beyond 600 lines, split it by responsibility.
 
+## Git Commits
+- Write git commit messages in Korean.
+- Prefer the format `type(scope if useful): summary`.
+- If a scope is helpful, use a concrete area such as `home`, `navigation`, `settings`, or `i18n`.
+- After the title, add flat bullet lines that summarize the grouped changes.
+- Keep the bullet lines in one contiguous block with no blank lines between bullets.
+- Use this style:
+```text
+feat(가능하면 어떤 부분인지): 저널형 UI와 한국어 기본 카피 정비
+- Home/Collection/Preorders/My 화면을 저널형 레이아웃으로 재구성하고 공통 UI 토큰을 정리
+- Transactions/Events/Settings 화면, 바텀 내비게이션, 시트 스타일, 상태 재로딩 흐름을 정리
+- 기본 화면 문구와 시드 데이터를 한국어로 정리하고 회귀 테스트와 작업 규칙을 추가
+```
+
 ## Tests
 - Use `InMemoryGoodsPocketRepository` for common tests unless the test explicitly targets SQLDelight behavior.
 - If DI definitions change, keep KSP configuration check passing.
