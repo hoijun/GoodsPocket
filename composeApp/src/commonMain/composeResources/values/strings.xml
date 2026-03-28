@@ -38,6 +38,12 @@
     <string name="home_recent_activity">최근 활동</string>
     <string name="home_recent_activity_subtitle">활동을 탭하면 이어서 확인할 수 있어요.</string>
     <string name="home_no_recent_activity">최근 활동이 아직 없어요.</string>
+    <string name="home_planner_preorders">예약 보기</string>
+    <string name="home_planner_preorders_count">진행 중 %1$s건</string>
+    <string name="home_planner_transactions">지출 보기</string>
+    <string name="home_planner_events">일정 보기</string>
+    <string name="home_planner_events_count">임박 %1$s건</string>
+    <string name="home_planner_quick_add">빠른 추가</string>
 
     <string name="collection_search_label">컬렉션 검색</string>
     <string name="collection_search_placeholder">이름 또는 시리즈</string>

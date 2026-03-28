@@ -38,6 +38,12 @@
     <string name="home_recent_activity">Recent activity</string>
     <string name="home_recent_activity_subtitle">Tap any activity to continue where you left off.</string>
     <string name="home_no_recent_activity">No recent activity yet.</string>
+    <string name="home_planner_preorders">View preorders</string>
+    <string name="home_planner_preorders_count">%1$s active</string>
+    <string name="home_planner_transactions">View spending</string>
+    <string name="home_planner_events">View events</string>
+    <string name="home_planner_events_count">%1$s due soon</string>
+    <string name="home_planner_quick_add">Quick add</string>
 
     <string name="collection_search_label">Search collection</string>
     <string name="collection_search_placeholder">Name or series</string>

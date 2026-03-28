@@ -273,6 +273,8 @@ private fun GoodsPocketNavHost(
                 onUpcomingEventsClick = appStateHolder::openEventsOverview,
                 onUpcomingEventClick = appStateHolder::openEventFromHome,
                 onRecentActivityClick = appStateHolder::openActivity,
+                onPreordersClick = { appStateHolder.selectDestination(AppDestination.Preorders) },
+                onQuickAddClick = appStateHolder::openQuickAdd,
             )
             AppDestination.Collection -> CollectionScreen(
                 items = uiState.collectionItems,
