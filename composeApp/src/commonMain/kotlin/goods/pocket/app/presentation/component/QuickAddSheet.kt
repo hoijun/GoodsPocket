@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import goods.pocket.app.domain.model.EventType
 import goods.pocket.app.domain.model.TransactionType
+import goods.pocket.app.presentation.designsystem.GoodsPocketBottomSheetHandle
 import goods.pocket.app.presentation.designsystem.GoodsPocketFilterChip
 import goods.pocket.app.presentation.designsystem.goodsPocketOutlinedFieldColors
 import goods.pocket.app.presentation.i18n.localizedLabel
@@ -67,7 +68,7 @@ fun QuickAddSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        dragHandle = null,
+        dragHandle = { GoodsPocketBottomSheetHandle() },
         containerColor = MaterialTheme.colorScheme.background,
         tonalElevation = 0.dp,
     ) {

@@ -27,6 +27,7 @@ import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.Transaction
 import goods.pocket.app.domain.model.TransactionType
+import goods.pocket.app.presentation.designsystem.GoodsPocketBottomSheetHandle
 import goods.pocket.app.presentation.designsystem.GoodsPocketFilterChip
 import goods.pocket.app.presentation.designsystem.goodsPocketOutlinedFieldColors
 import goods.pocket.app.presentation.i18n.localizedLabel
@@ -186,7 +187,7 @@ private fun EditorSheetContainer(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        dragHandle = null,
+        dragHandle = { GoodsPocketBottomSheetHandle() },
         containerColor = MaterialTheme.colorScheme.background,
         tonalElevation = 0.dp,
     ) {
