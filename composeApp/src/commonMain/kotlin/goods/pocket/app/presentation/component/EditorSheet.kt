@@ -187,7 +187,7 @@ private fun EditorSheetContainer(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        dragHandle = { GoodsPocketBottomSheetHandle() },
+        dragHandle = null,
         containerColor = MaterialTheme.colorScheme.background,
         tonalElevation = 0.dp,
     ) {
@@ -198,6 +198,7 @@ private fun EditorSheetContainer(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
+            GoodsPocketBottomSheetHandle()
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleLarge,

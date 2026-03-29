@@ -68,7 +68,7 @@ fun QuickAddSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        dragHandle = { GoodsPocketBottomSheetHandle() },
+        dragHandle = null,
         containerColor = MaterialTheme.colorScheme.background,
         tonalElevation = 0.dp,
     ) {
@@ -79,6 +79,7 @@ fun QuickAddSheet(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
+            GoodsPocketBottomSheetHandle()
             Text(
                 text = tr(Res.string.quick_add_title),
                 style = MaterialTheme.typography.titleLarge,

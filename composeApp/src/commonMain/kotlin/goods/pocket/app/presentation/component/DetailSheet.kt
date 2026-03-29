@@ -293,7 +293,7 @@ private fun DetailSheetContainer(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        dragHandle = { GoodsPocketBottomSheetHandle() },
+        dragHandle = null,
         containerColor = MaterialTheme.colorScheme.background,
         tonalElevation = 0.dp,
     ) {
@@ -304,6 +304,7 @@ private fun DetailSheetContainer(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            GoodsPocketBottomSheetHandle()
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleLarge,
