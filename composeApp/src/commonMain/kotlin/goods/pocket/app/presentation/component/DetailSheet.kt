@@ -29,7 +29,7 @@ import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.PreorderStatus
 import goods.pocket.app.domain.model.Transaction
-import goods.pocket.app.presentation.designsystem.GoodsPocketBottomSheetHandle
+import goods.pocket.app.presentation.designsystem.GoodsPocketBottomSheetHeader
 import goods.pocket.app.presentation.designsystem.GoodsPocketTonalBadge
 import goods.pocket.app.presentation.i18n.formatCurrency
 import goods.pocket.app.presentation.i18n.localizedLabel
@@ -304,10 +304,8 @@ private fun DetailSheetContainer(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            GoodsPocketBottomSheetHandle()
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge,
+            GoodsPocketBottomSheetHeader(
+                title = title,
                 fontWeight = FontWeight.SemiBold,
             )
             content()

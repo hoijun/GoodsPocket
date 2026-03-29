@@ -137,6 +137,27 @@ fun GoodsPocketBottomSheetHandle(
 }
 
 @Composable
+fun GoodsPocketBottomSheetHeader(
+    title: String,
+    modifier: Modifier = Modifier,
+    fontWeight: FontWeight? = null,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        GoodsPocketBottomSheetHandle()
+        Text(
+            text = title,
+            modifier = Modifier
+                .padding(start = 8.dp)
+                .padding(vertical = 8.dp),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = fontWeight,
+        )
+    }
+}
+
+@Composable
 fun GoodsPocketMetricPill(
     label: String,
     value: String,

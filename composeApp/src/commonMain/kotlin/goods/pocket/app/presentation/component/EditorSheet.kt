@@ -27,7 +27,7 @@ import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.Transaction
 import goods.pocket.app.domain.model.TransactionType
-import goods.pocket.app.presentation.designsystem.GoodsPocketBottomSheetHandle
+import goods.pocket.app.presentation.designsystem.GoodsPocketBottomSheetHeader
 import goods.pocket.app.presentation.designsystem.GoodsPocketFilterChip
 import goods.pocket.app.presentation.designsystem.goodsPocketOutlinedFieldColors
 import goods.pocket.app.presentation.i18n.localizedLabel
@@ -198,11 +198,7 @@ private fun EditorSheetContainer(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            GoodsPocketBottomSheetHandle()
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge,
-            )
+            GoodsPocketBottomSheetHeader(title = title)
             content()
         }
     }

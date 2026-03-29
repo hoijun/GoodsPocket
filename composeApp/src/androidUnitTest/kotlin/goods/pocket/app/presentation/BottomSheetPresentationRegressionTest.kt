@@ -7,7 +7,7 @@ import kotlin.test.assertTrue
 class BottomSheetPresentationRegressionTest {
 
     @Test
-    fun `all modal bottom sheets open fully and render a static inline header handle`() {
+    fun `all modal bottom sheets open fully and render a static inline header handle with padded titles`() {
         val quickAddSource = source("composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/component/QuickAddSheet.kt")
         val detailSource = source("composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/component/DetailSheet.kt")
         val editorSource = source("composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/component/EditorSheet.kt")
@@ -16,10 +16,13 @@ class BottomSheetPresentationRegressionTest {
         listOf(quickAddSource, detailSource, editorSource).forEach { source ->
             assertTrue(source.contains("rememberModalBottomSheetState(skipPartiallyExpanded = true)"))
             assertTrue(source.contains("dragHandle = null"))
-            assertTrue(source.contains("GoodsPocketBottomSheetHandle()"))
+            assertTrue(source.contains("GoodsPocketBottomSheetHeader("))
         }
 
         assertTrue(surfaceSource.contains("fun GoodsPocketBottomSheetHandle("))
+        assertTrue(surfaceSource.contains("fun GoodsPocketBottomSheetHeader("))
+        assertTrue(surfaceSource.contains("padding(start = 8.dp)"))
+        assertTrue(surfaceSource.contains("padding(vertical = 8.dp)"))
     }
 
     private fun source(path: String): String {

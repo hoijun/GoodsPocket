@@ -20,16 +20,14 @@ class CollectionMetricLabelRegressionTest {
     }
 
     @Test
-    fun `collection summary metrics use wider padding and reduced rounding`() {
+    fun `collection total purchase summary matches the selected status card footprint`() {
         val collectionScreen = source("composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/screen/CollectionScreen.kt")
-        val surfaceSource = source("composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/designsystem/GoodsPocketSurface.kt")
 
-        assertTrue(surfaceSource.contains("shape: Shape = CircleShape"))
-        assertTrue(surfaceSource.contains("contentPadding: PaddingValues = PaddingValues(horizontal = 12.dp, vertical = 10.dp)"))
-        assertTrue(collectionScreen.contains("val summaryMetricShape = RoundedCornerShape(14.dp)"))
-        assertTrue(collectionScreen.contains("val summaryMetricPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)"))
-        assertTrue(collectionScreen.contains("shape = summaryMetricShape"))
-        assertTrue(collectionScreen.contains("contentPadding = summaryMetricPadding"))
+        assertTrue(collectionScreen.contains("CollectionSummaryCard("))
+        assertTrue(collectionScreen.contains("modifier = Modifier.widthIn(min = 136.dp)"))
+        assertTrue(collectionScreen.contains("modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)"))
+        assertTrue(collectionScreen.contains("style = MaterialTheme.typography.titleLarge"))
+        assertTrue(collectionScreen.contains("style = MaterialTheme.typography.labelMedium"))
     }
 
     private fun source(path: String): String {

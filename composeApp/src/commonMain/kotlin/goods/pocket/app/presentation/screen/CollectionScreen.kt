@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -27,7 +26,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import goods.pocket.app.domain.model.Item
 import goods.pocket.app.domain.model.ItemStatus
-import goods.pocket.app.presentation.designsystem.GoodsPocketMetricPill
 import goods.pocket.app.presentation.designsystem.GoodsPocketSectionCard
 import goods.pocket.app.presentation.designsystem.GoodsPocketSectionHeader
 import goods.pocket.app.presentation.designsystem.GoodsPocketTonalBadge
@@ -60,8 +58,6 @@ fun CollectionScreen(
     val visibleItems = items.filter { it.status == selectedStatus }
     val totalSpend = items.sumOf { it.purchasePrice ?: 0L }
     val highlightedCategories = visibleItems.map(Item::category).distinct().take(4)
-    val summaryMetricShape = RoundedCornerShape(14.dp)
-    val summaryMetricPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
 
     LazyColumn(
         modifier = goodsPocketScreenModifier(),
@@ -91,13 +87,11 @@ fun CollectionScreen(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
-                    GoodsPocketMetricPill(
+                    CollectionSummaryCard(
                         label = tr(Res.string.collection_metric_monthly_spend),
                         value = formatCurrency(totalSpend),
                         containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                         contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                        shape = summaryMetricShape,
-                        contentPadding = summaryMetricPadding,
                     )
                 }
             }
@@ -256,6 +250,38 @@ private fun CollectionStatusCard(
                 } else {
                     MaterialTheme.colorScheme.onSurfaceVariant
                 },
+            )
+        }
+    }
+}
+
+@Composable
+private fun CollectionSummaryCard(
+    label: String,
+    value: String,
+    containerColor: Color,
+    contentColor: Color,
+) {
+    Surface(
+        modifier = Modifier.widthIn(min = 136.dp),
+        color = containerColor,
+        contentColor = contentColor,
+        shape = RoundedCornerShape(14.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = contentColor.copy(alpha = 0.82f),
             )
         }
     }

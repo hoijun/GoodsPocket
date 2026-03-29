@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import goods.pocket.app.domain.model.EventType
 import goods.pocket.app.domain.model.TransactionType
-import goods.pocket.app.presentation.designsystem.GoodsPocketBottomSheetHandle
+import goods.pocket.app.presentation.designsystem.GoodsPocketBottomSheetHeader
 import goods.pocket.app.presentation.designsystem.GoodsPocketFilterChip
 import goods.pocket.app.presentation.designsystem.goodsPocketOutlinedFieldColors
 import goods.pocket.app.presentation.i18n.localizedLabel
@@ -79,10 +79,8 @@ fun QuickAddSheet(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            GoodsPocketBottomSheetHandle()
-            Text(
-                text = tr(Res.string.quick_add_title),
-                style = MaterialTheme.typography.titleLarge,
+            GoodsPocketBottomSheetHeader(
+                title = tr(Res.string.quick_add_title),
                 fontWeight = FontWeight.SemiBold,
             )
 
