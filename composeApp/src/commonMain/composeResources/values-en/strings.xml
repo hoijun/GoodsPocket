@@ -105,17 +105,15 @@
     <string name="my_utility_sync_backup_subtitle">You can connect an account or set up backup later.</string>
     <string name="my_utility_notifications">Notifications</string>
     <string name="my_utility_settings">Settings</string>
-    <string name="my_utility_settings_subtitle">Manage app settings and the default start tab.</string>
+    <string name="my_utility_settings_subtitle">Manage app settings.</string>
 
-    <string name="settings_app_preferences">App Preferences</string>
+    <string name="settings_quick_preferences">Quick preferences</string>
+    <string name="settings_display_format">Display format</string>
     <string name="settings_currency">Currency: %1$s</string>
     <string name="settings_date_format">Date format: %1$s</string>
     <string name="settings_language">Language</string>
     <string name="settings_language_korean">Korean</string>
     <string name="settings_language_english">English</string>
-    <string name="settings_default_start_tab">Default start tab</string>
-    <string name="settings_storage_presets">Storage presets</string>
-    <string name="settings_storage_preset_fallback">Reusable storage location preset</string>
 
     <string name="quick_add_title">Quick Add</string>
     <string name="field_item_name">Item name</string>

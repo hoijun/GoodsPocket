@@ -313,9 +313,7 @@ private fun GoodsPocketNavHost(
                 onEventClick = appStateHolder::openEventDetail,
             )
             AppDestination.Settings -> SettingsScreen(
-                storageLocations = uiState.storageLocations,
                 appPreferences = uiState.appPreferences,
-                onStartTabChange = appStateHolder::updateStartTab,
                 onLanguageChange = appStateHolder::updateLanguage,
             )
         }

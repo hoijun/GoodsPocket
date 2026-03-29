@@ -140,24 +140,6 @@ class GoodsPocketAppStateHolder(
         }
     }
 
-    fun updateStartTab(route: String) {
-        val currentPreferences = _state.value.appPreferences
-        updateAppPreferencesUseCase(
-            currentPreferences.copy(startTabRoute = route),
-        )
-        reload()
-        _state.update { current ->
-            val startDestination = primaryDestinationForRoute(route)
-            current.copy(
-                currentDestination = startDestination,
-                selectedPrimaryDestination = selectedPrimaryDestinationFor(
-                    destination = startDestination,
-                    fallback = current.selectedPrimaryDestination,
-                ),
-            )
-        }
-    }
-
     fun updateLanguage(languageCode: String) {
         val currentPreferences = _state.value.appPreferences
         updateAppPreferencesUseCase(
@@ -575,7 +557,6 @@ class GoodsPocketAppStateHolder(
             getRecentActivitiesUseCase = getRecentActivitiesUseCase,
             getStorageLocationsUseCase = getStorageLocationsUseCase,
             getUpcomingEventsUseCase = getUpcomingEventsUseCase,
-            updateAppPreferencesUseCase = updateAppPreferencesUseCase,
             currentMonth = CURRENT_MONTH,
             upcomingEventPreviewLimit = UPCOMING_EVENT_PREVIEW_LIMIT,
         )

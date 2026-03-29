@@ -1,7 +1,6 @@
 package goods.pocket.app.presentation.state
 
 import goods.pocket.app.data.InMemoryGoodsPocketRepository
-import goods.pocket.app.domain.model.AppPreference
 import goods.pocket.app.domain.model.EventType
 import goods.pocket.app.domain.model.PreorderStatus
 import goods.pocket.app.presentation.navigation.AppDestination
@@ -219,35 +218,6 @@ class GoodsPocketAppStateHolderTest {
         val preorders = stateHolder.state.value.preorders
         assertEquals(1, preorders.size)
         assertEquals("pre-2", preorders.first().id)
-    }
-
-    @Test
-    fun startTabPreferenceUpdatesCurrentDestination() {
-        val stateHolder = newStateHolder()
-
-        stateHolder.updateStartTab("my")
-
-        val state = stateHolder.state.value
-        assertEquals("my", state.appPreferences.startTabRoute)
-        assertEquals("my", state.currentDestination.route)
-    }
-
-    @Test
-    fun legacyTransactionStartTabIsRewrittenToHomeOnInit() {
-        val repository = InMemoryGoodsPocketRepository()
-        UpdateAppPreferencesUseCase(repository)(
-            AppPreference(startTabRoute = AppDestination.Transactions.route),
-        )
-
-        val stateHolder = newStateHolder(repository)
-        val state = stateHolder.state.value
-
-        assertEquals(AppDestination.Home.route, state.appPreferences.startTabRoute)
-        assertEquals(AppDestination.Home.route, state.currentDestination.route)
-        assertEquals(
-            AppDestination.Home.route,
-            GetAppPreferencesUseCase(repository)().startTabRoute,
-        )
     }
 
     @Test

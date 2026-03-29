@@ -105,17 +105,15 @@
     <string name="my_utility_sync_backup_subtitle">나중에 계정 연결과 백업을 설정할 수 있어요.</string>
     <string name="my_utility_notifications">알림</string>
     <string name="my_utility_settings">설정</string>
-    <string name="my_utility_settings_subtitle">앱 설정과 기본 시작 탭을 관리해요.</string>
+    <string name="my_utility_settings_subtitle">앱 설정을 관리해요.</string>
 
-    <string name="settings_app_preferences">앱 설정</string>
+    <string name="settings_quick_preferences">앱 바로 설정</string>
+    <string name="settings_display_format">표시 형식</string>
     <string name="settings_currency">통화: %1$s</string>
     <string name="settings_date_format">날짜 형식: %1$s</string>
     <string name="settings_language">언어</string>
     <string name="settings_language_korean">한국어</string>
     <string name="settings_language_english">영어</string>
-    <string name="settings_default_start_tab">기본 시작 탭</string>
-    <string name="settings_storage_presets">보관 위치 프리셋</string>
-    <string name="settings_storage_preset_fallback">재사용 가능한 보관 위치 프리셋</string>
 
     <string name="quick_add_title">빠른 추가</string>
     <string name="field_item_name">굿즈 이름</string>

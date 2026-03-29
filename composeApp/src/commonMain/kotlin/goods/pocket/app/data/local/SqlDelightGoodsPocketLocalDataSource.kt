@@ -338,7 +338,6 @@ class SqlDelightGoodsPocketLocalDataSource(
             AppPreference(
                 currencyCode = row.currency_code,
                 dateFormat = row.date_format,
-                startTabRoute = row.start_tab_route,
                 languageCode = row.language_code,
             )
         } ?: AppPreference()
@@ -348,7 +347,6 @@ class SqlDelightGoodsPocketLocalDataSource(
         queries.upsertAppPreferences(
             currency_code = preferences.currencyCode,
             date_format = preferences.dateFormat,
-            start_tab_route = preferences.startTabRoute,
             language_code = preferences.languageCode,
         )
     }

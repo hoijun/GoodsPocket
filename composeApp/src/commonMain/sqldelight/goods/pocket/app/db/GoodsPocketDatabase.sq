@@ -228,12 +228,12 @@ DELETE FROM storage_locations
 WHERE id = ?;
 
 selectAppPreferences:
-SELECT * FROM app_preferences
+SELECT currency_code, date_format, language_code FROM app_preferences
 WHERE id = 'default';
 
 upsertAppPreferences:
 INSERT OR REPLACE INTO app_preferences (id, currency_code, date_format, start_tab_route, language_code)
-VALUES ('default', ?, ?, ?, ?);
+VALUES ('default', ?, ?, 'home', ?);
 
 deleteAllAppPreferences:
 DELETE FROM app_preferences;

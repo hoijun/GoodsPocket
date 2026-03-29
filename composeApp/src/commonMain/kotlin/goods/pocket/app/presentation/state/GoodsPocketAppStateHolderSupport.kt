@@ -11,7 +11,6 @@ import goods.pocket.app.domain.usecase.GetPreorderListUseCase
 import goods.pocket.app.domain.usecase.GetRecentActivitiesUseCase
 import goods.pocket.app.domain.usecase.GetStorageLocationsUseCase
 import goods.pocket.app.domain.usecase.GetUpcomingEventsUseCase
-import goods.pocket.app.domain.usecase.UpdateAppPreferencesUseCase
 import goods.pocket.app.i18n.localizedLocalProfileLabel
 import goods.pocket.app.i18n.localizedSyncNotConnectedLabel
 import goods.pocket.app.presentation.navigation.AppDestination
@@ -29,12 +28,10 @@ internal fun reloadState(
     getRecentActivitiesUseCase: GetRecentActivitiesUseCase,
     getStorageLocationsUseCase: GetStorageLocationsUseCase,
     getUpcomingEventsUseCase: GetUpcomingEventsUseCase,
-    updateAppPreferencesUseCase: UpdateAppPreferencesUseCase,
     currentMonth: String,
     upcomingEventPreviewLimit: Int,
 ) {
-    val storedAppPreferences = getAppPreferencesUseCase()
-    val appPreferences = migrateLegacyStartTabPreference(storedAppPreferences)
+    val appPreferences = getAppPreferencesUseCase()
     val recentActivities = getRecentActivitiesUseCase(
         limit = 5,
         languageCode = appPreferences.languageCode,
@@ -44,22 +41,7 @@ internal fun reloadState(
         recentActivities = recentActivities,
     )
     val allUpcomingEvents = getUpcomingEventsUseCase(limit = Int.MAX_VALUE)
-    if (appPreferences != storedAppPreferences) {
-        updateAppPreferencesUseCase(appPreferences)
-    }
     state.update { current ->
-        val initialDestination = primaryDestinationForRoute(appPreferences.startTabRoute)
-        val shouldRedirectFromEmptyHome =
-            current.currentDestination == AppDestination.Home &&
-                current.collectionItems.isEmpty() &&
-                current.preorders.isEmpty() &&
-                current.transactions.isEmpty() &&
-                current.events.isEmpty()
-        val nextDestination = if (shouldRedirectFromEmptyHome) {
-            initialDestination
-        } else {
-            current.currentDestination
-        }
         current.copy(
             myPage = homeSummary.toMyPageUiModel(
                 upcomingEventCount = allUpcomingEvents.size,
@@ -74,9 +56,9 @@ internal fun reloadState(
             events = getEventListUseCase(current.eventTypeFilter),
             storageLocations = getStorageLocationsUseCase(),
             appPreferences = appPreferences,
-            currentDestination = nextDestination,
+            currentDestination = current.currentDestination,
             selectedPrimaryDestination = selectedPrimaryDestinationFor(
-                destination = nextDestination,
+                destination = current.currentDestination,
                 fallback = current.selectedPrimaryDestination,
             ),
             collectionQuery = current.collectionQuery,
@@ -92,27 +74,11 @@ internal fun reloadState(
     }
 }
 
-internal fun primaryDestinationForRoute(route: String): AppDestination {
-    return AppDestination.primaryDestinations.firstOrNull { it.route == route } ?: AppDestination.Home
-}
-
 internal fun selectedPrimaryDestinationFor(
     destination: AppDestination,
     fallback: AppDestination,
 ): AppDestination {
     return AppDestination.primaryDestinations.firstOrNull { it.route == destination.route } ?: fallback
-}
-
-private fun migrateLegacyStartTabPreference(appPreference: AppPreference): AppPreference {
-    val migratedStartTabRoute = when (appPreference.startTabRoute) {
-        AppDestination.Transactions.route -> AppDestination.Home.route
-        else -> appPreference.startTabRoute
-    }
-    return if (migratedStartTabRoute == appPreference.startTabRoute) {
-        appPreference
-    } else {
-        appPreference.copy(startTabRoute = migratedStartTabRoute)
-    }
 }
 
 private fun HomeSummary.toMyPageUiModel(

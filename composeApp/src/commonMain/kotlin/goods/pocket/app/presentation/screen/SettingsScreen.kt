@@ -2,44 +2,31 @@ package goods.pocket.app.presentation.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import goods.pocket.app.domain.model.AppPreference
-import goods.pocket.app.domain.model.StorageLocation
 import goods.pocket.app.presentation.designsystem.GoodsPocketFilterChip
-import goods.pocket.app.presentation.designsystem.GoodsPocketListRow
 import goods.pocket.app.presentation.designsystem.GoodsPocketSectionCard
 import goods.pocket.app.presentation.designsystem.GoodsPocketSectionHeader
 import goods.pocket.app.presentation.designsystem.goodsPocketScreenModifier
 import goods.pocket.app.presentation.designsystem.goodsPocketSecondaryScrollContentPadding
 import goods.pocket.app.presentation.i18n.AppLanguage
-import goods.pocket.app.presentation.i18n.localizedLabel
 import goods.pocket.app.presentation.i18n.tr
-import goods.pocket.app.presentation.navigation.AppDestination
 import goodspocket.composeapp.generated.resources.Res
-import goodspocket.composeapp.generated.resources.settings_app_preferences
 import goodspocket.composeapp.generated.resources.settings_currency
 import goodspocket.composeapp.generated.resources.settings_date_format
-import goodspocket.composeapp.generated.resources.settings_default_start_tab
+import goodspocket.composeapp.generated.resources.settings_display_format
 import goodspocket.composeapp.generated.resources.settings_language
 import goodspocket.composeapp.generated.resources.settings_language_english
 import goodspocket.composeapp.generated.resources.settings_language_korean
-import goodspocket.composeapp.generated.resources.settings_storage_preset_fallback
-import goodspocket.composeapp.generated.resources.settings_storage_presets
+import goodspocket.composeapp.generated.resources.settings_quick_preferences
 
 @Composable
 fun SettingsScreen(
-    storageLocations: List<StorageLocation>,
     appPreferences: AppPreference,
-    onStartTabChange: (String) -> Unit,
     onLanguageChange: (String) -> Unit,
 ) {
     LazyColumn(
@@ -50,18 +37,7 @@ fun SettingsScreen(
         item {
             GoodsPocketSectionCard(containerColor = MaterialTheme.colorScheme.surface) {
                 GoodsPocketSectionHeader(
-                    title = tr(Res.string.settings_app_preferences),
-                    subtitle = tr(Res.string.settings_default_start_tab),
-                )
-                Text(
-                    text = tr(Res.string.settings_currency, appPreferences.currencyCode),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                Text(
-                    text = tr(Res.string.settings_date_format, appPreferences.dateFormat),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    title = tr(Res.string.settings_quick_preferences),
                 )
                 Text(
                     text = tr(Res.string.settings_language),
@@ -82,36 +58,23 @@ fun SettingsScreen(
                         label = tr(Res.string.settings_language_english),
                     )
                 }
-                Text(
-                    text = tr(Res.string.settings_default_start_tab),
-                    style = MaterialTheme.typography.labelLarge,
-                )
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    AppDestination.primaryDestinations.forEach { destination ->
-                        GoodsPocketFilterChip(
-                            selected = appPreferences.startTabRoute == destination.route,
-                            onClick = { onStartTabChange(destination.route) },
-                            label = destination.localizedLabel(),
-                        )
-                    }
-                }
             }
         }
         item {
             GoodsPocketSectionCard(containerColor = MaterialTheme.colorScheme.surface) {
                 GoodsPocketSectionHeader(
-                    title = tr(Res.string.settings_storage_presets),
-                    subtitle = tr(Res.string.settings_storage_preset_fallback),
+                    title = tr(Res.string.settings_display_format),
                 )
-                storageLocations.forEach { location ->
-                    GoodsPocketListRow(
-                        title = location.name,
-                        subtitle = location.memo ?: tr(Res.string.settings_storage_preset_fallback),
-                    )
-                }
+                Text(
+                    text = tr(Res.string.settings_currency, appPreferences.currencyCode),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Text(
+                    text = tr(Res.string.settings_date_format, appPreferences.dateFormat),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         }
     }
