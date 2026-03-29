@@ -20,7 +20,5 @@ data class Item(
 
 enum class ItemStatus {
     OWNED,
-    WAITING_DELIVERY,
-    PLANNED_TRANSFER,
-    LOST,
+    PLANNED_CLEANUP,
 }

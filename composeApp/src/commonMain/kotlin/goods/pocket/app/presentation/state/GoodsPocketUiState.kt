@@ -3,6 +3,7 @@ package goods.pocket.app.presentation.state
 import goods.pocket.app.domain.model.Event
 import goods.pocket.app.domain.model.HomeSummary
 import goods.pocket.app.domain.model.Item
+import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.PreorderStatus
 import goods.pocket.app.domain.model.AppPreference
@@ -17,6 +18,7 @@ data class GoodsPocketUiState(
     val selectedPrimaryDestination: AppDestination = AppDestination.Home,
     val myPage: MyPageUiModel = MyPageUiModel(),
     val collectionQuery: String = "",
+    val collectionStatusFilter: ItemStatus = ItemStatus.OWNED,
     val preorderStatusFilter: PreorderStatus? = null,
     val transactionTypeFilter: TransactionType? = null,
     val eventTypeFilter: EventType? = null,

@@ -2,6 +2,7 @@ package goods.pocket.app.presentation.state
 
 import goods.pocket.app.data.InMemoryGoodsPocketRepository
 import goods.pocket.app.domain.model.EventType
+import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.PreorderStatus
 import goods.pocket.app.presentation.navigation.AppDestination
 import goods.pocket.app.domain.usecase.CancelPreorderUseCase
@@ -155,6 +156,7 @@ class GoodsPocketAppStateHolderTest {
             itemId = "item-1",
             name = "Updated Acrylic Stand",
             category = "Figure",
+            status = ItemStatus.PLANNED_CLEANUP,
             seriesName = "Hololive",
             characterName = "Suisei",
             purchaseStore = "Animate International",
@@ -163,6 +165,7 @@ class GoodsPocketAppStateHolderTest {
         val updatedItem = stateHolder.state.value.collectionItems.first { it.id == "item-1" }
         assertEquals("Updated Acrylic Stand", updatedItem.name)
         assertEquals("Figure", updatedItem.category)
+        assertEquals(ItemStatus.PLANNED_CLEANUP, updatedItem.status)
         assertEquals("Animate International", updatedItem.purchaseStore)
         assertEquals(ActiveDetail.ItemDetail("item-1"), stateHolder.state.value.activeDetail)
     }
@@ -207,6 +210,24 @@ class GoodsPocketAppStateHolderTest {
         val items = stateHolder.state.value.collectionItems
         assertEquals(1, items.size)
         assertEquals("item-2", items.first().id)
+    }
+
+    @Test
+    fun collectionStatusFilterDefaultsToOwned() {
+        val stateHolder = newStateHolder()
+
+        assertEquals(ItemStatus.OWNED, stateHolder.state.value.collectionStatusFilter)
+    }
+
+    @Test
+    fun collectionStatusFilterCanBeUpdatedIndependentlyFromSearchQuery() {
+        val stateHolder = newStateHolder()
+
+        stateHolder.updateCollectionStatusFilter(ItemStatus.PLANNED_CLEANUP)
+        stateHolder.updateCollectionQuery("스이세이")
+
+        assertEquals(ItemStatus.PLANNED_CLEANUP, stateHolder.state.value.collectionStatusFilter)
+        assertEquals("스이세이", stateHolder.state.value.collectionQuery)
     }
 
     @Test

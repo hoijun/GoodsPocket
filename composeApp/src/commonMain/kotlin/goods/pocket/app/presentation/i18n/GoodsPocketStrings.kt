@@ -81,9 +81,7 @@ fun QuickAddTarget.localizedLabel(): String {
 fun ItemStatus.localizedLabel(): String {
     return when (this) {
         ItemStatus.OWNED -> tr(Res.string.item_status_owned)
-        ItemStatus.WAITING_DELIVERY -> tr(Res.string.item_status_waiting_delivery)
-        ItemStatus.PLANNED_TRANSFER -> tr(Res.string.item_status_planned_transfer)
-        ItemStatus.LOST -> tr(Res.string.item_status_lost)
+        ItemStatus.PLANNED_CLEANUP -> tr(Res.string.item_status_planned_cleanup)
     }
 }
 

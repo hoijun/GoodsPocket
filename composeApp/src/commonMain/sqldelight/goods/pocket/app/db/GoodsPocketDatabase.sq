@@ -114,7 +114,7 @@ ORDER BY transaction_date DESC, created_at DESC;
 
 countOwnedItems:
 SELECT COUNT(*) FROM items
-WHERE status = 'OWNED';
+WHERE status IN ('OWNED', 'WAITING_DELIVERY', 'LOST');
 
 selectAllPreorders:
 SELECT * FROM preorders

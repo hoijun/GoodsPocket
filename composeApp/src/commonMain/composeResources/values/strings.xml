@@ -47,14 +47,14 @@
 
     <string name="collection_search_label">컬렉션 검색</string>
     <string name="collection_search_placeholder">이름 또는 시리즈</string>
-    <string name="collection_empty_search">검색과 일치하는 컬렉션이 없어요.</string>
-    <string name="collection_badge_total">전체 %1$s건</string>
-    <string name="collection_badge_query">검색어 "%1$s"</string>
+    <string name="collection_empty_search">현재 조건과 일치하는 굿즈가 없어요.</string>
+    <string name="collection_status_section">굿즈 상태</string>
+    <string name="collection_status_section_subtitle">보유 중과 정리 예정 굿즈를 나눠서 확인해요.</string>
+    <string name="collection_overview_title">컬렉션 규모</string>
     <string name="collection_quantity_badge">%1$s개</string>
     <string name="collection_series_category">%1$s · %2$s</string>
     <string name="collection_metric_total_items">전체 굿즈</string>
     <string name="collection_metric_monthly_spend">총 구매액</string>
-    <string name="collection_metric_waiting">배송 대기</string>
 
     <string name="preorders_status_filter">상태 필터</string>
     <string name="preorders_empty_filter">이 상태의 예약이 없어요.</string>
@@ -126,6 +126,7 @@
     <string name="field_date">날짜</string>
     <string name="field_target_date">목표 날짜</string>
     <string name="field_name">이름</string>
+    <string name="field_status">상태</string>
     <string name="field_series">시리즈</string>
     <string name="field_character">캐릭터</string>
     <string name="field_title">제목</string>
@@ -171,9 +172,7 @@
     <string name="target_event">이벤트</string>
 
     <string name="item_status_owned">보유 중</string>
-    <string name="item_status_waiting_delivery">배송 대기</string>
-    <string name="item_status_planned_transfer">양도 예정</string>
-    <string name="item_status_lost">분실</string>
+    <string name="item_status_planned_cleanup">정리 예정</string>
 
     <string name="preorder_status_active">진행 중</string>
     <string name="preorder_status_payment_pending">잔금 대기</string>

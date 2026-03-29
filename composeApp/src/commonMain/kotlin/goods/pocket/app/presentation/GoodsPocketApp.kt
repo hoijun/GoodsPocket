@@ -286,7 +286,9 @@ private fun GoodsPocketNavHost(
             )
             AppDestination.Collection -> CollectionScreen(
                 items = uiState.collectionItems,
+                selectedStatus = uiState.collectionStatusFilter,
                 query = uiState.collectionQuery,
+                onStatusChange = appStateHolder::updateCollectionStatusFilter,
                 onQueryChange = appStateHolder::updateCollectionQuery,
                 onItemClick = appStateHolder::openItemDetail,
             )
@@ -383,11 +385,12 @@ private fun ActiveEditorSheet(
             ItemEditorSheet(
                 item = item,
                 onDismiss = appStateHolder::closeEditor,
-                onSave = { name, category, seriesName, characterName, purchaseStore ->
+                onSave = { name, category, status, seriesName, characterName, purchaseStore ->
                     appStateHolder.saveEditedItem(
                         itemId = item.id,
                         name = name,
                         category = category,
+                        status = status,
                         seriesName = seriesName,
                         characterName = characterName,
                         purchaseStore = purchaseStore,

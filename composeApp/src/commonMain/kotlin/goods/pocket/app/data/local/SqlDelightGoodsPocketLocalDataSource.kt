@@ -370,7 +370,12 @@ class SqlDelightGoodsPocketLocalDataSource(
     private fun currentTimestamp(): String = GoodsPocketSeedData.defaultTimestamp
 
     private fun String.toItemStatus(): ItemStatus {
-        return ItemStatus.valueOf(this)
+        return when (this) {
+            "PLANNED_TRANSFER" -> ItemStatus.PLANNED_CLEANUP
+            "WAITING_DELIVERY" -> ItemStatus.OWNED
+            "LOST" -> ItemStatus.OWNED
+            else -> ItemStatus.valueOf(this)
+        }
     }
 
     private fun String.toPreorderStatus(): PreorderStatus {

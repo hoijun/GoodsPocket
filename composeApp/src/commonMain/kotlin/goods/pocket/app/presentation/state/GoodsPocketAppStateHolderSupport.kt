@@ -62,6 +62,7 @@ internal fun reloadState(
                 fallback = current.selectedPrimaryDestination,
             ),
             collectionQuery = current.collectionQuery,
+            collectionStatusFilter = current.collectionStatusFilter,
             preorderStatusFilter = current.preorderStatusFilter,
             transactionTypeFilter = current.transactionTypeFilter,
             eventTypeFilter = current.eventTypeFilter,

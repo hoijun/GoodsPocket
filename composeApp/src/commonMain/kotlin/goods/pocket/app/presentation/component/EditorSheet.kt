@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import goods.pocket.app.domain.model.Event
 import goods.pocket.app.domain.model.EventType
 import goods.pocket.app.domain.model.Item
+import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.Transaction
 import goods.pocket.app.domain.model.TransactionType
@@ -42,6 +43,7 @@ import goodspocket.composeapp.generated.resources.field_date
 import goodspocket.composeapp.generated.resources.field_name
 import goodspocket.composeapp.generated.resources.field_release_date
 import goodspocket.composeapp.generated.resources.field_series
+import goodspocket.composeapp.generated.resources.field_status
 import goodspocket.composeapp.generated.resources.field_store
 import goodspocket.composeapp.generated.resources.field_target_date
 import goodspocket.composeapp.generated.resources.field_title
@@ -51,10 +53,11 @@ import goodspocket.composeapp.generated.resources.field_title
 fun ItemEditorSheet(
     item: Item,
     onDismiss: () -> Unit,
-    onSave: (String, String, String, String, String) -> Unit,
+    onSave: (String, String, ItemStatus, String, String, String) -> Unit,
 ) {
     var name by remember(item.id) { mutableStateOf(item.name) }
     var category by remember(item.id) { mutableStateOf(item.category) }
+    var status by remember(item.id) { mutableStateOf(item.status) }
     var seriesName by remember(item.id) { mutableStateOf(item.seriesName.orEmpty()) }
     var characterName by remember(item.id) { mutableStateOf(item.characterName.orEmpty()) }
     var purchaseStore by remember(item.id) { mutableStateOf(item.purchaseStore.orEmpty()) }
@@ -62,11 +65,27 @@ fun ItemEditorSheet(
     EditorSheetContainer(title = tr(Res.string.editor_item_title), onDismiss = onDismiss) {
         GoodsPocketEditorField(name, { name = it }, tr(Res.string.field_name))
         GoodsPocketEditorField(category, { category = it }, tr(Res.string.field_category))
+        Text(
+            text = tr(Res.string.field_status),
+            style = MaterialTheme.typography.labelLarge,
+        )
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            listOf(ItemStatus.OWNED, ItemStatus.PLANNED_CLEANUP).forEach { itemStatus ->
+                GoodsPocketFilterChip(
+                    selected = status == itemStatus,
+                    onClick = { status = itemStatus },
+                    label = itemStatus.localizedLabel(),
+                )
+            }
+        }
         GoodsPocketEditorField(seriesName, { seriesName = it }, tr(Res.string.field_series))
         GoodsPocketEditorField(characterName, { characterName = it }, tr(Res.string.field_character))
         GoodsPocketEditorField(purchaseStore, { purchaseStore = it }, tr(Res.string.field_store))
         SaveButton(enabled = name.isNotBlank() && category.isNotBlank()) {
-            onSave(name, category, seriesName, characterName, purchaseStore)
+            onSave(name, category, status, seriesName, characterName, purchaseStore)
         }
     }
 }

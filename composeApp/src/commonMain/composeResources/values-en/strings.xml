@@ -47,14 +47,14 @@
 
     <string name="collection_search_label">Search collection</string>
     <string name="collection_search_placeholder">Name or series</string>
-    <string name="collection_empty_search">No collection items match this search.</string>
-    <string name="collection_badge_total">%1$s items</string>
-    <string name="collection_badge_query">Query "%1$s"</string>
+    <string name="collection_empty_search">No items match the current collection filters.</string>
+    <string name="collection_status_section">Item status</string>
+    <string name="collection_status_section_subtitle">Switch between owned and planned cleanup items first.</string>
+    <string name="collection_overview_title">Collection overview</string>
     <string name="collection_quantity_badge">Qty %1$s</string>
     <string name="collection_series_category">%1$s · %2$s</string>
     <string name="collection_metric_total_items">Total items</string>
     <string name="collection_metric_monthly_spend">Total purchase amount</string>
-    <string name="collection_metric_waiting">Waiting</string>
 
     <string name="preorders_status_filter">Status filter</string>
     <string name="preorders_empty_filter">No preorders in this status.</string>
@@ -126,6 +126,7 @@
     <string name="field_date">Date</string>
     <string name="field_target_date">Target date</string>
     <string name="field_name">Name</string>
+    <string name="field_status">Status</string>
     <string name="field_series">Series</string>
     <string name="field_character">Character</string>
     <string name="field_title">Title</string>
@@ -171,9 +172,7 @@
     <string name="target_event">Event</string>
 
     <string name="item_status_owned">Owned</string>
-    <string name="item_status_waiting_delivery">Waiting Delivery</string>
-    <string name="item_status_planned_transfer">Planned Transfer</string>
-    <string name="item_status_lost">Lost</string>
+    <string name="item_status_planned_cleanup">Planned cleanup</string>
 
     <string name="preorder_status_active">Active</string>
     <string name="preorder_status_payment_pending">Payment Pending</string>

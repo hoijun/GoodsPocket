@@ -153,6 +153,10 @@ class GoodsPocketAppStateHolder(
         reload()
     }
 
+    fun updateCollectionStatusFilter(status: ItemStatus) {
+        _state.update { it.copy(collectionStatusFilter = status) }
+    }
+
     fun updatePreorderStatusFilter(status: PreorderStatus?) {
         _state.update { it.copy(preorderStatusFilter = status) }
         reload()
@@ -195,6 +199,7 @@ class GoodsPocketAppStateHolder(
         reloadAndCloseSheet(
             destination = AppDestination.Collection,
             detail = ActiveDetail.ItemDetail(newId),
+            collectionStatusOverride = ItemStatus.OWNED,
         )
     }
 
@@ -317,6 +322,7 @@ class GoodsPocketAppStateHolder(
         itemId: String,
         name: String,
         category: String,
+        status: ItemStatus,
         seriesName: String,
         characterName: String,
         purchaseStore: String,
@@ -326,6 +332,7 @@ class GoodsPocketAppStateHolder(
             existing.copy(
                 name = name.trim(),
                 category = category.trim(),
+                status = status,
                 seriesName = seriesName.trim().ifBlank { null },
                 characterName = characterName.trim().ifBlank { null },
                 purchaseStore = purchaseStore.trim().ifBlank { null },
@@ -523,6 +530,7 @@ class GoodsPocketAppStateHolder(
             current.copy(
                 currentDestination = AppDestination.Collection,
                 selectedPrimaryDestination = AppDestination.Collection,
+                collectionStatusFilter = ItemStatus.OWNED,
                 activeDetail = ActiveDetail.ItemDetail(newItemId),
             )
         }
@@ -530,7 +538,11 @@ class GoodsPocketAppStateHolder(
 
     fun itemTransactions(itemId: String): List<Transaction> = getItemTransactionsUseCase(itemId)
 
-    private fun reloadAndCloseSheet(destination: AppDestination, detail: ActiveDetail) {
+    private fun reloadAndCloseSheet(
+        destination: AppDestination,
+        detail: ActiveDetail,
+        collectionStatusOverride: ItemStatus? = null,
+    ) {
         reload()
         _state.update { current ->
             current.copy(
@@ -539,6 +551,7 @@ class GoodsPocketAppStateHolder(
                     destination = destination,
                     fallback = current.selectedPrimaryDestination,
                 ),
+                collectionStatusFilter = collectionStatusOverride ?: current.collectionStatusFilter,
                 activeDetail = detail,
                 isQuickAddOpen = false,
             )

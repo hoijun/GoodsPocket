@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import goods.pocket.app.domain.model.Event
 import goods.pocket.app.domain.model.Item
+import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.PreorderStatus
 import goods.pocket.app.domain.model.Transaction
@@ -130,9 +131,25 @@ private fun ItemDetailHero(
         }
         GoodsPocketTonalBadge(
             text = item.status.localizedLabel(),
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            containerColor = itemStatusContainerColor(item.status),
+            contentColor = itemStatusContentColor(item.status),
         )
+    }
+}
+
+@Composable
+private fun itemStatusContainerColor(status: ItemStatus): androidx.compose.ui.graphics.Color {
+    return when (status) {
+        ItemStatus.OWNED -> MaterialTheme.colorScheme.secondaryContainer
+        ItemStatus.PLANNED_CLEANUP -> MaterialTheme.colorScheme.tertiaryContainer
+    }
+}
+
+@Composable
+private fun itemStatusContentColor(status: ItemStatus): androidx.compose.ui.graphics.Color {
+    return when (status) {
+        ItemStatus.OWNED -> MaterialTheme.colorScheme.onSecondaryContainer
+        ItemStatus.PLANNED_CLEANUP -> MaterialTheme.colorScheme.onTertiaryContainer
     }
 }
 
