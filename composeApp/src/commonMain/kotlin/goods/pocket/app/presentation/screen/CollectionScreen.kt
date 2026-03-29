@@ -164,8 +164,8 @@ fun CollectionScreen(
                     Column(
                         modifier = Modifier
                             .weight(1f)
-                            .padding(start = 8.dp)
-                            .padding(vertical = 6.dp),
+                            .padding(start = 10.dp)
+                            .padding(vertical = 10.dp),
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
                         Row(

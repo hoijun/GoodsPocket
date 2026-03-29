@@ -49,8 +49,8 @@ class CollectionStatusModelRegressionTest {
         assertFalse(collectionSource.contains("collection_metric_waiting"))
         assertFalse(collectionSource.contains("collection_badge_total"))
         assertFalse(collectionSource.contains("collection_badge_query"))
-        assertTrue(collectionSource.contains(".padding(start = 8.dp)"))
-        assertTrue(collectionSource.contains(".padding(vertical = 6.dp)"))
+        assertTrue(collectionSource.contains(".padding(start = 10.dp)"))
+        assertTrue(collectionSource.contains(".padding(vertical = 10.dp)"))
         assertTrue(collectionSource.contains("verticalArrangement = Arrangement.spacedBy(10.dp)"))
     }
 
