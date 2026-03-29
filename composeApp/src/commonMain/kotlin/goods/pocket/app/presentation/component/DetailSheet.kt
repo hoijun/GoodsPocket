@@ -7,17 +7,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
@@ -29,7 +24,7 @@ import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.PreorderStatus
 import goods.pocket.app.domain.model.Transaction
-import goods.pocket.app.presentation.designsystem.GoodsPocketBottomSheetHeader
+import goods.pocket.app.presentation.designsystem.GoodsPocketModalBottomSheet
 import goods.pocket.app.presentation.designsystem.GoodsPocketTonalBadge
 import goods.pocket.app.presentation.i18n.formatCurrency
 import goods.pocket.app.presentation.i18n.localizedLabel
@@ -62,7 +57,6 @@ import goodspocket.composeapp.generated.resources.detail_store
 import goodspocket.composeapp.generated.resources.detail_target_date
 import goodspocket.composeapp.generated.resources.detail_type
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemDetailSheet(
     item: Item,
@@ -192,7 +186,6 @@ private fun LinkedTransactionRow(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PreorderDetailSheet(
     preorder: Preorder,
@@ -229,7 +222,6 @@ fun PreorderDetailSheet(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionDetailSheet(
     transaction: Transaction,
@@ -256,7 +248,6 @@ fun TransactionDetailSheet(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventDetailSheet(
     event: Event,
@@ -283,33 +274,19 @@ fun EventDetailSheet(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DetailSheetContainer(
     title: String,
     onDismiss: () -> Unit,
     content: @Composable () -> Unit,
 ) {
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        dragHandle = null,
-        containerColor = MaterialTheme.colorScheme.background,
-        tonalElevation = 0.dp,
+    GoodsPocketModalBottomSheet(
+        title = title,
+        onDismiss = onDismiss,
+        titleFontWeight = FontWeight.SemiBold,
+        contentSpacing = 12.dp,
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 18.dp, vertical = 10.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            GoodsPocketBottomSheetHeader(
-                title = title,
-                fontWeight = FontWeight.SemiBold,
-            )
-            content()
-        }
+        content()
     }
 }
 

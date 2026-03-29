@@ -22,13 +22,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import goods.pocket.app.presentation.i18n.tr
+import goodspocket.composeapp.generated.resources.Res
+import goodspocket.composeapp.generated.resources.action_close
 
 @Composable
 fun GoodsPocketSectionCard(
@@ -119,11 +125,24 @@ fun GoodsPocketSectionHeader(
 @Composable
 fun GoodsPocketBottomSheetHandle(
     modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 8.dp, bottom = 2.dp),
+            .padding(top = 8.dp, bottom = 2.dp)
+            .then(
+                if (onClick != null) {
+                    Modifier.clickable(
+                        interactionSource = interactionSource,
+                        indication = null,
+                        onClick = onClick,
+                    )
+                } else {
+                    Modifier
+                },
+            ),
         contentAlignment = Alignment.Center,
     ) {
         Surface(
@@ -139,21 +158,34 @@ fun GoodsPocketBottomSheetHandle(
 @Composable
 fun GoodsPocketBottomSheetHeader(
     title: String,
+    onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     fontWeight: FontWeight? = null,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
     ) {
-        GoodsPocketBottomSheetHandle()
-        Text(
-            text = title,
-            modifier = Modifier
-                .padding(start = 8.dp)
-                .padding(vertical = 8.dp),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = fontWeight,
-        )
+        GoodsPocketBottomSheetHandle(onClick = onDismiss)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = title,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 10.dp)
+                    .padding(vertical = 12.dp),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = fontWeight,
+            )
+            TextButton(
+                onClick = onDismiss,
+            ) {
+                Text(tr(Res.string.action_close))
+            }
+        }
     }
 }
 

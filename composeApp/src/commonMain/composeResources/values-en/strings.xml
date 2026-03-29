@@ -11,6 +11,7 @@
     <string name="action_back">Back</string>
     <string name="action_confirm">Confirm</string>
     <string name="action_cancel">Cancel</string>
+    <string name="action_close">Close</string>
     <string name="action_save">Save</string>
     <string name="action_save_changes">Save Changes</string>
     <string name="action_edit">Edit</string>

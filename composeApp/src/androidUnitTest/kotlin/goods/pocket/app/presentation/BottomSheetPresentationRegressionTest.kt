@@ -7,22 +7,31 @@ import kotlin.test.assertTrue
 class BottomSheetPresentationRegressionTest {
 
     @Test
-    fun `all modal bottom sheets open fully and render a static inline header handle with padded titles`() {
+    fun `all modal bottom sheets use a bounded bordered container with header-only dismissal affordances`() {
         val quickAddSource = source("composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/component/QuickAddSheet.kt")
         val detailSource = source("composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/component/DetailSheet.kt")
         val editorSource = source("composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/component/EditorSheet.kt")
+        val bottomSheetSource = source("composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/designsystem/GoodsPocketBottomSheet.kt")
         val surfaceSource = source("composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/designsystem/GoodsPocketSurface.kt")
 
         listOf(quickAddSource, detailSource, editorSource).forEach { source ->
-            assertTrue(source.contains("rememberModalBottomSheetState(skipPartiallyExpanded = true)"))
-            assertTrue(source.contains("dragHandle = null"))
-            assertTrue(source.contains("GoodsPocketBottomSheetHeader("))
+            assertTrue(source.contains("GoodsPocketModalBottomSheet("))
         }
 
+        assertTrue(bottomSheetSource.contains("rememberModalBottomSheetState(skipPartiallyExpanded = true)"))
+        assertTrue(bottomSheetSource.contains("sheetGesturesEnabled = false"))
+        assertTrue(bottomSheetSource.contains("ModalBottomSheetProperties("))
+        assertTrue(bottomSheetSource.contains("shouldDismissOnBackPress = false"))
+        assertTrue(bottomSheetSource.contains("shouldDismissOnClickOutside = false"))
+        assertTrue(bottomSheetSource.contains("heightIn(max = maxHeight - 88.dp)"))
+        assertTrue(bottomSheetSource.contains("border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)"))
+        assertTrue(bottomSheetSource.contains("verticalScroll(rememberScrollState())"))
         assertTrue(surfaceSource.contains("fun GoodsPocketBottomSheetHandle("))
         assertTrue(surfaceSource.contains("fun GoodsPocketBottomSheetHeader("))
-        assertTrue(surfaceSource.contains("padding(start = 8.dp)"))
-        assertTrue(surfaceSource.contains("padding(vertical = 8.dp)"))
+        assertTrue(surfaceSource.contains("GoodsPocketBottomSheetHandle(onClick = onDismiss)"))
+        assertTrue(surfaceSource.contains("TextButton("))
+        assertTrue(surfaceSource.contains("padding(start = 10.dp)"))
+        assertTrue(surfaceSource.contains("padding(vertical = 12.dp)"))
     }
 
     private fun source(path: String): String {

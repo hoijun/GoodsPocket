@@ -3,16 +3,10 @@ package goods.pocket.app.presentation.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,8 +21,8 @@ import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.Transaction
 import goods.pocket.app.domain.model.TransactionType
-import goods.pocket.app.presentation.designsystem.GoodsPocketBottomSheetHeader
 import goods.pocket.app.presentation.designsystem.GoodsPocketFilterChip
+import goods.pocket.app.presentation.designsystem.GoodsPocketModalBottomSheet
 import goods.pocket.app.presentation.designsystem.goodsPocketOutlinedFieldColors
 import goods.pocket.app.presentation.i18n.localizedLabel
 import goods.pocket.app.presentation.i18n.tr
@@ -50,7 +44,6 @@ import goodspocket.composeapp.generated.resources.field_store
 import goodspocket.composeapp.generated.resources.field_target_date
 import goodspocket.composeapp.generated.resources.field_title
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemEditorSheet(
     item: Item,
@@ -92,7 +85,6 @@ fun ItemEditorSheet(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PreorderEditorSheet(
     preorder: Preorder,
@@ -113,7 +105,6 @@ fun PreorderEditorSheet(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionEditorSheet(
     transaction: Transaction,
@@ -145,7 +136,6 @@ fun TransactionEditorSheet(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventEditorSheet(
     event: Event,
@@ -177,30 +167,18 @@ fun EventEditorSheet(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EditorSheetContainer(
     title: String,
     onDismiss: () -> Unit,
     content: @Composable () -> Unit,
 ) {
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        dragHandle = null,
-        containerColor = MaterialTheme.colorScheme.background,
-        tonalElevation = 0.dp,
+    GoodsPocketModalBottomSheet(
+        title = title,
+        onDismiss = onDismiss,
+        contentSpacing = 14.dp,
     ) {
-        androidx.compose.foundation.layout.Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 18.dp, vertical = 10.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
-        ) {
-            GoodsPocketBottomSheetHeader(title = title)
-            content()
-        }
+        content()
     }
 }
 
