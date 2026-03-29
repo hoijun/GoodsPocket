@@ -41,7 +41,6 @@ import goodspocket.composeapp.generated.resources.Res
 import goodspocket.composeapp.generated.resources.collection_empty_search
 import goodspocket.composeapp.generated.resources.collection_metric_monthly_spend
 import goodspocket.composeapp.generated.resources.collection_metric_total_items
-import goodspocket.composeapp.generated.resources.collection_overview_title
 import goodspocket.composeapp.generated.resources.collection_quantity_badge
 import goodspocket.composeapp.generated.resources.collection_search_label
 import goodspocket.composeapp.generated.resources.collection_search_placeholder
@@ -89,11 +88,6 @@ fun CollectionScreen(
                         )
                     }
                 }
-            }
-        }
-        item {
-            GoodsPocketSectionCard {
-                GoodsPocketSectionHeader(title = tr(Res.string.collection_overview_title))
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -175,8 +169,11 @@ fun CollectionScreen(
                         }
                     }
                     Column(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 4.dp)
+                            .padding(vertical = 2.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
