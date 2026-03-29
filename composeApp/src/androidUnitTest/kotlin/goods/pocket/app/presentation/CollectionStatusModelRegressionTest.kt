@@ -37,7 +37,7 @@ class CollectionStatusModelRegressionTest {
     }
 
     @Test
-    fun `collection screen merges status and overview into one card and expands title spacing`() {
+    fun `collection screen keeps one top card, drops total-items summary, and further expands title spacing`() {
         val collectionSource = source("composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/screen/CollectionScreen.kt")
 
         assertTrue(collectionSource.contains("selectedStatus: ItemStatus"))
@@ -45,12 +45,13 @@ class CollectionStatusModelRegressionTest {
         assertTrue(collectionSource.contains("visibleItems = items.filter { it.status == selectedStatus }"))
         assertTrue(collectionSource.contains("ItemStatus.PLANNED_CLEANUP"))
         assertFalse(collectionSource.contains("collection_overview_title"))
+        assertFalse(collectionSource.contains("collection_metric_total_items"))
         assertFalse(collectionSource.contains("collection_metric_waiting"))
         assertFalse(collectionSource.contains("collection_badge_total"))
         assertFalse(collectionSource.contains("collection_badge_query"))
-        assertTrue(collectionSource.contains(".padding(start = 4.dp)"))
-        assertTrue(collectionSource.contains(".padding(vertical = 2.dp)"))
-        assertTrue(collectionSource.contains("verticalArrangement = Arrangement.spacedBy(8.dp)"))
+        assertTrue(collectionSource.contains(".padding(start = 8.dp)"))
+        assertTrue(collectionSource.contains(".padding(vertical = 6.dp)"))
+        assertTrue(collectionSource.contains("verticalArrangement = Arrangement.spacedBy(10.dp)"))
     }
 
     @Test

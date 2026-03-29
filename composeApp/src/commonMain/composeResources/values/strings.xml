@@ -49,10 +49,9 @@
     <string name="collection_search_placeholder">이름 또는 시리즈</string>
     <string name="collection_empty_search">현재 조건과 일치하는 굿즈가 없어요.</string>
     <string name="collection_status_section">굿즈 상태</string>
-    <string name="collection_status_section_subtitle">보유 중과 정리 예정 굿즈를 나누고 규모도 함께 확인해요.</string>
+    <string name="collection_status_section_subtitle">보유 중과 정리 예정 굿즈를 나누고 구매 규모를 함께 확인해요.</string>
     <string name="collection_quantity_badge">%1$s개</string>
     <string name="collection_series_category">%1$s · %2$s</string>
-    <string name="collection_metric_total_items">전체 굿즈</string>
     <string name="collection_metric_monthly_spend">총 구매액</string>
 
     <string name="preorders_status_filter">상태 필터</string>

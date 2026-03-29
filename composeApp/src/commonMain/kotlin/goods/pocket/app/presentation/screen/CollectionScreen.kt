@@ -40,7 +40,6 @@ import goods.pocket.app.presentation.i18n.tr
 import goodspocket.composeapp.generated.resources.Res
 import goodspocket.composeapp.generated.resources.collection_empty_search
 import goodspocket.composeapp.generated.resources.collection_metric_monthly_spend
-import goodspocket.composeapp.generated.resources.collection_metric_total_items
 import goodspocket.composeapp.generated.resources.collection_quantity_badge
 import goodspocket.composeapp.generated.resources.collection_search_label
 import goodspocket.composeapp.generated.resources.collection_search_placeholder
@@ -92,12 +91,6 @@ fun CollectionScreen(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
-                    GoodsPocketMetricPill(
-                        label = tr(Res.string.collection_metric_total_items),
-                        value = items.size.toString(),
-                        shape = summaryMetricShape,
-                        contentPadding = summaryMetricPadding,
-                    )
                     GoodsPocketMetricPill(
                         label = tr(Res.string.collection_metric_monthly_spend),
                         value = formatCurrency(totalSpend),
@@ -171,9 +164,9 @@ fun CollectionScreen(
                     Column(
                         modifier = Modifier
                             .weight(1f)
-                            .padding(start = 4.dp)
-                            .padding(vertical = 2.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                            .padding(start = 8.dp)
+                            .padding(vertical = 6.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),

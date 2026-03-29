@@ -49,10 +49,9 @@
     <string name="collection_search_placeholder">Name or series</string>
     <string name="collection_empty_search">No items match the current collection filters.</string>
     <string name="collection_status_section">Item status</string>
-    <string name="collection_status_section_subtitle">Switch between owned and planned cleanup items and review the scale together.</string>
+    <string name="collection_status_section_subtitle">Switch between owned and planned cleanup items and review purchase scale together.</string>
     <string name="collection_quantity_badge">Qty %1$s</string>
     <string name="collection_series_category">%1$s · %2$s</string>
-    <string name="collection_metric_total_items">Total items</string>
     <string name="collection_metric_monthly_spend">Total purchase amount</string>
 
     <string name="preorders_status_filter">Status filter</string>
