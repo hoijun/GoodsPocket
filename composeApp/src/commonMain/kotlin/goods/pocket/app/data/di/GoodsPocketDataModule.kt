@@ -7,7 +7,6 @@ import goods.pocket.app.domain.repository.CollectionRepository
 import goods.pocket.app.domain.repository.EventRepository
 import goods.pocket.app.domain.repository.PreorderRepository
 import goods.pocket.app.domain.repository.SettingsRepository
-import goods.pocket.app.domain.repository.TransactionRepository
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
 
@@ -22,7 +21,6 @@ class GoodsPocketDataModule {
         binds = [
             CollectionRepository::class,
             PreorderRepository::class,
-            TransactionRepository::class,
             EventRepository::class,
             SettingsRepository::class,
         ],

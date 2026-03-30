@@ -8,8 +8,6 @@ import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.PreorderStatus
 import goods.pocket.app.domain.model.StorageLocation
-import goods.pocket.app.domain.model.Transaction
-import goods.pocket.app.domain.model.TransactionType
 
 internal object GoodsPocketSeedData {
     const val defaultTimestamp = "2026-03-18"
@@ -74,37 +72,6 @@ internal object GoodsPocketSeedData {
                 paymentDueDate = "2026-03-22",
                 createdAt = "2026-03-01",
                 updatedAt = "2026-03-12",
-            ),
-        )
-
-    val transactions: List<Transaction>
-        get() = listOf(
-            Transaction(
-                id = "tx-1",
-                type = TransactionType.PURCHASE,
-                amount = 18000,
-                transactionDate = "2026-03-02",
-                relatedItemId = "item-1",
-                placeName = "애니메이트",
-                createdAt = "2026-03-02",
-            ),
-            Transaction(
-                id = "tx-2",
-                type = TransactionType.PURCHASE,
-                amount = 32000,
-                transactionDate = "2026-03-06",
-                relatedItemId = "item-2",
-                placeName = "교보문고",
-                createdAt = "2026-03-06",
-            ),
-            Transaction(
-                id = "tx-3",
-                type = TransactionType.DEPOSIT,
-                amount = 10000,
-                transactionDate = "2026-03-10",
-                relatedPreorderId = "pre-1",
-                placeName = "애니플러스 샵",
-                createdAt = "2026-03-10",
             ),
         )
 

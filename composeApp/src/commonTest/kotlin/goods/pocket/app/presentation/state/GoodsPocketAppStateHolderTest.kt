@@ -8,13 +8,10 @@ import goods.pocket.app.presentation.navigation.AppDestination
 import goods.pocket.app.domain.usecase.CancelPreorderUseCase
 import goods.pocket.app.domain.usecase.DeleteCollectionItemUseCase
 import goods.pocket.app.domain.usecase.DeleteEventUseCase
-import goods.pocket.app.domain.usecase.DeleteTransactionUseCase
 import goods.pocket.app.domain.usecase.GetAppPreferencesUseCase
 import goods.pocket.app.domain.usecase.GetCollectionItemsUseCase
 import goods.pocket.app.domain.usecase.GetDashboardSummaryUseCase
 import goods.pocket.app.domain.usecase.GetEventListUseCase
-import goods.pocket.app.domain.usecase.GetItemTransactionsUseCase
-import goods.pocket.app.domain.usecase.GetMonthlyTransactionsUseCase
 import goods.pocket.app.domain.usecase.GetPreorderListUseCase
 import goods.pocket.app.domain.usecase.GetRecentActivitiesUseCase
 import goods.pocket.app.domain.usecase.GetStorageLocationsUseCase
@@ -23,7 +20,6 @@ import goods.pocket.app.domain.usecase.MarkPreorderReceivedUseCase
 import goods.pocket.app.domain.usecase.SaveCollectionItemUseCase
 import goods.pocket.app.domain.usecase.SaveEventUseCase
 import goods.pocket.app.domain.usecase.SavePreorderUseCase
-import goods.pocket.app.domain.usecase.SaveTransactionUseCase
 import goods.pocket.app.domain.usecase.UpdateAppPreferencesUseCase
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -79,7 +75,7 @@ class GoodsPocketAppStateHolderTest {
         assertTrue(myPage.notificationsEnabled)
         assertEquals(2, myPage.ownedItemCount)
         assertEquals(2, myPage.activePreorderCount)
-        assertEquals(60_000L, myPage.monthlySpend)
+        assertEquals(106_000L, myPage.monthlySpend)
         assertEquals(3, myPage.upcomingEventCount)
     }
 
@@ -104,11 +100,8 @@ class GoodsPocketAppStateHolderTest {
     }
 
     @Test
-    fun `home and my still provide access to secondary screens`() {
+    fun `my still provides access to secondary screens`() {
         val stateHolder = newStateHolder()
-
-        stateHolder.openTransactionsOverview()
-        assertEquals(AppDestination.Transactions, stateHolder.state.value.currentDestination)
 
         stateHolder.selectDestination(AppDestination.My)
         stateHolder.openEventsOverview()
@@ -124,6 +117,10 @@ class GoodsPocketAppStateHolderTest {
         stateHolder.submitItem(
             name = "Uma Musume Postcard",
             category = "Postcard",
+            status = ItemStatus.OWNED,
+            seriesName = "Uma Musume",
+            characterName = "Special Week",
+            purchaseStore = "Animate",
         )
 
         val after = stateHolder.state.value
@@ -168,22 +165,6 @@ class GoodsPocketAppStateHolderTest {
         assertEquals(ItemStatus.PLANNED_CLEANUP, updatedItem.status)
         assertEquals("Animate International", updatedItem.purchaseStore)
         assertEquals(ActiveDetail.ItemDetail("item-1"), stateHolder.state.value.activeDetail)
-    }
-
-    @Test
-    fun deleteTransactionRemovesItFromCurrentMonthList() {
-        val stateHolder = newStateHolder()
-        val before = stateHolder.state.value.transactions.size
-
-        stateHolder.requestDeleteTransaction("tx-1")
-        assertEquals(PendingDelete.TransactionDelete("tx-1"), stateHolder.state.value.pendingDelete)
-
-        stateHolder.confirmPendingDelete()
-
-        val after = stateHolder.state.value.transactions.size
-        assertEquals(before - 1, after)
-        assertNull(stateHolder.state.value.pendingDelete)
-        assertEquals(AppDestination.Transactions.route, stateHolder.state.value.currentDestination.route)
     }
 
     @Test
@@ -265,8 +246,8 @@ class GoodsPocketAppStateHolderTest {
 
         assertEquals("프로젝트 세카이 한정 태피스트리", recentActivities[0].title)
         assertEquals("멜론북스 예약 추적", recentActivities[0].subtitle)
-        assertEquals("10,000원", recentActivities[2].title)
-        assertEquals("예약금 거래 기록", recentActivities[2].subtitle)
+        assertEquals("블루 아카이브 아트북", recentActivities[2].title)
+        assertEquals("컬렉션 굿즈 추가", recentActivities[2].subtitle)
     }
 
     private fun newStateHolder(
@@ -275,23 +256,19 @@ class GoodsPocketAppStateHolderTest {
         return GoodsPocketAppStateHolder(
             getCollectionItemsUseCase = GetCollectionItemsUseCase(repository),
             getAppPreferencesUseCase = GetAppPreferencesUseCase(repository),
-            getDashboardSummaryUseCase = GetDashboardSummaryUseCase(repository, repository, repository),
+            getDashboardSummaryUseCase = GetDashboardSummaryUseCase(repository, repository),
             getEventListUseCase = GetEventListUseCase(repository),
-            getItemTransactionsUseCase = GetItemTransactionsUseCase(repository),
-            getMonthlyTransactionsUseCase = GetMonthlyTransactionsUseCase(repository),
             getPreorderListUseCase = GetPreorderListUseCase(repository),
-            getRecentActivitiesUseCase = GetRecentActivitiesUseCase(repository, repository, repository),
+            getRecentActivitiesUseCase = GetRecentActivitiesUseCase(repository, repository),
             getStorageLocationsUseCase = GetStorageLocationsUseCase(repository),
             getUpcomingEventsUseCase = GetUpcomingEventsUseCase(repository),
             cancelPreorderUseCase = CancelPreorderUseCase(repository),
             deleteCollectionItemUseCase = DeleteCollectionItemUseCase(repository),
             deleteEventUseCase = DeleteEventUseCase(repository),
-            deleteTransactionUseCase = DeleteTransactionUseCase(repository),
-            markPreorderReceivedUseCase = MarkPreorderReceivedUseCase(repository, repository, repository),
+            markPreorderReceivedUseCase = MarkPreorderReceivedUseCase(repository, repository),
             saveCollectionItemUseCase = SaveCollectionItemUseCase(repository),
             saveEventUseCase = SaveEventUseCase(repository),
             savePreorderUseCase = SavePreorderUseCase(repository),
-            saveTransactionUseCase = SaveTransactionUseCase(repository),
             updateAppPreferencesUseCase = UpdateAppPreferencesUseCase(repository),
         )
     }

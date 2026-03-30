@@ -8,8 +8,6 @@ import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.PreorderStatus
 import goods.pocket.app.domain.model.AppPreference
 import goods.pocket.app.domain.model.StorageLocation
-import goods.pocket.app.domain.model.Transaction
-import goods.pocket.app.domain.model.TransactionType
 import goods.pocket.app.domain.model.EventType
 import goods.pocket.app.presentation.navigation.AppDestination
 
@@ -20,7 +18,6 @@ data class GoodsPocketUiState(
     val collectionQuery: String = "",
     val collectionStatusFilter: ItemStatus = ItemStatus.OWNED,
     val preorderStatusFilter: PreorderStatus? = null,
-    val transactionTypeFilter: TransactionType? = null,
     val eventTypeFilter: EventType? = null,
     val homeSummary: HomeSummary = HomeSummary(
         monthlySpend = 0,
@@ -31,7 +28,6 @@ data class GoodsPocketUiState(
     val upcomingEvents: List<Event> = emptyList(),
     val collectionItems: List<Item> = emptyList(),
     val preorders: List<Preorder> = emptyList(),
-    val transactions: List<Transaction> = emptyList(),
     val events: List<Event> = emptyList(),
     val storageLocations: List<StorageLocation> = emptyList(),
     val appPreferences: AppPreference = AppPreference(),

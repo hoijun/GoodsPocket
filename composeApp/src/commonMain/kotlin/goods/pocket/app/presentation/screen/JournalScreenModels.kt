@@ -5,8 +5,6 @@ import goods.pocket.app.domain.model.Event
 import goods.pocket.app.domain.model.EventType
 import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.PreorderStatus
-import goods.pocket.app.domain.model.Transaction
-import goods.pocket.app.domain.model.TransactionType
 import goods.pocket.app.presentation.state.MyPageUiModel
 
 internal data class PreorderJournalOverview(
@@ -15,19 +13,6 @@ internal data class PreorderJournalOverview(
     val arrivingCount: Int,
     val nextReleaseDate: String?,
     val visibleRemainingTotal: Long,
-)
-
-internal data class TransactionJournalOverview(
-    val headlineMonth: String,
-    val visibleTotalAmount: Long,
-    val outgoingTotal: Long,
-    val incomingTotal: Long,
-    val dayGroups: List<TransactionDayGroup>,
-)
-
-internal data class TransactionDayGroup(
-    val date: String,
-    val transactions: List<Transaction>,
 )
 
 internal data class EventJournalOverview(
@@ -65,29 +50,6 @@ internal fun buildPreorderJournalOverview(
     )
 }
 
-internal fun buildTransactionJournalOverview(
-    transactions: List<Transaction>,
-    selectedType: TransactionType?,
-): TransactionJournalOverview {
-    val visibleTransactions = transactions.visibleBy(selectedType).sortedWith(
-        compareByDescending<Transaction> { journalDateKey(it.transactionDate) }
-            .thenByDescending { journalDateKey(it.createdAt) },
-    )
-    val groupedByDay = visibleTransactions
-        .groupBy(Transaction::transactionDate)
-        .toList()
-        .sortedByDescending { (date, _) -> journalDateKey(date) }
-        .map { (date, entries) -> TransactionDayGroup(date = date, transactions = entries) }
-
-    return TransactionJournalOverview(
-        headlineMonth = visibleTransactions.firstOrNull()?.transactionDate?.journalMonthLabel().orEmpty(),
-        visibleTotalAmount = visibleTransactions.sumOf(Transaction::amount),
-        outgoingTotal = visibleTransactions.filterNot { it.type.isIncoming() }.sumOf(Transaction::amount),
-        incomingTotal = visibleTransactions.filter { it.type.isIncoming() }.sumOf(Transaction::amount),
-        dayGroups = groupedByDay,
-    )
-}
-
 internal fun buildEventJournalOverview(
     events: List<Event>,
     selectedType: EventType?,
@@ -120,16 +82,8 @@ internal fun List<Preorder>.visibleBy(selectedStatus: PreorderStatus?): List<Pre
     return if (selectedStatus == null) this else filter { it.status == selectedStatus }
 }
 
-internal fun List<Transaction>.visibleBy(selectedType: TransactionType?): List<Transaction> {
-    return if (selectedType == null) this else filter { it.type == selectedType }
-}
-
 internal fun List<Event>.visibleBy(selectedType: EventType?): List<Event> {
     return if (selectedType == null) this else filter { it.eventType == selectedType }
-}
-
-private fun TransactionType.isIncoming(): Boolean {
-    return this == TransactionType.REFUND || this == TransactionType.TRANSFER_INCOME
 }
 
 private fun String.journalMonthLabel(): String {

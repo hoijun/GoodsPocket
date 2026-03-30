@@ -44,8 +44,6 @@ import goods.pocket.app.presentation.component.ItemEditorSheet
 import goods.pocket.app.presentation.component.PreorderDetailSheet
 import goods.pocket.app.presentation.component.PreorderEditorSheet
 import goods.pocket.app.presentation.component.QuickAddSheet
-import goods.pocket.app.presentation.component.TransactionDetailSheet
-import goods.pocket.app.presentation.component.TransactionEditorSheet
 import goods.pocket.app.presentation.i18n.ProvideLocalizedResources
 import goods.pocket.app.presentation.i18n.localizedLabel
 import goods.pocket.app.presentation.i18n.tr
@@ -56,7 +54,6 @@ import goods.pocket.app.presentation.screen.HomeScreen
 import goods.pocket.app.presentation.screen.MyScreen
 import goods.pocket.app.presentation.screen.PreordersScreen
 import goods.pocket.app.presentation.screen.SettingsScreen
-import goods.pocket.app.presentation.screen.TransactionsScreen
 import goods.pocket.app.presentation.state.ActiveDetail
 import goods.pocket.app.presentation.state.ActiveEditor
 import goods.pocket.app.presentation.state.GoodsPocketAppStateHolder
@@ -149,7 +146,6 @@ fun GoodsPocketApp(
                 onDismiss = appStateHolder::closeQuickAdd,
                 onSubmitItem = appStateHolder::submitItem,
                 onSubmitPreorder = appStateHolder::submitPreorder,
-                onSubmitTransaction = appStateHolder::submitTransaction,
                 onSubmitEvent = appStateHolder::submitEvent,
             )
         }
@@ -277,7 +273,6 @@ private fun GoodsPocketNavHost(
             AppDestination.Home -> HomeScreen(
                 dashboardSummary = uiState.homeSummary,
                 upcomingEvents = uiState.upcomingEvents,
-                onMonthlySummaryClick = appStateHolder::openTransactionsOverview,
                 onUpcomingEventsClick = appStateHolder::openEventsOverview,
                 onUpcomingEventClick = appStateHolder::openEventFromHome,
                 onRecentActivityClick = appStateHolder::openActivity,
@@ -301,12 +296,6 @@ private fun GoodsPocketNavHost(
             AppDestination.My -> MyScreen(
                 myPage = uiState.myPage,
                 onOpenSettings = appStateHolder::openSettings,
-            )
-            AppDestination.Transactions -> TransactionsScreen(
-                transactions = uiState.transactions,
-                selectedType = uiState.transactionTypeFilter,
-                onTypeChange = appStateHolder::updateTransactionTypeFilter,
-                onTransactionClick = appStateHolder::openTransactionDetail,
             )
             AppDestination.Events -> EventsScreen(
                 events = uiState.events,
@@ -332,7 +321,6 @@ private fun ActiveDetailSheet(
             val item = uiState.collectionItems.firstOrNull { it.id == detail.itemId } ?: return
             ItemDetailSheet(
                 item = item,
-                linkedTransactions = appStateHolder.itemTransactions(item.id),
                 onDismiss = appStateHolder::closeDetail,
                 onEdit = { appStateHolder.openItemEditor(item.id) },
                 onDelete = { appStateHolder.requestDeleteItem(item.id) },
@@ -347,16 +335,6 @@ private fun ActiveDetailSheet(
                 onMarkReceived = { appStateHolder.markPreorderReceived(preorder.id) },
                 onEdit = { appStateHolder.openPreorderEditor(preorder.id) },
                 onCancel = { appStateHolder.requestCancelPreorder(preorder.id) },
-            )
-        }
-
-        is ActiveDetail.TransactionDetail -> {
-            val transaction = uiState.transactions.firstOrNull { it.id == detail.transactionId } ?: return
-            TransactionDetailSheet(
-                transaction = transaction,
-                onDismiss = appStateHolder::closeDetail,
-                onEdit = { appStateHolder.openTransactionEditor(transaction.id) },
-                onDelete = { appStateHolder.requestDeleteTransaction(transaction.id) },
             )
         }
 
@@ -415,22 +393,6 @@ private fun ActiveEditorSheet(
             )
         }
 
-        is ActiveEditor.TransactionEditor -> {
-            val transaction = uiState.transactions.firstOrNull { it.id == editor.transactionId } ?: return
-            TransactionEditorSheet(
-                transaction = transaction,
-                onDismiss = appStateHolder::closeEditor,
-                onSave = { amount, type, transactionDate ->
-                    appStateHolder.saveEditedTransaction(
-                        transactionId = transaction.id,
-                        amount = amount,
-                        type = type,
-                        transactionDate = transactionDate,
-                    )
-                },
-            )
-        }
-
         is ActiveEditor.EventEditor -> {
             val event = uiState.events.firstOrNull { it.id == editor.eventId } ?: return
             EventEditorSheet(
@@ -462,19 +424,11 @@ private fun PendingDeleteDialog(
     when (pendingDelete) {
         is PendingDelete.ItemDelete -> {
             title = tr(Res.string.dialog_delete_item_title)
-            body = if (pendingDelete.linkedTransactionCount > 0) {
-                tr(Res.string.dialog_delete_item_body_linked, pendingDelete.linkedTransactionCount.toString())
-            } else {
-                tr(Res.string.dialog_delete_item_body)
-            }
+            body = tr(Res.string.dialog_delete_item_body)
         }
         is PendingDelete.PreorderCancel -> {
             title = tr(Res.string.dialog_cancel_preorder_title)
             body = tr(Res.string.dialog_cancel_preorder_body)
-        }
-        is PendingDelete.TransactionDelete -> {
-            title = tr(Res.string.dialog_delete_transaction_title)
-            body = tr(Res.string.dialog_delete_transaction_body)
         }
         is PendingDelete.EventDelete -> {
             title = tr(Res.string.dialog_delete_event_title)

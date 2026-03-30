@@ -172,7 +172,6 @@ class BottomNavLayoutRegressionTest {
             ?: error("Could not locate presentation/screen directory from ${startingDirectory.absolutePath}")
 
         return listOf(
-            "TransactionsScreen.kt",
             "EventsScreen.kt",
             "SettingsScreen.kt",
         ).map { name ->

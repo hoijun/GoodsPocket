@@ -34,7 +34,6 @@ class GoodsPocketVisualContractTest {
     @Test
     fun `secondary destinations hide bottom navigation and floating action button`() {
         listOf(
-            AppDestination.Transactions,
             AppDestination.Events,
             AppDestination.Settings,
         ).forEach { destination ->

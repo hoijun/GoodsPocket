@@ -23,7 +23,6 @@ import goods.pocket.app.domain.model.Item
 import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.PreorderStatus
-import goods.pocket.app.domain.model.Transaction
 import goods.pocket.app.presentation.designsystem.GoodsPocketModalBottomSheet
 import goods.pocket.app.presentation.designsystem.GoodsPocketTonalBadge
 import goods.pocket.app.presentation.i18n.formatCurrency
@@ -42,10 +41,10 @@ import goodspocket.composeapp.generated.resources.detail_character
 import goodspocket.composeapp.generated.resources.detail_date
 import goodspocket.composeapp.generated.resources.detail_deposit
 import goodspocket.composeapp.generated.resources.detail_linked_preorder
-import goodspocket.composeapp.generated.resources.detail_linked_transactions
 import goodspocket.composeapp.generated.resources.detail_location
-import goodspocket.composeapp.generated.resources.detail_no_linked_transactions
 import goodspocket.composeapp.generated.resources.detail_place
+import goodspocket.composeapp.generated.resources.detail_purchase_date
+import goodspocket.composeapp.generated.resources.detail_purchase_price
 import goodspocket.composeapp.generated.resources.detail_related_item
 import goodspocket.composeapp.generated.resources.detail_related_preorder
 import goodspocket.composeapp.generated.resources.detail_release_date
@@ -60,7 +59,6 @@ import goodspocket.composeapp.generated.resources.detail_type
 @Composable
 fun ItemDetailSheet(
     item: Item,
-    linkedTransactions: List<Transaction>,
     onDismiss: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
@@ -75,23 +73,12 @@ fun ItemDetailSheet(
         DetailLine(tr(Res.string.detail_series), item.seriesName ?: tr(Res.string.common_unknown))
         DetailLine(tr(Res.string.detail_character), item.characterName ?: tr(Res.string.common_unknown))
         DetailLine(tr(Res.string.detail_store), item.purchaseStore ?: tr(Res.string.common_unknown))
-        DetailLine(tr(Res.string.detail_linked_preorder), item.linkedPreorderId ?: tr(Res.string.common_none))
-        Text(
-            text = tr(Res.string.detail_linked_transactions),
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.SemiBold,
+        DetailLine(tr(Res.string.detail_purchase_date), item.purchaseDate ?: tr(Res.string.common_not_set))
+        DetailLine(
+            tr(Res.string.detail_purchase_price),
+            item.purchasePrice?.let { amount -> formatCurrency(amount) } ?: tr(Res.string.common_not_set),
         )
-        if (linkedTransactions.isEmpty()) {
-            Text(
-                text = tr(Res.string.detail_no_linked_transactions),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        } else {
-            linkedTransactions.forEach { transaction ->
-                LinkedTransactionRow(transaction)
-            }
-        }
+        DetailLine(tr(Res.string.detail_linked_preorder), item.linkedPreorderId ?: tr(Res.string.common_none))
         SheetActionRow(
             primaryLabel = tr(Res.string.action_edit),
             onPrimary = onEdit,
@@ -150,43 +137,6 @@ private fun itemStatusContentColor(status: ItemStatus): androidx.compose.ui.grap
 }
 
 @Composable
-private fun LinkedTransactionRow(
-    transaction: Transaction,
-) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.small,
-        color = MaterialTheme.colorScheme.surfaceContainerLow,
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(
-                    text = transaction.type.localizedLabel(),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Text(
-                    text = transaction.transactionDate,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            Text(
-                text = formatCurrency(transaction.amount),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.SemiBold,
-            )
-        }
-    }
-}
-
-@Composable
 fun PreorderDetailSheet(
     preorder: Preorder,
     onDismiss: () -> Unit,
@@ -217,32 +167,6 @@ fun PreorderDetailSheet(
             onPrimary = onEdit,
             secondaryLabel = tr(Res.string.action_cancel_preorder),
             onSecondary = onCancel,
-            destructive = true,
-        )
-    }
-}
-
-@Composable
-fun TransactionDetailSheet(
-    transaction: Transaction,
-    onDismiss: () -> Unit,
-    onEdit: () -> Unit,
-    onDelete: () -> Unit,
-) {
-    DetailSheetContainer(
-        title = formatCurrency(transaction.amount),
-        onDismiss = onDismiss,
-    ) {
-        DetailLine(tr(Res.string.detail_type), transaction.type.localizedLabel())
-        DetailLine(tr(Res.string.detail_date), transaction.transactionDate)
-        DetailLine(tr(Res.string.detail_place), transaction.placeName ?: tr(Res.string.common_unknown))
-        DetailLine(tr(Res.string.detail_related_item), transaction.relatedItemId ?: tr(Res.string.common_none))
-        DetailLine(tr(Res.string.detail_related_preorder), transaction.relatedPreorderId ?: tr(Res.string.common_none))
-        SheetActionRow(
-            primaryLabel = tr(Res.string.action_edit),
-            onPrimary = onEdit,
-            secondaryLabel = tr(Res.string.action_delete),
-            onSecondary = onDelete,
             destructive = true,
         )
     }

@@ -1,7 +1,5 @@
 package goods.pocket.app.i18n
 
-import goods.pocket.app.domain.model.TransactionType
-
 const val DEFAULT_LANGUAGE_CODE = "ko"
 
 fun formatCurrencyByLanguage(amount: Long, languageCode: String): String {
@@ -34,40 +32,6 @@ fun localizedRecentPreorderTrackedSubtitle(languageCode: String, storeName: Stri
         "$storeName 예약 추적"
     } else {
         "Preorder tracked at $storeName"
-    }
-}
-
-fun localizedRecentTransactionTitle(languageCode: String, amount: Long): String {
-    return formatCurrencyByLanguage(amount, languageCode)
-}
-
-fun localizedRecentTransactionSubtitle(languageCode: String, type: TransactionType): String {
-    return if (isKoreanLanguage(languageCode)) {
-        "${localizedTransactionTypeLabel(type, languageCode)} 거래 기록"
-    } else {
-        "Transaction recorded as ${localizedTransactionTypeLabel(type, languageCode)}"
-    }
-}
-
-fun localizedTransactionTypeLabel(type: TransactionType, languageCode: String): String {
-    return if (isKoreanLanguage(languageCode)) {
-        when (type) {
-            TransactionType.DEPOSIT -> "예약금"
-            TransactionType.BALANCE -> "잔금"
-            TransactionType.PURCHASE -> "구매"
-            TransactionType.SHIPPING -> "배송비"
-            TransactionType.REFUND -> "환불"
-            TransactionType.TRANSFER_INCOME -> "양도 수입"
-        }
-    } else {
-        when (type) {
-            TransactionType.DEPOSIT -> "Deposit"
-            TransactionType.BALANCE -> "Balance"
-            TransactionType.PURCHASE -> "Purchase"
-            TransactionType.SHIPPING -> "Shipping"
-            TransactionType.REFUND -> "Refund"
-            TransactionType.TRANSFER_INCOME -> "Transfer Income"
-        }
     }
 }
 

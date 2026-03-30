@@ -17,11 +17,12 @@ class HomePlannerActionRegressionTest {
         assertFalse(homeSource.contains("\"일정 보기\""))
         assertFalse(homeSource.contains("\"빠른 추가\""))
         assertTrue(homeSource.contains("home_planner_preorders_count"))
-        assertTrue(homeSource.contains("home_planner_transactions"))
+        assertFalse(homeSource.contains("home_planner_transactions"))
         assertTrue(homeSource.contains("home_planner_events_count"))
 
         assertTrue(appSource.contains("onPreordersClick = { appStateHolder.selectDestination(AppDestination.Preorders) }"))
         assertTrue(appSource.contains("onQuickAddClick = appStateHolder::openQuickAdd"))
+        assertFalse(appSource.contains("onMonthlySummaryClick = appStateHolder::openTransactionsOverview"))
     }
 
     private fun source(path: String): String {

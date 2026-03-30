@@ -19,8 +19,6 @@ import goods.pocket.app.domain.model.EventType
 import goods.pocket.app.domain.model.Item
 import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.Preorder
-import goods.pocket.app.domain.model.Transaction
-import goods.pocket.app.domain.model.TransactionType
 import goods.pocket.app.presentation.designsystem.GoodsPocketFilterChip
 import goods.pocket.app.presentation.designsystem.GoodsPocketModalBottomSheet
 import goods.pocket.app.presentation.designsystem.goodsPocketOutlinedFieldColors
@@ -31,11 +29,8 @@ import goodspocket.composeapp.generated.resources.action_save_changes
 import goodspocket.composeapp.generated.resources.editor_event_title
 import goodspocket.composeapp.generated.resources.editor_item_title
 import goodspocket.composeapp.generated.resources.editor_preorder_title
-import goodspocket.composeapp.generated.resources.editor_transaction_title
-import goodspocket.composeapp.generated.resources.field_amount
 import goodspocket.composeapp.generated.resources.field_category
 import goodspocket.composeapp.generated.resources.field_character
-import goodspocket.composeapp.generated.resources.field_date
 import goodspocket.composeapp.generated.resources.field_name
 import goodspocket.composeapp.generated.resources.field_release_date
 import goodspocket.composeapp.generated.resources.field_series
@@ -101,37 +96,6 @@ fun PreorderEditorSheet(
         GoodsPocketEditorField(releaseDate, { releaseDate = it }, tr(Res.string.field_release_date))
         SaveButton(enabled = name.isNotBlank() && storeName.isNotBlank() && releaseDate.isNotBlank()) {
             onSave(name, storeName, releaseDate)
-        }
-    }
-}
-
-@Composable
-fun TransactionEditorSheet(
-    transaction: Transaction,
-    onDismiss: () -> Unit,
-    onSave: (String, TransactionType, String) -> Unit,
-) {
-    var amount by remember(transaction.id) { mutableStateOf(transaction.amount.toString()) }
-    var transactionDate by remember(transaction.id) { mutableStateOf(transaction.transactionDate) }
-    var transactionType by remember(transaction.id) { mutableStateOf(transaction.type) }
-
-    EditorSheetContainer(title = tr(Res.string.editor_transaction_title), onDismiss = onDismiss) {
-        GoodsPocketEditorField(amount, { amount = it }, tr(Res.string.field_amount))
-        GoodsPocketEditorField(transactionDate, { transactionDate = it }, tr(Res.string.field_date))
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            listOf(TransactionType.PURCHASE, TransactionType.DEPOSIT, TransactionType.BALANCE).forEach { type ->
-                GoodsPocketFilterChip(
-                    selected = transactionType == type,
-                    onClick = { transactionType = type },
-                    label = type.localizedLabel(),
-                )
-            }
-        }
-        SaveButton(enabled = amount.isNotBlank() && transactionDate.isNotBlank()) {
-            onSave(amount, transactionType, transactionDate)
         }
     }
 }

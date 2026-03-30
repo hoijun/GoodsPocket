@@ -10,8 +10,6 @@ import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.PreorderStatus
 import goods.pocket.app.domain.model.StorageLocation
-import goods.pocket.app.domain.model.Transaction
-import goods.pocket.app.domain.model.TransactionType
 
 class SqlDelightGoodsPocketLocalDataSource(
     driverFactory: DatabaseDriverFactory,
@@ -94,23 +92,6 @@ class SqlDelightGoodsPocketLocalDataSource(
 
     override fun deleteItem(id: String) {
         queries.deleteItemById(id)
-    }
-
-    override fun getItemTransactions(itemId: String): List<Transaction> {
-        return queries.selectItemTransactions(itemId).executeAsList().map { row ->
-            Transaction(
-                id = row.id,
-                type = row.type.toTransactionType(),
-                amount = row.amount,
-                transactionDate = row.transaction_date,
-                relatedItemId = row.related_item_id,
-                relatedPreorderId = row.related_preorder_id,
-                paymentMethod = row.payment_method,
-                placeName = row.place_name,
-                note = row.note,
-                createdAt = row.created_at,
-            )
-        }
     }
 
     override fun countOwnedItems(): Int {
@@ -204,50 +185,6 @@ class SqlDelightGoodsPocketLocalDataSource(
 
     override fun countActivePreorders(): Int {
         return queries.countActivePreorders().executeAsOne().toInt()
-    }
-
-    override fun getTransactions(monthFilter: String?): List<Transaction> {
-        val rows = when {
-            monthFilter.isNullOrBlank() -> queries.selectAllTransactions().executeAsList()
-            else -> queries.selectTransactionsByMonth(monthFilter).executeAsList()
-        }
-        return rows.map { row ->
-            Transaction(
-                id = row.id,
-                type = row.type.toTransactionType(),
-                amount = row.amount,
-                transactionDate = row.transaction_date,
-                relatedItemId = row.related_item_id,
-                relatedPreorderId = row.related_preorder_id,
-                paymentMethod = row.payment_method,
-                placeName = row.place_name,
-                note = row.note,
-                createdAt = row.created_at,
-            )
-        }
-    }
-
-    override fun getMonthlySummary(monthFilter: String): Long {
-        return queries.monthlySummary(monthFilter).executeAsOne()
-    }
-
-    override fun upsertTransaction(transaction: Transaction) {
-        queries.upsertTransaction(
-            id = transaction.id,
-            type = transaction.type.name,
-            amount = transaction.amount,
-            transaction_date = transaction.transactionDate,
-            related_item_id = transaction.relatedItemId,
-            related_preorder_id = transaction.relatedPreorderId,
-            payment_method = transaction.paymentMethod,
-            place_name = transaction.placeName,
-            note = transaction.note,
-            created_at = transaction.createdAt,
-        )
-    }
-
-    override fun deleteTransaction(id: String) {
-        queries.deleteTransactionById(id)
     }
 
     override fun getUpcomingEvents(limit: Int): List<Event> {
@@ -356,12 +293,10 @@ class SqlDelightGoodsPocketLocalDataSource(
 
         GoodsPocketSeedData.items.forEach(::upsertItem)
         GoodsPocketSeedData.preorders.forEach(::upsertPreorder)
-        GoodsPocketSeedData.transactions.forEach(::upsertTransaction)
         GoodsPocketSeedData.events.forEach(::upsertEvent)
         GoodsPocketSeedData.storageLocations.forEach(::upsertStorageLocation)
         updateAppPreferences(GoodsPocketSeedData.appPreferences)
         queries.selectAllItems().executeAsList()
-        queries.selectAllTransactions().executeAsList()
         queries.selectAllEvents().executeAsList()
         queries.selectAllStorageLocations().executeAsList()
         queries.selectAppPreferences().executeAsOneOrNull() ?: updateAppPreferences(GoodsPocketSeedData.appPreferences)
@@ -380,10 +315,6 @@ class SqlDelightGoodsPocketLocalDataSource(
 
     private fun String.toPreorderStatus(): PreorderStatus {
         return PreorderStatus.valueOf(this)
-    }
-
-    private fun String.toTransactionType(): TransactionType {
-        return TransactionType.valueOf(this)
     }
 
     private fun String.toEventType(): EventType {

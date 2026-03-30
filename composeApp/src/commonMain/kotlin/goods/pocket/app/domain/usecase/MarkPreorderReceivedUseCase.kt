@@ -3,24 +3,19 @@ package goods.pocket.app.domain.usecase
 import goods.pocket.app.domain.model.Item
 import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.PreorderStatus
-import goods.pocket.app.domain.model.Transaction
-import goods.pocket.app.domain.model.TransactionType
 import goods.pocket.app.domain.repository.CollectionRepository
 import goods.pocket.app.domain.repository.PreorderRepository
-import goods.pocket.app.domain.repository.TransactionRepository
 import goods.pocket.app.i18n.DEFAULT_LANGUAGE_CODE
 import goods.pocket.app.i18n.localizedReceivedItemCategory
 
 class MarkPreorderReceivedUseCase(
     private val preorderRepository: PreorderRepository,
     private val collectionRepository: CollectionRepository,
-    private val transactionRepository: TransactionRepository,
 ) {
     operator fun invoke(
         preorderId: String,
         receiveDate: String,
         newItemId: String,
-        transactionId: String,
         languageCode: String = DEFAULT_LANGUAGE_CODE,
     ) {
         val preorder = preorderRepository.getPreorder(preorderId) ?: return
@@ -46,21 +41,5 @@ class MarkPreorderReceivedUseCase(
                 updatedAt = receiveDate,
             ),
         )
-
-        val remainingPrice = preorder.remainingPrice ?: 0L
-        if (remainingPrice > 0L) {
-            transactionRepository.saveTransaction(
-                Transaction(
-                    id = transactionId,
-                    type = TransactionType.BALANCE,
-                    amount = remainingPrice,
-                    transactionDate = receiveDate,
-                    relatedItemId = newItemId,
-                    relatedPreorderId = preorder.id,
-                    placeName = preorder.storeName,
-                    createdAt = receiveDate,
-                ),
-            )
-        }
     }
 }

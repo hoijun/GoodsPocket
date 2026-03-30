@@ -6,7 +6,6 @@ import goods.pocket.app.domain.usecase.GetAppPreferencesUseCase
 import goods.pocket.app.domain.usecase.GetCollectionItemsUseCase
 import goods.pocket.app.domain.usecase.GetDashboardSummaryUseCase
 import goods.pocket.app.domain.usecase.GetEventListUseCase
-import goods.pocket.app.domain.usecase.GetMonthlyTransactionsUseCase
 import goods.pocket.app.domain.usecase.GetPreorderListUseCase
 import goods.pocket.app.domain.usecase.GetRecentActivitiesUseCase
 import goods.pocket.app.domain.usecase.GetStorageLocationsUseCase
@@ -23,7 +22,6 @@ internal fun reloadState(
     getAppPreferencesUseCase: GetAppPreferencesUseCase,
     getDashboardSummaryUseCase: GetDashboardSummaryUseCase,
     getEventListUseCase: GetEventListUseCase,
-    getMonthlyTransactionsUseCase: GetMonthlyTransactionsUseCase,
     getPreorderListUseCase: GetPreorderListUseCase,
     getRecentActivitiesUseCase: GetRecentActivitiesUseCase,
     getStorageLocationsUseCase: GetStorageLocationsUseCase,
@@ -51,8 +49,6 @@ internal fun reloadState(
             upcomingEvents = allUpcomingEvents.take(upcomingEventPreviewLimit),
             collectionItems = getCollectionItemsUseCase(current.collectionQuery),
             preorders = getPreorderListUseCase(current.preorderStatusFilter),
-            transactions = getMonthlyTransactionsUseCase(currentMonth)
-                .filter { current.transactionTypeFilter == null || it.type == current.transactionTypeFilter },
             events = getEventListUseCase(current.eventTypeFilter),
             storageLocations = getStorageLocationsUseCase(),
             appPreferences = appPreferences,
@@ -64,7 +60,6 @@ internal fun reloadState(
             collectionQuery = current.collectionQuery,
             collectionStatusFilter = current.collectionStatusFilter,
             preorderStatusFilter = current.preorderStatusFilter,
-            transactionTypeFilter = current.transactionTypeFilter,
             eventTypeFilter = current.eventTypeFilter,
             isQuickAddOpen = current.isQuickAddOpen,
             quickAddTarget = current.quickAddTarget,

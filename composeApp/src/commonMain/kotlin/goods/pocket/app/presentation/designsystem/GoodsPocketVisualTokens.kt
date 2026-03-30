@@ -46,7 +46,6 @@ fun goodsPocketChromeFor(destination: AppDestination): GoodsPocketChrome {
             showBackButton = false,
         )
 
-        AppDestination.Transactions,
         AppDestination.Events,
         AppDestination.Settings,
         -> GoodsPocketChrome(

@@ -39,6 +39,8 @@ class CollectionStatusModelRegressionTest {
     @Test
     fun `collection screen keeps one top card, drops total-items summary, and further expands title spacing`() {
         val collectionSource = source("composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/screen/CollectionScreen.kt")
+        val koreanStrings = source("composeApp/src/commonMain/composeResources/values/strings.xml")
+        val englishStrings = source("composeApp/src/commonMain/composeResources/values-en/strings.xml")
 
         assertTrue(collectionSource.contains("selectedStatus: ItemStatus"))
         assertTrue(collectionSource.contains("onStatusChange: (ItemStatus) -> Unit"))
@@ -49,6 +51,11 @@ class CollectionStatusModelRegressionTest {
         assertFalse(collectionSource.contains("collection_metric_waiting"))
         assertFalse(collectionSource.contains("collection_badge_total"))
         assertFalse(collectionSource.contains("collection_badge_query"))
+        assertFalse(collectionSource.contains("collection_quantity_badge"))
+        assertFalse(collectionSource.contains("highlightedCategories"))
+        assertFalse(collectionSource.contains("GoodsPocketTonalBadge(text = category)"))
+        assertFalse(koreanStrings.contains("collection_quantity_badge"))
+        assertFalse(englishStrings.contains("collection_quantity_badge"))
         assertTrue(collectionSource.contains(".padding(start = 8.dp)"))
         assertTrue(collectionSource.contains(".padding(vertical = 6.dp)"))
         assertTrue(collectionSource.contains("verticalArrangement = Arrangement.spacedBy(10.dp)"))
@@ -62,7 +69,7 @@ class CollectionStatusModelRegressionTest {
         assertTrue(sqlDelightSource.contains("\"PLANNED_TRANSFER\" -> ItemStatus.PLANNED_CLEANUP"))
         assertTrue(sqlDelightSource.contains("\"WAITING_DELIVERY\" -> ItemStatus.OWNED"))
         assertTrue(sqlDelightSource.contains("\"LOST\" -> ItemStatus.OWNED"))
-        assertTrue(databaseSource.contains("WHERE status IN ('OWNED', 'WAITING_DELIVERY', 'LOST');"))
+        assertTrue(databaseSource.contains("WHERE status = 'OWNED';"))
     }
 
     private fun source(path: String): String {

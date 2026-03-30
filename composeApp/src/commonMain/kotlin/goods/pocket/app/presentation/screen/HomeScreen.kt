@@ -40,7 +40,6 @@ import goodspocket.composeapp.generated.resources.home_planner_events_count
 import goodspocket.composeapp.generated.resources.home_planner_preorders
 import goodspocket.composeapp.generated.resources.home_planner_preorders_count
 import goodspocket.composeapp.generated.resources.home_planner_quick_add
-import goodspocket.composeapp.generated.resources.home_planner_transactions
 import goodspocket.composeapp.generated.resources.home_recent_activity
 import goodspocket.composeapp.generated.resources.home_recent_activity_subtitle
 import goodspocket.composeapp.generated.resources.home_stat_active_preorder_subtitle
@@ -53,7 +52,6 @@ import goodspocket.composeapp.generated.resources.home_upcoming_subtitle
 fun HomeScreen(
     dashboardSummary: HomeSummary,
     upcomingEvents: List<Event>,
-    onMonthlySummaryClick: () -> Unit = {},
     onUpcomingEventsClick: () -> Unit = {},
     onRecentActivitiesClick: () -> Unit = {},
     onUpcomingEventClick: (String) -> Unit = {},
@@ -69,14 +67,12 @@ fun HomeScreen(
         item {
             SummaryOverviewRow(
                 dashboardSummary = dashboardSummary,
-                onClick = onMonthlySummaryClick,
             )
         }
         item {
             PlannerBoardCard(
                 dashboardSummary = dashboardSummary,
                 upcomingEvents = upcomingEvents,
-                onMonthlySummaryClick = onMonthlySummaryClick,
                 onUpcomingEventsClick = onUpcomingEventsClick,
                 onPreordersClick = onPreordersClick,
                 onQuickAddClick = onQuickAddClick,
@@ -102,12 +98,10 @@ fun HomeScreen(
 @Composable
 private fun SummaryOverviewRow(
     dashboardSummary: HomeSummary,
-    onClick: () -> Unit,
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         GoodsPocketHeroCard(
             modifier = Modifier.weight(1.15f),
-            onClick = onClick,
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 GoodsPocketTonalBadge(
@@ -129,7 +123,6 @@ private fun SummaryOverviewRow(
         }
         GoodsPocketSectionCard(
             modifier = Modifier.weight(1f),
-            onClick = onClick,
             containerColor = MaterialTheme.colorScheme.surface,
         ) {
             GoodsPocketTonalBadge(
@@ -155,7 +148,6 @@ private fun SummaryOverviewRow(
 private fun PlannerBoardCard(
     dashboardSummary: HomeSummary,
     upcomingEvents: List<Event>,
-    onMonthlySummaryClick: () -> Unit,
     onUpcomingEventsClick: () -> Unit,
     onPreordersClick: () -> Unit,
     onQuickAddClick: () -> Unit,
@@ -190,11 +182,6 @@ private fun PlannerBoardCard(
                     dashboardSummary.activePreorderCount,
                 ),
                 onClick = onPreordersClick,
-            )
-            PlannerMiniCard(
-                title = tr(Res.string.home_planner_transactions),
-                subtitle = formatCurrency(dashboardSummary.monthlySpend),
-                onClick = onMonthlySummaryClick,
             )
             PlannerMiniCard(
                 title = tr(Res.string.home_planner_events),

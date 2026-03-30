@@ -7,9 +7,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import goods.pocket.app.domain.model.EventType
 import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.PreorderStatus
-import goods.pocket.app.domain.model.TransactionType
 import goods.pocket.app.i18n.formatCurrencyByLanguage
-import goods.pocket.app.i18n.localizedTransactionTypeLabel
 import goods.pocket.app.presentation.navigation.AppDestination
 import goods.pocket.app.presentation.state.QuickAddTarget
 import goodspocket.composeapp.generated.resources.*
@@ -61,7 +59,6 @@ fun AppDestination.localizedLabel(): String {
         AppDestination.Collection -> tr(Res.string.nav_collection)
         AppDestination.Preorders -> tr(Res.string.nav_preorders)
         AppDestination.My -> tr(Res.string.nav_my)
-        AppDestination.Transactions -> tr(Res.string.nav_transactions)
         AppDestination.Events -> tr(Res.string.nav_events)
         AppDestination.Settings -> tr(Res.string.nav_settings)
     }
@@ -72,7 +69,6 @@ fun QuickAddTarget.localizedLabel(): String {
     return when (this) {
         QuickAddTarget.ITEM -> tr(Res.string.target_item)
         QuickAddTarget.PREORDER -> tr(Res.string.target_preorder)
-        QuickAddTarget.TRANSACTION -> tr(Res.string.target_transaction)
         QuickAddTarget.EVENT -> tr(Res.string.target_event)
     }
 }
@@ -93,11 +89,6 @@ fun PreorderStatus.localizedLabel(): String {
         PreorderStatus.RECEIVED -> tr(Res.string.preorder_status_received)
         PreorderStatus.CANCELED -> tr(Res.string.preorder_status_canceled)
     }
-}
-
-@Composable
-fun TransactionType.localizedLabel(): String {
-    return localizedTransactionTypeLabel(this, LocalAppLanguageCode.current)
 }
 
 @Composable

@@ -15,8 +15,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.EventType
-import goods.pocket.app.domain.model.TransactionType
 import goods.pocket.app.presentation.designsystem.GoodsPocketFilterChip
 import goods.pocket.app.presentation.designsystem.GoodsPocketModalBottomSheet
 import goods.pocket.app.presentation.designsystem.goodsPocketOutlinedFieldColors
@@ -25,13 +25,14 @@ import goods.pocket.app.presentation.i18n.tr
 import goods.pocket.app.presentation.state.QuickAddTarget
 import goodspocket.composeapp.generated.resources.Res
 import goodspocket.composeapp.generated.resources.action_save
-import goodspocket.composeapp.generated.resources.field_amount
 import goodspocket.composeapp.generated.resources.field_category
-import goodspocket.composeapp.generated.resources.field_date
 import goodspocket.composeapp.generated.resources.field_event_title
+import goodspocket.composeapp.generated.resources.field_character
 import goodspocket.composeapp.generated.resources.field_item_name
 import goodspocket.composeapp.generated.resources.field_preorder_name
 import goodspocket.composeapp.generated.resources.field_release_date
+import goodspocket.composeapp.generated.resources.field_series
+import goodspocket.composeapp.generated.resources.field_status
 import goodspocket.composeapp.generated.resources.field_store
 import goodspocket.composeapp.generated.resources.field_target_date
 import goodspocket.composeapp.generated.resources.quick_add_title
@@ -41,19 +42,19 @@ fun QuickAddSheet(
     target: QuickAddTarget,
     onTargetChange: (QuickAddTarget) -> Unit,
     onDismiss: () -> Unit,
-    onSubmitItem: (String, String) -> Unit,
+    onSubmitItem: (String, String, ItemStatus, String, String, String) -> Unit,
     onSubmitPreorder: (String, String, String) -> Unit,
-    onSubmitTransaction: (String, TransactionType, String) -> Unit,
     onSubmitEvent: (String, String, EventType) -> Unit,
 ) {
     var itemName by remember { mutableStateOf("") }
     var itemCategory by remember { mutableStateOf("") }
+    var itemStatus by remember { mutableStateOf(ItemStatus.OWNED) }
+    var itemSeries by remember { mutableStateOf("") }
+    var itemCharacter by remember { mutableStateOf("") }
+    var itemStore by remember { mutableStateOf("") }
     var preorderName by remember { mutableStateOf("") }
     var preorderStore by remember { mutableStateOf("") }
     var preorderReleaseDate by remember { mutableStateOf("") }
-    var transactionAmount by remember { mutableStateOf("") }
-    var transactionDate by remember { mutableStateOf("") }
-    var transactionType by remember { mutableStateOf(TransactionType.PURCHASE) }
     var eventTitle by remember { mutableStateOf("") }
     var eventDate by remember { mutableStateOf("") }
     var eventType by remember { mutableStateOf(EventType.RELEASE) }
@@ -89,9 +90,49 @@ fun QuickAddSheet(
                     onValueChange = { itemCategory = it },
                     label = tr(Res.string.field_category),
                 )
+                Text(
+                    text = tr(Res.string.field_status),
+                    style = MaterialTheme.typography.labelLarge,
+                )
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    listOf(ItemStatus.OWNED, ItemStatus.PLANNED_CLEANUP).forEach { status ->
+                        GoodsPocketFilterChip(
+                            selected = itemStatus == status,
+                            onClick = { itemStatus = status },
+                            label = status.localizedLabel(),
+                        )
+                    }
+                }
+                GoodsPocketInputField(
+                    value = itemSeries,
+                    onValueChange = { itemSeries = it },
+                    label = tr(Res.string.field_series),
+                )
+                GoodsPocketInputField(
+                    value = itemCharacter,
+                    onValueChange = { itemCharacter = it },
+                    label = tr(Res.string.field_character),
+                )
+                GoodsPocketInputField(
+                    value = itemStore,
+                    onValueChange = { itemStore = it },
+                    label = tr(Res.string.field_store),
+                )
                 SubmitButton(
                     enabled = itemName.isNotBlank() && itemCategory.isNotBlank(),
-                    onClick = { onSubmitItem(itemName, itemCategory) },
+                    onClick = {
+                        onSubmitItem(
+                            itemName,
+                            itemCategory,
+                            itemStatus,
+                            itemSeries,
+                            itemCharacter,
+                            itemStore,
+                        )
+                    },
                 )
             }
 
@@ -114,35 +155,6 @@ fun QuickAddSheet(
                 SubmitButton(
                     enabled = preorderName.isNotBlank() && preorderStore.isNotBlank() && preorderReleaseDate.isNotBlank(),
                     onClick = { onSubmitPreorder(preorderName, preorderStore, preorderReleaseDate) },
-                )
-            }
-
-            QuickAddTarget.TRANSACTION -> {
-                GoodsPocketInputField(
-                    value = transactionAmount,
-                    onValueChange = { transactionAmount = it },
-                    label = tr(Res.string.field_amount),
-                )
-                GoodsPocketInputField(
-                    value = transactionDate,
-                    onValueChange = { transactionDate = it },
-                    label = tr(Res.string.field_date),
-                )
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    listOf(TransactionType.PURCHASE, TransactionType.DEPOSIT, TransactionType.BALANCE).forEach { type ->
-                        GoodsPocketFilterChip(
-                            selected = transactionType == type,
-                            onClick = { transactionType = type },
-                            label = type.localizedLabel(),
-                        )
-                    }
-                }
-                SubmitButton(
-                    enabled = transactionAmount.isNotBlank() && transactionDate.isNotBlank(),
-                    onClick = { onSubmitTransaction(transactionAmount, transactionType, transactionDate) },
                 )
             }
 

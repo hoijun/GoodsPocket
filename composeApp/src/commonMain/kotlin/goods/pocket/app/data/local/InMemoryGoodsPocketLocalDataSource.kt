@@ -8,13 +8,10 @@ import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.PreorderStatus
 import goods.pocket.app.domain.model.StorageLocation
-import goods.pocket.app.domain.model.Transaction
-import goods.pocket.app.domain.model.TransactionType
 
 internal class InMemoryGoodsPocketLocalDataSource : GoodsPocketLocalDataSource {
     private val items = GoodsPocketSeedData.items.toMutableList()
     private val preorders = GoodsPocketSeedData.preorders.toMutableList()
-    private val transactions = GoodsPocketSeedData.transactions.toMutableList()
     private val events = GoodsPocketSeedData.events.toMutableList()
     private val storageLocations = GoodsPocketSeedData.storageLocations.toMutableList()
     private var appPreferences = GoodsPocketSeedData.appPreferences
@@ -39,14 +36,6 @@ internal class InMemoryGoodsPocketLocalDataSource : GoodsPocketLocalDataSource {
 
     override fun deleteItem(id: String) {
         items.removeAll { it.id == id }
-    }
-
-    override fun getItemTransactions(itemId: String): List<Transaction> {
-        return transactions
-            .asSequence()
-            .filter { it.relatedItemId == itemId }
-            .sortedWith(compareByDescending<Transaction> { it.transactionDate }.thenByDescending { it.createdAt })
-            .toList()
     }
 
     override fun countOwnedItems(): Int = items.count { it.status == ItemStatus.OWNED }
@@ -86,29 +75,6 @@ internal class InMemoryGoodsPocketLocalDataSource : GoodsPocketLocalDataSource {
 
     override fun countActivePreorders(): Int {
         return preorders.count { it.status == PreorderStatus.ACTIVE || it.status == PreorderStatus.PAYMENT_PENDING }
-    }
-
-    override fun getTransactions(monthFilter: String?): List<Transaction> {
-        return transactions
-            .asSequence()
-            .filter { monthFilter.isNullOrBlank() || it.transactionDate.startsWith(monthFilter) }
-            .sortedWith(compareByDescending<Transaction> { it.transactionDate }.thenByDescending { it.createdAt })
-            .toList()
-    }
-
-    override fun getMonthlySummary(monthFilter: String): Long {
-        return transactions
-            .filter { it.transactionDate.startsWith(monthFilter) }
-            .filterNot { it.type == TransactionType.REFUND || it.type == TransactionType.TRANSFER_INCOME }
-            .sumOf(Transaction::amount)
-    }
-
-    override fun upsertTransaction(transaction: Transaction) {
-        transactions.replaceById(transaction, Transaction::id)
-    }
-
-    override fun deleteTransaction(id: String) {
-        transactions.removeAll { it.id == id }
     }
 
     override fun getUpcomingEvents(limit: Int): List<Event> {

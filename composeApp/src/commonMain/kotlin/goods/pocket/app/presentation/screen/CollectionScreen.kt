@@ -38,7 +38,6 @@ import goods.pocket.app.presentation.i18n.tr
 import goodspocket.composeapp.generated.resources.Res
 import goodspocket.composeapp.generated.resources.collection_empty_search
 import goodspocket.composeapp.generated.resources.collection_metric_monthly_spend
-import goodspocket.composeapp.generated.resources.collection_quantity_badge
 import goodspocket.composeapp.generated.resources.collection_search_label
 import goodspocket.composeapp.generated.resources.collection_search_placeholder
 import goodspocket.composeapp.generated.resources.collection_series_category
@@ -57,7 +56,6 @@ fun CollectionScreen(
 ) {
     val visibleItems = items.filter { it.status == selectedStatus }
     val totalSpend = items.sumOf { it.purchasePrice ?: 0L }
-    val highlightedCategories = visibleItems.map(Item::category).distinct().take(4)
 
     LazyColumn(
         modifier = goodsPocketScreenModifier(),
@@ -107,18 +105,6 @@ fun CollectionScreen(
                 singleLine = true,
                 shape = MaterialTheme.shapes.medium,
             )
-        }
-        if (highlightedCategories.isNotEmpty()) {
-            item {
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    highlightedCategories.forEach { category ->
-                        GoodsPocketTonalBadge(text = category)
-                    }
-                }
-            }
         }
         if (visibleItems.isEmpty()) {
             item {
@@ -171,10 +157,6 @@ fun CollectionScreen(
                                 text = item.name,
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.SemiBold,
-                            )
-                            GoodsPocketTonalBadge(
-                                text = tr(Res.string.collection_quantity_badge, item.quantity),
-                                containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
                             )
                         }
                         Text(

@@ -4,7 +4,6 @@
     <string name="nav_collection">Collection</string>
     <string name="nav_preorders">Preorders</string>
     <string name="nav_my">My</string>
-    <string name="nav_transactions">Transactions</string>
     <string name="nav_events">Events</string>
     <string name="nav_settings">Settings</string>
 
@@ -41,7 +40,6 @@
     <string name="home_no_recent_activity">No recent activity yet.</string>
     <string name="home_planner_preorders">View preorders</string>
     <string name="home_planner_preorders_count">%1$s active</string>
-    <string name="home_planner_transactions">View spending</string>
     <string name="home_planner_events">View events</string>
     <string name="home_planner_events_count">%1$s due soon</string>
     <string name="home_planner_quick_add">Quick add</string>
@@ -51,7 +49,6 @@
     <string name="collection_empty_search">No items match the current collection filters.</string>
     <string name="collection_status_section">Item status</string>
     <string name="collection_status_section_subtitle">Switch between owned and planned cleanup items and review purchase scale together.</string>
-    <string name="collection_quantity_badge">Qty %1$s</string>
     <string name="collection_series_category">%1$s · %2$s</string>
     <string name="collection_metric_monthly_spend">Total purchase amount</string>
 
@@ -65,12 +62,6 @@
     <string name="preorders_next_release">Next Release</string>
     <string name="preorders_pending_payment_short">Pending Payment</string>
 
-    <string name="transactions_month_summary">Month Summary</string>
-    <string name="transactions_visible_total">Visible total: %1$s</string>
-    <string name="transactions_empty_filter">No transactions for this filter.</string>
-    <string name="transactions_outgoing_total">Outgoing</string>
-    <string name="transactions_incoming_total">Incoming</string>
-    <string name="transactions_visible_entries">Entries</string>
 
     <string name="events_empty_filter">No events for this filter.</string>
     <string name="events_highlight">Upcoming Highlights</string>
@@ -132,7 +123,6 @@
 
     <string name="editor_item_title">Edit Item</string>
     <string name="editor_preorder_title">Edit Preorder</string>
-    <string name="editor_transaction_title">Edit Transaction</string>
     <string name="editor_event_title">Edit Event</string>
 
     <string name="detail_category">Category</string>
@@ -140,9 +130,9 @@
     <string name="detail_series">Series</string>
     <string name="detail_character">Character</string>
     <string name="detail_store">Store</string>
+    <string name="detail_purchase_date">Purchase date</string>
+    <string name="detail_purchase_price">Purchase price</string>
     <string name="detail_linked_preorder">Linked preorder</string>
-    <string name="detail_linked_transactions">Linked transactions</string>
-    <string name="detail_no_linked_transactions">No linked transactions yet.</string>
     <string name="detail_release_date">Release date</string>
     <string name="detail_deposit">Deposit</string>
     <string name="detail_remaining">Remaining</string>
@@ -160,14 +150,11 @@
     <string name="dialog_delete_item_body">This action permanently removes the item from your collection.</string>
     <string name="dialog_cancel_preorder_title">Cancel preorder?</string>
     <string name="dialog_cancel_preorder_body">The preorder status will change to canceled and remain in the preorder list.</string>
-    <string name="dialog_delete_transaction_title">Delete transaction?</string>
-    <string name="dialog_delete_transaction_body">This action permanently removes the transaction record.</string>
     <string name="dialog_delete_event_title">Delete event?</string>
     <string name="dialog_delete_event_body">This action permanently removes the event.</string>
 
     <string name="target_item">Item</string>
     <string name="target_preorder">Preorder</string>
-    <string name="target_transaction">Transaction</string>
     <string name="target_event">Event</string>
 
     <string name="item_status_owned">Owned</string>
@@ -178,12 +165,6 @@
     <string name="preorder_status_received">Received</string>
     <string name="preorder_status_canceled">Canceled</string>
 
-    <string name="transaction_type_deposit">Deposit</string>
-    <string name="transaction_type_balance">Balance</string>
-    <string name="transaction_type_purchase">Purchase</string>
-    <string name="transaction_type_shipping">Shipping</string>
-    <string name="transaction_type_refund">Refund</string>
-    <string name="transaction_type_transfer_income">Transfer Income</string>
 
     <string name="event_type_release">Release</string>
     <string name="event_type_payment_due">Payment Due</string>

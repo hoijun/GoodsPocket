@@ -7,7 +7,6 @@ sealed class AppDestination(
     data object Collection : AppDestination("collection/list")
     data object Preorders : AppDestination("preorder/list")
     data object My : AppDestination("my")
-    data object Transactions : AppDestination("transaction/list")
     data object Events : AppDestination("event/list")
     data object Settings : AppDestination("settings")
 

@@ -5,8 +5,6 @@ import goods.pocket.app.domain.model.Event
 import goods.pocket.app.domain.model.EventType
 import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.PreorderStatus
-import goods.pocket.app.domain.model.Transaction
-import goods.pocket.app.domain.model.TransactionType
 import goods.pocket.app.presentation.state.MyPageUiModel
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -44,46 +42,6 @@ class JournalScreenModelsTest {
         assertEquals(2, overview.arrivingCount)
         assertEquals("2024.05.12", overview.nextReleaseDate)
         assertEquals(46000, overview.visibleRemainingTotal)
-    }
-
-    @Test
-    fun `transaction journal overview groups visible entries by date and direction`() {
-        val overview = buildTransactionJournalOverview(
-            transactions = listOf(
-                transaction(
-                    id = "purchase",
-                    type = TransactionType.PURCHASE,
-                    amount = 42000,
-                    date = "2024.05.28",
-                ),
-                transaction(
-                    id = "refund",
-                    type = TransactionType.REFUND,
-                    amount = 6000,
-                    date = "2024.05.28",
-                ),
-                transaction(
-                    id = "shipping",
-                    type = TransactionType.SHIPPING,
-                    amount = 3000,
-                    date = "2024.05.20",
-                ),
-                transaction(
-                    id = "income",
-                    type = TransactionType.TRANSFER_INCOME,
-                    amount = 15000,
-                    date = "2024.05.29",
-                ),
-            ),
-            selectedType = null,
-        )
-
-        assertEquals(66000, overview.visibleTotalAmount)
-        assertEquals(45000, overview.outgoingTotal)
-        assertEquals(21000, overview.incomingTotal)
-        assertEquals(listOf("2024.05.29", "2024.05.28", "2024.05.20"), overview.dayGroups.map { it.date })
-        assertEquals(listOf("income"), overview.dayGroups.first().transactions.map(Transaction::id))
-        assertEquals(listOf("purchase", "refund"), overview.dayGroups[1].transactions.map(Transaction::id))
     }
 
     @Test
@@ -162,19 +120,6 @@ class JournalScreenModelsTest {
         remainingPrice = remainingPrice,
         createdAt = "2024.05.01",
         updatedAt = "2024.05.01",
-    )
-
-    private fun transaction(
-        id: String,
-        type: TransactionType,
-        amount: Long,
-        date: String,
-    ) = Transaction(
-        id = id,
-        type = type,
-        amount = amount,
-        transactionDate = date,
-        createdAt = date,
     )
 
     private fun event(

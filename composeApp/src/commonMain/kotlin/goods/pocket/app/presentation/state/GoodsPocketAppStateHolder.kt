@@ -6,18 +6,13 @@ import goods.pocket.app.domain.model.Item
 import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.PreorderStatus
-import goods.pocket.app.domain.model.Transaction
-import goods.pocket.app.domain.model.TransactionType
 import goods.pocket.app.domain.usecase.CancelPreorderUseCase
 import goods.pocket.app.domain.usecase.DeleteCollectionItemUseCase
 import goods.pocket.app.domain.usecase.DeleteEventUseCase
-import goods.pocket.app.domain.usecase.DeleteTransactionUseCase
 import goods.pocket.app.domain.usecase.GetCollectionItemsUseCase
 import goods.pocket.app.domain.usecase.GetAppPreferencesUseCase
 import goods.pocket.app.domain.usecase.GetDashboardSummaryUseCase
 import goods.pocket.app.domain.usecase.GetEventListUseCase
-import goods.pocket.app.domain.usecase.GetItemTransactionsUseCase
-import goods.pocket.app.domain.usecase.GetMonthlyTransactionsUseCase
 import goods.pocket.app.domain.usecase.GetPreorderListUseCase
 import goods.pocket.app.domain.usecase.GetRecentActivitiesUseCase
 import goods.pocket.app.domain.usecase.GetStorageLocationsUseCase
@@ -26,7 +21,6 @@ import goods.pocket.app.domain.usecase.MarkPreorderReceivedUseCase
 import goods.pocket.app.domain.usecase.SaveCollectionItemUseCase
 import goods.pocket.app.domain.usecase.SaveEventUseCase
 import goods.pocket.app.domain.usecase.SavePreorderUseCase
-import goods.pocket.app.domain.usecase.SaveTransactionUseCase
 import goods.pocket.app.domain.usecase.UpdateAppPreferencesUseCase
 import goods.pocket.app.presentation.navigation.AppDestination
 import kotlin.random.Random
@@ -40,8 +34,6 @@ class GoodsPocketAppStateHolder(
     private val getAppPreferencesUseCase: GetAppPreferencesUseCase,
     private val getDashboardSummaryUseCase: GetDashboardSummaryUseCase,
     private val getEventListUseCase: GetEventListUseCase,
-    private val getItemTransactionsUseCase: GetItemTransactionsUseCase,
-    private val getMonthlyTransactionsUseCase: GetMonthlyTransactionsUseCase,
     private val getPreorderListUseCase: GetPreorderListUseCase,
     private val getRecentActivitiesUseCase: GetRecentActivitiesUseCase,
     private val getStorageLocationsUseCase: GetStorageLocationsUseCase,
@@ -49,12 +41,10 @@ class GoodsPocketAppStateHolder(
     private val cancelPreorderUseCase: CancelPreorderUseCase,
     private val deleteCollectionItemUseCase: DeleteCollectionItemUseCase,
     private val deleteEventUseCase: DeleteEventUseCase,
-    private val deleteTransactionUseCase: DeleteTransactionUseCase,
     private val markPreorderReceivedUseCase: MarkPreorderReceivedUseCase,
     private val saveCollectionItemUseCase: SaveCollectionItemUseCase,
     private val saveEventUseCase: SaveEventUseCase,
     private val savePreorderUseCase: SavePreorderUseCase,
-    private val saveTransactionUseCase: SaveTransactionUseCase,
     private val updateAppPreferencesUseCase: UpdateAppPreferencesUseCase,
 ) {
     private val _state = MutableStateFlow(GoodsPocketUiState())
@@ -84,10 +74,6 @@ class GoodsPocketAppStateHolder(
         _state.update { current ->
             current.copy(currentDestination = current.selectedPrimaryDestination)
         }
-    }
-
-    fun openTransactionsOverview() {
-        selectDestination(AppDestination.Transactions)
     }
 
     fun openEventsOverview() {
@@ -124,19 +110,6 @@ class GoodsPocketAppStateHolder(
                     )
                 }
             }
-
-            activityId.startsWith("tx-") -> {
-                _state.update { current ->
-                    current.copy(
-                        currentDestination = AppDestination.Transactions,
-                        selectedPrimaryDestination = selectedPrimaryDestinationFor(
-                            destination = AppDestination.Transactions,
-                            fallback = current.selectedPrimaryDestination,
-                        ),
-                        activeDetail = ActiveDetail.TransactionDetail(activityId),
-                    )
-                }
-            }
         }
     }
 
@@ -162,11 +135,6 @@ class GoodsPocketAppStateHolder(
         reload()
     }
 
-    fun updateTransactionTypeFilter(type: TransactionType?) {
-        _state.update { it.copy(transactionTypeFilter = type) }
-        reload()
-    }
-
     fun updateEventTypeFilter(type: EventType?) {
         _state.update { it.copy(eventTypeFilter = type) }
         reload()
@@ -184,14 +152,24 @@ class GoodsPocketAppStateHolder(
         _state.update { it.copy(quickAddTarget = target) }
     }
 
-    fun submitItem(name: String, category: String) {
+    fun submitItem(
+        name: String,
+        category: String,
+        status: ItemStatus,
+        seriesName: String,
+        characterName: String,
+        purchaseStore: String,
+    ) {
         val newId = generateId("item")
         saveCollectionItemUseCase(
             Item(
                 id = newId,
                 name = name.trim(),
                 category = category.trim(),
-                status = ItemStatus.OWNED,
+                status = status,
+                seriesName = seriesName.trim().ifBlank { null },
+                characterName = characterName.trim().ifBlank { null },
+                purchaseStore = purchaseStore.trim().ifBlank { null },
                 createdAt = CURRENT_DATE,
                 updatedAt = CURRENT_DATE,
             ),
@@ -199,7 +177,7 @@ class GoodsPocketAppStateHolder(
         reloadAndCloseSheet(
             destination = AppDestination.Collection,
             detail = ActiveDetail.ItemDetail(newId),
-            collectionStatusOverride = ItemStatus.OWNED,
+            collectionStatusOverride = status,
         )
     }
 
@@ -219,24 +197,6 @@ class GoodsPocketAppStateHolder(
         reloadAndCloseSheet(
             destination = AppDestination.Preorders,
             detail = ActiveDetail.PreorderDetail(newId),
-        )
-    }
-
-    fun submitTransaction(amount: String, type: TransactionType, transactionDate: String) {
-        val normalizedAmount = amount.toLongOrNull() ?: return
-        val newId = generateId("tx")
-        saveTransactionUseCase(
-            Transaction(
-                id = newId,
-                type = type,
-                amount = normalizedAmount,
-                transactionDate = transactionDate.trim(),
-                createdAt = CURRENT_DATE,
-            ),
-        )
-        reloadAndCloseSheet(
-            destination = AppDestination.Transactions,
-            detail = ActiveDetail.TransactionDetail(newId),
         )
     }
 
@@ -266,10 +226,6 @@ class GoodsPocketAppStateHolder(
         _state.update { it.copy(activeDetail = ActiveDetail.PreorderDetail(preorderId)) }
     }
 
-    fun openTransactionDetail(transactionId: String) {
-        _state.update { it.copy(activeDetail = ActiveDetail.TransactionDetail(transactionId)) }
-    }
-
     fun openEventDetail(eventId: String) {
         _state.update { it.copy(activeDetail = ActiveDetail.EventDetail(eventId)) }
     }
@@ -292,15 +248,6 @@ class GoodsPocketAppStateHolder(
             it.copy(
                 activeDetail = null,
                 activeEditor = ActiveEditor.PreorderEditor(preorderId),
-            )
-        }
-    }
-
-    fun openTransactionEditor(transactionId: String) {
-        _state.update {
-            it.copy(
-                activeDetail = null,
-                activeEditor = ActiveEditor.TransactionEditor(transactionId),
             )
         }
     }
@@ -372,30 +319,6 @@ class GoodsPocketAppStateHolder(
         }
     }
 
-    fun saveEditedTransaction(
-        transactionId: String,
-        amount: String,
-        type: TransactionType,
-        transactionDate: String,
-    ) {
-        val normalizedAmount = amount.toLongOrNull() ?: return
-        val existing = _state.value.transactions.firstOrNull { it.id == transactionId } ?: return
-        saveTransactionUseCase(
-            existing.copy(
-                amount = normalizedAmount,
-                type = type,
-                transactionDate = transactionDate.trim(),
-            ),
-        )
-        reload()
-        _state.update {
-            it.copy(
-                activeEditor = null,
-                activeDetail = ActiveDetail.TransactionDetail(transactionId),
-            )
-        }
-    }
-
     fun saveEditedEvent(
         eventId: String,
         title: String,
@@ -421,11 +344,10 @@ class GoodsPocketAppStateHolder(
     }
 
     fun requestDeleteItem(itemId: String) {
-        val linkedCount = itemTransactions(itemId).size
         _state.update {
             it.copy(
                 activeDetail = null,
-                pendingDelete = PendingDelete.ItemDelete(itemId, linkedCount),
+                pendingDelete = PendingDelete.ItemDelete(itemId),
             )
         }
     }
@@ -435,15 +357,6 @@ class GoodsPocketAppStateHolder(
             it.copy(
                 activeDetail = null,
                 pendingDelete = PendingDelete.PreorderCancel(preorderId),
-            )
-        }
-    }
-
-    fun requestDeleteTransaction(transactionId: String) {
-        _state.update {
-            it.copy(
-                activeDetail = null,
-                pendingDelete = PendingDelete.TransactionDelete(transactionId),
             )
         }
     }
@@ -486,21 +399,6 @@ class GoodsPocketAppStateHolder(
                 }
             }
 
-            is PendingDelete.TransactionDelete -> {
-                deleteTransactionUseCase(pending.transactionId)
-                reload()
-                _state.update { current ->
-                    current.copy(
-                        pendingDelete = null,
-                        currentDestination = AppDestination.Transactions,
-                        selectedPrimaryDestination = selectedPrimaryDestinationFor(
-                            destination = AppDestination.Transactions,
-                            fallback = current.selectedPrimaryDestination,
-                        ),
-                    )
-                }
-            }
-
             is PendingDelete.EventDelete -> {
                 deleteEventUseCase(pending.eventId)
                 reload()
@@ -522,7 +420,6 @@ class GoodsPocketAppStateHolder(
             preorderId = preorderId,
             receiveDate = CURRENT_DATE,
             newItemId = newItemId,
-            transactionId = generateId("tx"),
             languageCode = _state.value.appPreferences.languageCode,
         )
         reload()
@@ -535,8 +432,6 @@ class GoodsPocketAppStateHolder(
             )
         }
     }
-
-    fun itemTransactions(itemId: String): List<Transaction> = getItemTransactionsUseCase(itemId)
 
     private fun reloadAndCloseSheet(
         destination: AppDestination,
@@ -565,7 +460,6 @@ class GoodsPocketAppStateHolder(
             getAppPreferencesUseCase = getAppPreferencesUseCase,
             getDashboardSummaryUseCase = getDashboardSummaryUseCase,
             getEventListUseCase = getEventListUseCase,
-            getMonthlyTransactionsUseCase = getMonthlyTransactionsUseCase,
             getPreorderListUseCase = getPreorderListUseCase,
             getRecentActivitiesUseCase = getRecentActivitiesUseCase,
             getStorageLocationsUseCase = getStorageLocationsUseCase,

@@ -7,15 +7,12 @@ import goods.pocket.app.domain.model.Item
 import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.PreorderStatus
 import goods.pocket.app.domain.model.StorageLocation
-import goods.pocket.app.domain.model.Transaction
-import goods.pocket.app.domain.model.TransactionType
 
 interface GoodsPocketLocalDataSource {
     fun getItems(filter: String? = null): List<Item>
     fun getItem(id: String): Item?
     fun upsertItem(item: Item)
     fun deleteItem(id: String)
-    fun getItemTransactions(itemId: String): List<Transaction>
     fun countOwnedItems(): Int
 
     fun getPreorders(status: PreorderStatus? = null): List<Preorder>
@@ -24,11 +21,6 @@ interface GoodsPocketLocalDataSource {
     fun markAsReceived(preorderId: String, receiveDate: String)
     fun cancelPreorder(preorderId: String)
     fun countActivePreorders(): Int
-
-    fun getTransactions(monthFilter: String? = null): List<Transaction>
-    fun getMonthlySummary(monthFilter: String): Long
-    fun upsertTransaction(transaction: Transaction)
-    fun deleteTransaction(id: String)
 
     fun getUpcomingEvents(limit: Int): List<Event>
     fun getEvents(type: EventType? = null): List<Event>

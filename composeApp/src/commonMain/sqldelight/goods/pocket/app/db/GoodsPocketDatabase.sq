@@ -37,19 +37,6 @@ CREATE TABLE preorders (
   updated_at TEXT NOT NULL
 );
 
-CREATE TABLE transactions (
-  id TEXT NOT NULL PRIMARY KEY,
-  type TEXT NOT NULL,
-  amount INTEGER NOT NULL,
-  transaction_date TEXT NOT NULL,
-  related_item_id TEXT,
-  related_preorder_id TEXT,
-  payment_method TEXT,
-  place_name TEXT,
-  note TEXT,
-  created_at TEXT NOT NULL
-);
-
 CREATE TABLE events (
   id TEXT NOT NULL PRIMARY KEY,
   title TEXT NOT NULL,
@@ -107,14 +94,9 @@ deleteItemById:
 DELETE FROM items
 WHERE id = ?;
 
-selectItemTransactions:
-SELECT * FROM transactions
-WHERE related_item_id = ?
-ORDER BY transaction_date DESC, created_at DESC;
-
 countOwnedItems:
 SELECT COUNT(*) FROM items
-WHERE status IN ('OWNED', 'WAITING_DELIVERY', 'LOST');
+WHERE status = 'OWNED';
 
 selectAllPreorders:
 SELECT * FROM preorders
@@ -154,37 +136,6 @@ WHERE id = ?;
 countActivePreorders:
 SELECT COUNT(*) FROM preorders
 WHERE status IN ('ACTIVE', 'PAYMENT_PENDING');
-
-selectAllTransactions:
-SELECT * FROM transactions
-ORDER BY transaction_date DESC, created_at DESC;
-
-selectTransactionsByMonth:
-SELECT * FROM transactions
-WHERE transaction_date LIKE ? || '%'
-ORDER BY transaction_date DESC, created_at DESC;
-
-selectTransactionsByItemId:
-SELECT * FROM transactions
-WHERE related_item_id = ?
-ORDER BY transaction_date DESC, created_at DESC;
-
-monthlySummary:
-SELECT COALESCE(SUM(amount), 0) FROM transactions
-WHERE transaction_date LIKE ? || '%'
-  AND type NOT IN ('REFUND', 'TRANSFER_INCOME');
-
-upsertTransaction:
-INSERT OR REPLACE INTO transactions (
-  id, type, amount, transaction_date, related_item_id, related_preorder_id,
-  payment_method, place_name, note, created_at
-) VALUES (
-  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-);
-
-deleteTransactionById:
-DELETE FROM transactions
-WHERE id = ?;
 
 selectAllEvents:
 SELECT * FROM events

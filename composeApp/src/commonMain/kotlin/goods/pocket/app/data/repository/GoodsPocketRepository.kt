@@ -8,18 +8,15 @@ import goods.pocket.app.domain.model.Item
 import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.PreorderStatus
 import goods.pocket.app.domain.model.StorageLocation
-import goods.pocket.app.domain.model.Transaction
 import goods.pocket.app.domain.repository.CollectionRepository
 import goods.pocket.app.domain.repository.EventRepository
 import goods.pocket.app.domain.repository.PreorderRepository
 import goods.pocket.app.domain.repository.SettingsRepository
-import goods.pocket.app.domain.repository.TransactionRepository
 
 class GoodsPocketRepository(
     private val localDataSource: GoodsPocketLocalDataSource,
 ) : CollectionRepository,
     PreorderRepository,
-    TransactionRepository,
     EventRepository,
     SettingsRepository {
 
@@ -34,8 +31,6 @@ class GoodsPocketRepository(
     override fun deleteItem(id: String) {
         localDataSource.deleteItem(id)
     }
-
-    override fun getItemTransactions(itemId: String): List<Transaction> = localDataSource.getItemTransactions(itemId)
 
     override fun countOwnedItems(): Int = localDataSource.countOwnedItems()
 
@@ -56,18 +51,6 @@ class GoodsPocketRepository(
     }
 
     override fun countActivePreorders(): Int = localDataSource.countActivePreorders()
-
-    override fun getTransactions(monthFilter: String?): List<Transaction> = localDataSource.getTransactions(monthFilter)
-
-    override fun getMonthlySummary(monthFilter: String): Long = localDataSource.getMonthlySummary(monthFilter)
-
-    override fun saveTransaction(transaction: Transaction) {
-        localDataSource.upsertTransaction(transaction)
-    }
-
-    override fun deleteTransaction(id: String) {
-        localDataSource.deleteTransaction(id)
-    }
 
     override fun getUpcomingEvents(limit: Int): List<Event> = localDataSource.getUpcomingEvents(limit)
 
