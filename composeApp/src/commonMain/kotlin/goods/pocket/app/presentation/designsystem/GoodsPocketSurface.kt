@@ -1,7 +1,7 @@
 package goods.pocket.app.presentation.designsystem
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
@@ -30,8 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -165,28 +162,8 @@ fun GoodsPocketBottomSheetHeader(
     modifier: Modifier = Modifier,
     fontWeight: FontWeight? = null,
 ) {
-    val dismissDragThreshold = with(LocalDensity.current) { 24.dp.toPx() }
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .pointerInput(onDismiss) {
-                var dragDistance = 0f
-                detectVerticalDragGestures(
-                    onDragCancel = { dragDistance = 0f },
-                    onDragEnd = {
-                        if (dragDistance > dismissDragThreshold) {
-                            onDismiss()
-                        }
-                        dragDistance = 0f
-                    },
-                    onVerticalDrag = { change, dragAmount ->
-                        if (dragAmount > 0f) {
-                            dragDistance += dragAmount
-                            change.consume()
-                        }
-                    },
-                )
-            },
+        modifier = modifier.fillMaxWidth(),
     ) {
         GoodsPocketBottomSheetHandle()
         Row(

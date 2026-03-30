@@ -7,7 +7,7 @@ import kotlin.test.assertTrue
 class BottomSheetPresentationRegressionTest {
 
     @Test
-    fun `all modal bottom sheets use a bounded bordered container with header-only dismissal affordances`() {
+    fun `all modal bottom sheets use a bounded bordered container with animated header drag dismissal affordances`() {
         val quickAddSource = source("composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/component/QuickAddSheet.kt")
         val detailSource = source("composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/component/DetailSheet.kt")
         val editorSource = source("composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/component/EditorSheet.kt")
@@ -26,9 +26,11 @@ class BottomSheetPresentationRegressionTest {
         assertTrue(bottomSheetSource.contains("heightIn(max = maxHeight - 88.dp)"))
         assertTrue(bottomSheetSource.contains("border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)"))
         assertTrue(bottomSheetSource.contains("verticalScroll(rememberScrollState())"))
+        assertTrue(bottomSheetSource.contains("rememberDraggableState"))
+        assertTrue(bottomSheetSource.contains(".offset { IntOffset("))
+        assertTrue(bottomSheetSource.contains("animate("))
         assertTrue(surfaceSource.contains("fun GoodsPocketBottomSheetHandle("))
         assertTrue(surfaceSource.contains("fun GoodsPocketBottomSheetHeader("))
-        assertTrue(surfaceSource.contains("detectVerticalDragGestures"))
         assertTrue(surfaceSource.contains("GoodsPocketBottomSheetHandle()"))
         assertTrue(surfaceSource.contains("TextButton("))
         assertTrue(surfaceSource.contains("padding(start = 20.dp)"))
