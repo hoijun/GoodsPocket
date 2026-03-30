@@ -1,6 +1,8 @@
 package goods.pocket.app.presentation.designsystem
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -25,10 +27,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -162,10 +165,30 @@ fun GoodsPocketBottomSheetHeader(
     modifier: Modifier = Modifier,
     fontWeight: FontWeight? = null,
 ) {
+    val dismissDragThreshold = with(LocalDensity.current) { 24.dp.toPx() }
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .pointerInput(onDismiss) {
+                var dragDistance = 0f
+                detectVerticalDragGestures(
+                    onDragCancel = { dragDistance = 0f },
+                    onDragEnd = {
+                        if (dragDistance > dismissDragThreshold) {
+                            onDismiss()
+                        }
+                        dragDistance = 0f
+                    },
+                    onVerticalDrag = { change, dragAmount ->
+                        if (dragAmount > 0f) {
+                            dragDistance += dragAmount
+                            change.consume()
+                        }
+                    },
+                )
+            },
     ) {
-        GoodsPocketBottomSheetHandle(onClick = onDismiss)
+        GoodsPocketBottomSheetHandle()
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -175,13 +198,14 @@ fun GoodsPocketBottomSheetHeader(
                 text = title,
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = 10.dp)
-                    .padding(vertical = 12.dp),
+                    .padding(start = 20.dp)
+                    .padding(vertical = 20.dp),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = fontWeight,
             )
             TextButton(
                 onClick = onDismiss,
+                modifier = Modifier.padding(end = 5.dp)
             ) {
                 Text(tr(Res.string.action_close))
             }

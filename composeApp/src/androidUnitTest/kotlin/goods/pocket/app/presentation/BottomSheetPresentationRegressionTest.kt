@@ -28,10 +28,11 @@ class BottomSheetPresentationRegressionTest {
         assertTrue(bottomSheetSource.contains("verticalScroll(rememberScrollState())"))
         assertTrue(surfaceSource.contains("fun GoodsPocketBottomSheetHandle("))
         assertTrue(surfaceSource.contains("fun GoodsPocketBottomSheetHeader("))
-        assertTrue(surfaceSource.contains("GoodsPocketBottomSheetHandle(onClick = onDismiss)"))
+        assertTrue(surfaceSource.contains("detectVerticalDragGestures"))
+        assertTrue(surfaceSource.contains("GoodsPocketBottomSheetHandle()"))
         assertTrue(surfaceSource.contains("TextButton("))
-        assertTrue(surfaceSource.contains("padding(start = 10.dp)"))
-        assertTrue(surfaceSource.contains("padding(vertical = 12.dp)"))
+        assertTrue(surfaceSource.contains("padding(start = 20.dp)"))
+        assertTrue(surfaceSource.contains("padding(vertical = 20.dp)"))
     }
 
     private fun source(path: String): String {
