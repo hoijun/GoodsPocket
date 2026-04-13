@@ -1,6 +1,7 @@
 package goods.pocket.app.presentation.state
 
 import goods.pocket.app.data.InMemoryGoodsPocketRepository
+import goods.pocket.app.domain.model.CollectionEntryStatus
 import goods.pocket.app.domain.model.EventType
 import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.PreorderStatus
@@ -29,12 +30,40 @@ import kotlin.test.assertTrue
 class GoodsPocketAppStateHolderTest {
 
     @Test
+    fun `collection segment defaults to owned`() {
+        val stateHolder = newStateHolder()
+
+        assertEquals(CollectionSegment.OWNED, stateHolder.state.value.collectionSegment)
+    }
+
+    @Test
+    fun `selecting reserved collection segment opens collection with reserved focus`() {
+        val stateHolder = newStateHolder()
+
+        stateHolder.selectCollectionSegment(CollectionSegment.RESERVED)
+
+        val state = stateHolder.state.value
+        assertEquals(AppDestination.Collection, state.currentDestination)
+        assertEquals(AppDestination.Collection, state.selectedPrimaryDestination)
+        assertEquals(CollectionSegment.RESERVED, state.collectionSegment)
+    }
+
+    @Test
+    fun `marking a reserved collection entry as received keeps the same id and switches it to owned`() {
+        val stateHolder = newStateHolder()
+
+        stateHolder.markCollectionEntryReceived("pre-1")
+
+        val updated = stateHolder.state.value.collectionEntries.first { it.id == "pre-1" }
+        assertEquals(CollectionEntryStatus.OWNED, updated.status)
+    }
+
+    @Test
     fun `primary destinations expose my instead of transactions`() {
         assertEquals(
             listOf(
                 AppDestination.Home,
                 AppDestination.Collection,
-                AppDestination.Preorders,
                 AppDestination.My,
             ),
             AppDestination.primaryDestinations,
@@ -114,32 +143,35 @@ class GoodsPocketAppStateHolderTest {
         val stateHolder = newStateHolder()
         val before = stateHolder.state.value
 
-        stateHolder.submitItem(
+        stateHolder.submitCollectionEntry(
             name = "Uma Musume Postcard",
             category = "Postcard",
-            status = ItemStatus.OWNED,
+            status = CollectionEntryStatus.OWNED,
             seriesName = "Uma Musume",
             characterName = "Special Week",
             purchaseStore = "Animate",
+            releaseDate = "",
+            reservationStore = "",
+            note = "",
         )
 
         val after = stateHolder.state.value
         assertEquals(before.collectionItems.size + 1, after.collectionItems.size)
         assertEquals(before.homeSummary.ownedItemCount + 1, after.homeSummary.ownedItemCount)
         assertEquals(AppDestination.Collection.route, after.currentDestination.route)
-        assertEquals(ActiveDetail.ItemDetail::class, after.activeDetail!!::class)
+        assertEquals(ActiveDetail.CollectionEntryDetail::class, after.activeDetail!!::class)
     }
 
     @Test
     fun openDetailAndEditorFollowExpectedStateTransitions() {
         val stateHolder = newStateHolder()
 
-        stateHolder.openItemDetail("item-1")
-        assertEquals(ActiveDetail.ItemDetail("item-1"), stateHolder.state.value.activeDetail)
+        stateHolder.openCollectionEntryDetail("item-1")
+        assertEquals(ActiveDetail.CollectionEntryDetail("item-1"), stateHolder.state.value.activeDetail)
 
-        stateHolder.openItemEditor("item-1")
+        stateHolder.openCollectionEntryEditor("item-1")
         assertNull(stateHolder.state.value.activeDetail)
-        assertEquals(ActiveEditor.ItemEditor("item-1"), stateHolder.state.value.activeEditor)
+        assertEquals(ActiveEditor.CollectionEntryEditor("item-1"), stateHolder.state.value.activeEditor)
 
         stateHolder.closeEditor()
         assertNull(stateHolder.state.value.activeEditor)
@@ -149,14 +181,17 @@ class GoodsPocketAppStateHolderTest {
     fun editedItemIsReflectedInState() {
         val stateHolder = newStateHolder()
 
-        stateHolder.saveEditedItem(
-            itemId = "item-1",
+        stateHolder.saveEditedCollectionEntry(
+            entryId = "item-1",
             name = "Updated Acrylic Stand",
             category = "Figure",
-            status = ItemStatus.PLANNED_CLEANUP,
+            status = CollectionEntryStatus.PLANNED_CLEANUP,
             seriesName = "Hololive",
             characterName = "Suisei",
             purchaseStore = "Animate International",
+            releaseDate = "",
+            reservationStore = "",
+            note = "정리 후보",
         )
 
         val updatedItem = stateHolder.state.value.collectionItems.first { it.id == "item-1" }
@@ -164,14 +199,14 @@ class GoodsPocketAppStateHolderTest {
         assertEquals("Figure", updatedItem.category)
         assertEquals(ItemStatus.PLANNED_CLEANUP, updatedItem.status)
         assertEquals("Animate International", updatedItem.purchaseStore)
-        assertEquals(ActiveDetail.ItemDetail("item-1"), stateHolder.state.value.activeDetail)
+        assertEquals(ActiveDetail.CollectionEntryDetail("item-1"), stateHolder.state.value.activeDetail)
     }
 
     @Test
     fun cancelPreorderSetsPendingDeleteAndCanBeConfirmed() {
         val stateHolder = newStateHolder()
 
-        stateHolder.requestCancelPreorder("pre-1")
+        stateHolder.requestDeleteCollectionEntry("pre-1")
         assertEquals(PendingDelete.PreorderCancel("pre-1"), stateHolder.state.value.pendingDelete)
 
         stateHolder.confirmPendingDelete()
@@ -179,7 +214,7 @@ class GoodsPocketAppStateHolderTest {
         val preorder = stateHolder.state.value.preorders.first { it.id == "pre-1" }
         assertEquals(PreorderStatus.CANCELED, preorder.status)
         assertNull(stateHolder.state.value.pendingDelete)
-        assertEquals(ActiveDetail.PreorderDetail("pre-1"), stateHolder.state.value.activeDetail)
+        assertNull(stateHolder.state.value.activeDetail)
     }
 
     @Test
@@ -227,15 +262,15 @@ class GoodsPocketAppStateHolderTest {
         val stateHolder = newStateHolder()
         val before = stateHolder.state.value
 
-        stateHolder.markPreorderReceived("pre-1")
+        stateHolder.markCollectionEntryReceived("pre-1")
 
         val after = stateHolder.state.value
-        val receivedItem = after.collectionItems.first { it.linkedPreorderId == "pre-1" }
+        val receivedItem = after.collectionItems.first { it.id == "pre-1" }
         assertEquals(before.homeSummary.ownedItemCount + 1, after.homeSummary.ownedItemCount)
         assertEquals(AppDestination.Collection.route, after.currentDestination.route)
-        assertEquals(ActiveDetail.ItemDetail::class, after.activeDetail!!::class)
+        assertEquals(ActiveDetail.CollectionEntryDetail::class, after.activeDetail!!::class)
         assertEquals("예약 굿즈", receivedItem.category)
-        assertTrue(after.collectionItems.any { it.linkedPreorderId == "pre-1" })
+        assertEquals(ItemStatus.OWNED, receivedItem.status)
     }
 
     @Test

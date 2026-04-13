@@ -14,11 +14,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import goods.pocket.app.domain.model.CollectionEntry
+import goods.pocket.app.domain.model.CollectionEntryStatus
 import goods.pocket.app.domain.model.Event
 import goods.pocket.app.domain.model.EventType
-import goods.pocket.app.domain.model.Item
-import goods.pocket.app.domain.model.ItemStatus
-import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.presentation.designsystem.GoodsPocketFilterChip
 import goods.pocket.app.presentation.designsystem.GoodsPocketModalBottomSheet
 import goods.pocket.app.presentation.designsystem.goodsPocketOutlinedFieldColors
@@ -26,12 +25,12 @@ import goods.pocket.app.presentation.i18n.localizedLabel
 import goods.pocket.app.presentation.i18n.tr
 import goodspocket.composeapp.generated.resources.Res
 import goodspocket.composeapp.generated.resources.action_save_changes
+import goodspocket.composeapp.generated.resources.editor_collection_entry_title
 import goodspocket.composeapp.generated.resources.editor_event_title
-import goodspocket.composeapp.generated.resources.editor_item_title
-import goodspocket.composeapp.generated.resources.editor_preorder_title
 import goodspocket.composeapp.generated.resources.field_category
 import goodspocket.composeapp.generated.resources.field_character
 import goodspocket.composeapp.generated.resources.field_name
+import goodspocket.composeapp.generated.resources.field_note
 import goodspocket.composeapp.generated.resources.field_release_date
 import goodspocket.composeapp.generated.resources.field_series
 import goodspocket.composeapp.generated.resources.field_status
@@ -40,19 +39,35 @@ import goodspocket.composeapp.generated.resources.field_target_date
 import goodspocket.composeapp.generated.resources.field_title
 
 @Composable
-fun ItemEditorSheet(
-    item: Item,
+fun CollectionEntryEditorSheet(
+    entry: CollectionEntry,
     onDismiss: () -> Unit,
-    onSave: (String, String, ItemStatus, String, String, String) -> Unit,
+    onSave: (
+        name: String,
+        category: String,
+        status: CollectionEntryStatus,
+        seriesName: String,
+        characterName: String,
+        purchaseStore: String,
+        releaseDate: String,
+        reservationStore: String,
+        note: String,
+    ) -> Unit,
 ) {
-    var name by remember(item.id) { mutableStateOf(item.name) }
-    var category by remember(item.id) { mutableStateOf(item.category) }
-    var status by remember(item.id) { mutableStateOf(item.status) }
-    var seriesName by remember(item.id) { mutableStateOf(item.seriesName.orEmpty()) }
-    var characterName by remember(item.id) { mutableStateOf(item.characterName.orEmpty()) }
-    var purchaseStore by remember(item.id) { mutableStateOf(item.purchaseStore.orEmpty()) }
+    var name by remember(entry.id) { mutableStateOf(entry.name) }
+    var category by remember(entry.id) { mutableStateOf(entry.category) }
+    var status by remember(entry.id) { mutableStateOf(entry.status) }
+    var seriesName by remember(entry.id) { mutableStateOf(entry.seriesName.orEmpty()) }
+    var characterName by remember(entry.id) { mutableStateOf(entry.characterName.orEmpty()) }
+    var purchaseStore by remember(entry.id) { mutableStateOf(entry.purchaseStore.orEmpty()) }
+    var releaseDate by remember(entry.id) { mutableStateOf(entry.releaseDate.orEmpty()) }
+    var reservationStore by remember(entry.id) { mutableStateOf(entry.reservationStore.orEmpty()) }
+    var note by remember(entry.id) { mutableStateOf(entry.note.orEmpty()) }
 
-    EditorSheetContainer(title = tr(Res.string.editor_item_title), onDismiss = onDismiss) {
+    EditorSheetContainer(
+        title = tr(Res.string.editor_collection_entry_title),
+        onDismiss = onDismiss,
+    ) {
         GoodsPocketEditorField(name, { name = it }, tr(Res.string.field_name))
         GoodsPocketEditorField(category, { category = it }, tr(Res.string.field_category))
         Text(
@@ -63,39 +78,51 @@ fun ItemEditorSheet(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            listOf(ItemStatus.OWNED, ItemStatus.PLANNED_CLEANUP).forEach { itemStatus ->
+            CollectionEntryStatus.entries.forEach { entryStatus ->
                 GoodsPocketFilterChip(
-                    selected = status == itemStatus,
-                    onClick = { status = itemStatus },
-                    label = itemStatus.localizedLabel(),
+                    selected = status == entryStatus,
+                    onClick = { status = entryStatus },
+                    label = entryStatus.localizedLabel(),
                 )
             }
         }
         GoodsPocketEditorField(seriesName, { seriesName = it }, tr(Res.string.field_series))
         GoodsPocketEditorField(characterName, { characterName = it }, tr(Res.string.field_character))
-        GoodsPocketEditorField(purchaseStore, { purchaseStore = it }, tr(Res.string.field_store))
-        SaveButton(enabled = name.isNotBlank() && category.isNotBlank()) {
-            onSave(name, category, status, seriesName, characterName, purchaseStore)
+        GoodsPocketEditorField(
+            value = if (status == CollectionEntryStatus.RESERVED) reservationStore else purchaseStore,
+            onValueChange = {
+                if (status == CollectionEntryStatus.RESERVED) {
+                    reservationStore = it
+                } else {
+                    purchaseStore = it
+                }
+            },
+            label = tr(Res.string.field_store),
+        )
+        if (status == CollectionEntryStatus.RESERVED) {
+            GoodsPocketEditorField(releaseDate, { releaseDate = it }, tr(Res.string.field_release_date))
         }
-    }
-}
-
-@Composable
-fun PreorderEditorSheet(
-    preorder: Preorder,
-    onDismiss: () -> Unit,
-    onSave: (String, String, String) -> Unit,
-) {
-    var name by remember(preorder.id) { mutableStateOf(preorder.name) }
-    var storeName by remember(preorder.id) { mutableStateOf(preorder.storeName) }
-    var releaseDate by remember(preorder.id) { mutableStateOf(preorder.releaseDate) }
-
-    EditorSheetContainer(title = tr(Res.string.editor_preorder_title), onDismiss = onDismiss) {
-        GoodsPocketEditorField(name, { name = it }, tr(Res.string.field_name))
-        GoodsPocketEditorField(storeName, { storeName = it }, tr(Res.string.field_store))
-        GoodsPocketEditorField(releaseDate, { releaseDate = it }, tr(Res.string.field_release_date))
-        SaveButton(enabled = name.isNotBlank() && storeName.isNotBlank() && releaseDate.isNotBlank()) {
-            onSave(name, storeName, releaseDate)
+        GoodsPocketEditorField(note, { note = it }, tr(Res.string.field_note))
+        SaveButton(
+            enabled = name.isNotBlank() &&
+                category.isNotBlank() &&
+                if (status == CollectionEntryStatus.RESERVED) {
+                    reservationStore.isNotBlank() && releaseDate.isNotBlank()
+                } else {
+                    true
+                },
+        ) {
+            onSave(
+                name,
+                category,
+                status,
+                seriesName,
+                characterName,
+                purchaseStore,
+                releaseDate,
+                reservationStore,
+                note,
+            )
         }
     }
 }

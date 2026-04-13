@@ -2,7 +2,6 @@
 <resources>
     <string name="nav_home">Home</string>
     <string name="nav_collection">Collection</string>
-    <string name="nav_preorders">Preorders</string>
     <string name="nav_my">My</string>
     <string name="nav_events">Events</string>
     <string name="nav_settings">Settings</string>
@@ -50,7 +49,11 @@
     <string name="collection_status_section">Item status</string>
     <string name="collection_status_section_subtitle">Switch between owned and planned cleanup items and review purchase scale together.</string>
     <string name="collection_series_category">%1$s · %2$s</string>
+    <string name="collection_segment_owned">Owned</string>
+    <string name="collection_segment_reserved">Reserved</string>
+    <string name="collection_segment_all">All</string>
     <string name="collection_metric_monthly_spend">Total purchase amount</string>
+    <string name="collection_metric_reserved_count">Reserved count</string>
 
     <string name="preorders_status_filter">Status filter</string>
     <string name="preorders_empty_filter">No preorders in this status.</string>
@@ -119,10 +122,12 @@
     <string name="field_status">Status</string>
     <string name="field_series">Series</string>
     <string name="field_character">Character</string>
+    <string name="field_note">Note</string>
     <string name="field_title">Title</string>
 
     <string name="editor_item_title">Edit Item</string>
     <string name="editor_preorder_title">Edit Preorder</string>
+    <string name="editor_collection_entry_title">Edit Collection Entry</string>
     <string name="editor_event_title">Edit Event</string>
 
     <string name="detail_category">Category</string>
@@ -155,7 +160,12 @@
 
     <string name="target_item">Item</string>
     <string name="target_preorder">Preorder</string>
+    <string name="target_collection_entry">Item</string>
     <string name="target_event">Event</string>
+
+    <string name="collection_entry_status_reserved">Reserved</string>
+    <string name="collection_entry_status_owned">Owned</string>
+    <string name="collection_entry_status_planned_cleanup">Planned cleanup</string>
 
     <string name="item_status_owned">Owned</string>
     <string name="item_status_planned_cleanup">Planned cleanup</string>

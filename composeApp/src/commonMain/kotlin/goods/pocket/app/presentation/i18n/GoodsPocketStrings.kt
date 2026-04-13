@@ -4,11 +4,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.key
 import androidx.compose.runtime.staticCompositionLocalOf
+import goods.pocket.app.domain.model.CollectionEntryStatus
 import goods.pocket.app.domain.model.EventType
 import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.PreorderStatus
 import goods.pocket.app.i18n.formatCurrencyByLanguage
 import goods.pocket.app.presentation.navigation.AppDestination
+import goods.pocket.app.presentation.state.CollectionSegment
 import goods.pocket.app.presentation.state.QuickAddTarget
 import goodspocket.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.StringResource
@@ -57,7 +59,6 @@ fun AppDestination.localizedLabel(): String {
     return when (this) {
         AppDestination.Home -> tr(Res.string.nav_home)
         AppDestination.Collection -> tr(Res.string.nav_collection)
-        AppDestination.Preorders -> tr(Res.string.nav_preorders)
         AppDestination.My -> tr(Res.string.nav_my)
         AppDestination.Events -> tr(Res.string.nav_events)
         AppDestination.Settings -> tr(Res.string.nav_settings)
@@ -67,9 +68,26 @@ fun AppDestination.localizedLabel(): String {
 @Composable
 fun QuickAddTarget.localizedLabel(): String {
     return when (this) {
-        QuickAddTarget.ITEM -> tr(Res.string.target_item)
-        QuickAddTarget.PREORDER -> tr(Res.string.target_preorder)
+        QuickAddTarget.COLLECTION_ENTRY -> tr(Res.string.target_collection_entry)
         QuickAddTarget.EVENT -> tr(Res.string.target_event)
+    }
+}
+
+@Composable
+fun CollectionSegment.localizedLabel(): String {
+    return when (this) {
+        CollectionSegment.OWNED -> tr(Res.string.collection_segment_owned)
+        CollectionSegment.RESERVED -> tr(Res.string.collection_segment_reserved)
+        CollectionSegment.ALL -> tr(Res.string.collection_segment_all)
+    }
+}
+
+@Composable
+fun CollectionEntryStatus.localizedLabel(): String {
+    return when (this) {
+        CollectionEntryStatus.RESERVED -> tr(Res.string.collection_entry_status_reserved)
+        CollectionEntryStatus.OWNED -> tr(Res.string.collection_entry_status_owned)
+        CollectionEntryStatus.PLANNED_CLEANUP -> tr(Res.string.collection_entry_status_planned_cleanup)
     }
 }
 
