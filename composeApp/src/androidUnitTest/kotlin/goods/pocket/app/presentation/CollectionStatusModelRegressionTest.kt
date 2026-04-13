@@ -37,28 +37,27 @@ class CollectionStatusModelRegressionTest {
     }
 
     @Test
-    fun `collection screen keeps one top card, drops total-items summary, and further expands title spacing`() {
+    fun `collection screen uses unified entries with owned reserved and all segments`() {
         val collectionSource = source("composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/screen/CollectionScreen.kt")
+        val i18nSource = source("composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/i18n/GoodsPocketStrings.kt")
         val koreanStrings = source("composeApp/src/commonMain/composeResources/values/strings.xml")
         val englishStrings = source("composeApp/src/commonMain/composeResources/values-en/strings.xml")
 
-        assertTrue(collectionSource.contains("selectedStatus: ItemStatus"))
-        assertTrue(collectionSource.contains("onStatusChange: (ItemStatus) -> Unit"))
-        assertTrue(collectionSource.contains("visibleItems = items.filter { it.status == selectedStatus }"))
-        assertTrue(collectionSource.contains("ItemStatus.PLANNED_CLEANUP"))
-        assertFalse(collectionSource.contains("collection_overview_title"))
-        assertFalse(collectionSource.contains("collection_metric_total_items"))
-        assertFalse(collectionSource.contains("collection_metric_waiting"))
-        assertFalse(collectionSource.contains("collection_badge_total"))
-        assertFalse(collectionSource.contains("collection_badge_query"))
-        assertFalse(collectionSource.contains("collection_quantity_badge"))
-        assertFalse(collectionSource.contains("highlightedCategories"))
-        assertFalse(collectionSource.contains("GoodsPocketTonalBadge(text = category)"))
+        assertTrue(collectionSource.contains("entries: List<CollectionEntry>"))
+        assertTrue(collectionSource.contains("selectedSegment: CollectionSegment"))
+        assertTrue(collectionSource.contains("onSegmentChange: (CollectionSegment) -> Unit"))
+        assertTrue(collectionSource.contains("CollectionSegment.OWNED"))
+        assertTrue(collectionSource.contains("CollectionSegment.RESERVED"))
+        assertTrue(collectionSource.contains("CollectionSegment.ALL"))
+        assertTrue(collectionSource.contains("CollectionEntryStatus.RESERVED"))
+        assertTrue(collectionSource.contains("preorders_store_release"))
+        assertTrue(i18nSource.contains("CollectionSegment.OWNED"))
+        assertTrue(i18nSource.contains("collection_segment_reserved"))
+        assertTrue(i18nSource.contains("collection_segment_all"))
+        assertFalse(collectionSource.contains("selectedStatus: ItemStatus"))
+        assertFalse(collectionSource.contains("visibleItems = items.filter { it.status == selectedStatus }"))
         assertFalse(koreanStrings.contains("collection_quantity_badge"))
         assertFalse(englishStrings.contains("collection_quantity_badge"))
-        assertTrue(collectionSource.contains(".padding(start = 8.dp)"))
-        assertTrue(collectionSource.contains(".padding(vertical = 6.dp)"))
-        assertTrue(collectionSource.contains("verticalArrangement = Arrangement.spacedBy(10.dp)"))
     }
 
     @Test

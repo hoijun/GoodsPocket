@@ -36,13 +36,12 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import goods.pocket.app.domain.model.CollectionEntryStatus
 import goods.pocket.app.presentation.designsystem.goodsPocketChromeFor
+import goods.pocket.app.presentation.component.CollectionEntryDetailSheet
+import goods.pocket.app.presentation.component.CollectionEntryEditorSheet
 import goods.pocket.app.presentation.component.EventDetailSheet
 import goods.pocket.app.presentation.component.EventEditorSheet
-import goods.pocket.app.presentation.component.ItemDetailSheet
-import goods.pocket.app.presentation.component.ItemEditorSheet
-import goods.pocket.app.presentation.component.PreorderDetailSheet
-import goods.pocket.app.presentation.component.PreorderEditorSheet
 import goods.pocket.app.presentation.component.QuickAddSheet
 import goods.pocket.app.presentation.i18n.ProvideLocalizedResources
 import goods.pocket.app.presentation.i18n.localizedLabel
@@ -52,10 +51,10 @@ import goods.pocket.app.presentation.screen.CollectionScreen
 import goods.pocket.app.presentation.screen.EventsScreen
 import goods.pocket.app.presentation.screen.HomeScreen
 import goods.pocket.app.presentation.screen.MyScreen
-import goods.pocket.app.presentation.screen.PreordersScreen
 import goods.pocket.app.presentation.screen.SettingsScreen
 import goods.pocket.app.presentation.state.ActiveDetail
 import goods.pocket.app.presentation.state.ActiveEditor
+import goods.pocket.app.presentation.state.CollectionSegment
 import goods.pocket.app.presentation.state.GoodsPocketAppStateHolder
 import goods.pocket.app.presentation.state.GoodsPocketUiState
 import goods.pocket.app.presentation.state.PendingDelete
@@ -144,8 +143,7 @@ fun GoodsPocketApp(
                 target = uiState.quickAddTarget,
                 onTargetChange = appStateHolder::selectQuickAddTarget,
                 onDismiss = appStateHolder::closeQuickAdd,
-                onSubmitItem = appStateHolder::submitItem,
-                onSubmitPreorder = appStateHolder::submitPreorder,
+                onSubmitCollectionEntry = appStateHolder::submitCollectionEntry,
                 onSubmitEvent = appStateHolder::submitEvent,
             )
         }
@@ -276,22 +274,16 @@ private fun GoodsPocketNavHost(
                 onUpcomingEventsClick = appStateHolder::openEventsOverview,
                 onUpcomingEventClick = appStateHolder::openEventFromHome,
                 onRecentActivityClick = appStateHolder::openActivity,
-                onPreordersClick = { appStateHolder.selectDestination(AppDestination.Preorders) },
+                onPreordersClick = { appStateHolder.selectCollectionSegment(CollectionSegment.RESERVED) },
                 onQuickAddClick = appStateHolder::openQuickAdd,
             )
             AppDestination.Collection -> CollectionScreen(
-                items = uiState.collectionItems,
-                selectedStatus = uiState.collectionStatusFilter,
+                entries = uiState.collectionEntries,
+                selectedSegment = uiState.collectionSegment,
                 query = uiState.collectionQuery,
-                onStatusChange = appStateHolder::updateCollectionStatusFilter,
+                onSegmentChange = appStateHolder::selectCollectionSegment,
                 onQueryChange = appStateHolder::updateCollectionQuery,
-                onItemClick = appStateHolder::openItemDetail,
-            )
-            AppDestination.Preorders -> PreordersScreen(
-                preorders = uiState.preorders,
-                selectedStatus = uiState.preorderStatusFilter,
-                onStatusChange = appStateHolder::updatePreorderStatusFilter,
-                onPreorderClick = appStateHolder::openPreorderDetail,
+                onEntryClick = appStateHolder::openCollectionEntryDetail,
             )
             AppDestination.My -> MyScreen(
                 myPage = uiState.myPage,
@@ -317,24 +309,18 @@ private fun ActiveDetailSheet(
     appStateHolder: GoodsPocketAppStateHolder,
 ) {
     when (val detail = uiState.activeDetail) {
-        is ActiveDetail.ItemDetail -> {
-            val item = uiState.collectionItems.firstOrNull { it.id == detail.itemId } ?: return
-            ItemDetailSheet(
-                item = item,
+        is ActiveDetail.CollectionEntryDetail -> {
+            val entry = uiState.collectionEntries.firstOrNull { it.id == detail.entryId } ?: return
+            CollectionEntryDetailSheet(
+                entry = entry,
                 onDismiss = appStateHolder::closeDetail,
-                onEdit = { appStateHolder.openItemEditor(item.id) },
-                onDelete = { appStateHolder.requestDeleteItem(item.id) },
-            )
-        }
-
-        is ActiveDetail.PreorderDetail -> {
-            val preorder = uiState.preorders.firstOrNull { it.id == detail.preorderId } ?: return
-            PreorderDetailSheet(
-                preorder = preorder,
-                onDismiss = appStateHolder::closeDetail,
-                onMarkReceived = { appStateHolder.markPreorderReceived(preorder.id) },
-                onEdit = { appStateHolder.openPreorderEditor(preorder.id) },
-                onCancel = { appStateHolder.requestCancelPreorder(preorder.id) },
+                onEdit = { appStateHolder.openCollectionEntryEditor(entry.id) },
+                onDelete = { appStateHolder.requestDeleteCollectionEntry(entry.id) },
+                onMarkReceived = if (entry.status == CollectionEntryStatus.RESERVED) {
+                    { appStateHolder.markCollectionEntryReceived(entry.id) }
+                } else {
+                    null
+                },
             )
         }
 
@@ -358,36 +344,23 @@ private fun ActiveEditorSheet(
     appStateHolder: GoodsPocketAppStateHolder,
 ) {
     when (val editor = uiState.activeEditor) {
-        is ActiveEditor.ItemEditor -> {
-            val item = uiState.collectionItems.firstOrNull { it.id == editor.itemId } ?: return
-            ItemEditorSheet(
-                item = item,
+        is ActiveEditor.CollectionEntryEditor -> {
+            val entry = uiState.collectionEntries.firstOrNull { it.id == editor.entryId } ?: return
+            CollectionEntryEditorSheet(
+                entry = entry,
                 onDismiss = appStateHolder::closeEditor,
-                onSave = { name, category, status, seriesName, characterName, purchaseStore ->
-                    appStateHolder.saveEditedItem(
-                        itemId = item.id,
+                onSave = { name, category, status, seriesName, characterName, purchaseStore, releaseDate, reservationStore, note ->
+                    appStateHolder.saveEditedCollectionEntry(
+                        entryId = entry.id,
                         name = name,
                         category = category,
                         status = status,
                         seriesName = seriesName,
                         characterName = characterName,
                         purchaseStore = purchaseStore,
-                    )
-                },
-            )
-        }
-
-        is ActiveEditor.PreorderEditor -> {
-            val preorder = uiState.preorders.firstOrNull { it.id == editor.preorderId } ?: return
-            PreorderEditorSheet(
-                preorder = preorder,
-                onDismiss = appStateHolder::closeEditor,
-                onSave = { name, storeName, releaseDate ->
-                    appStateHolder.saveEditedPreorder(
-                        preorderId = preorder.id,
-                        name = name,
-                        storeName = storeName,
                         releaseDate = releaseDate,
+                        reservationStore = reservationStore,
+                        note = note,
                     )
                 },
             )

@@ -5,7 +5,6 @@ sealed class AppDestination(
 ) {
     data object Home : AppDestination("home")
     data object Collection : AppDestination("collection/list")
-    data object Preorders : AppDestination("preorder/list")
     data object My : AppDestination("my")
     data object Events : AppDestination("event/list")
     data object Settings : AppDestination("settings")
@@ -15,7 +14,6 @@ sealed class AppDestination(
             get() = listOf(
                 Home,
                 Collection,
-                Preorders,
                 My,
             )
     }

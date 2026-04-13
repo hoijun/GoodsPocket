@@ -33,7 +33,6 @@ fun goodsPocketChromeFor(destination: AppDestination): GoodsPocketChrome {
     return when (destination) {
         AppDestination.Home,
         AppDestination.Collection,
-        AppDestination.Preorders,
         -> GoodsPocketChrome(
             showBottomBar = true,
             showFab = true,

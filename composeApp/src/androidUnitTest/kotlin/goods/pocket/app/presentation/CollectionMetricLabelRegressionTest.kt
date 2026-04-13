@@ -24,8 +24,9 @@ class CollectionMetricLabelRegressionTest {
         val collectionScreen = source("composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/screen/CollectionScreen.kt")
 
         assertTrue(collectionScreen.contains("CollectionSummaryCard("))
-        assertTrue(collectionScreen.contains("modifier = Modifier.widthIn(min = 136.dp)"))
-        assertTrue(collectionScreen.contains("modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)"))
+        assertTrue(collectionScreen.contains("widthIn(min = 136.dp)"))
+        assertTrue(collectionScreen.contains("padding(horizontal = 16.dp, vertical = 14.dp)"))
+        assertTrue(collectionScreen.contains("pixelShadow("))
         assertTrue(collectionScreen.contains("style = MaterialTheme.typography.titleLarge"))
         assertTrue(collectionScreen.contains("style = MaterialTheme.typography.labelMedium"))
     }

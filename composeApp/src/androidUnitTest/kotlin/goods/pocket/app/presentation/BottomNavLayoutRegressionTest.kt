@@ -158,7 +158,6 @@ class BottomNavLayoutRegressionTest {
         return listOf(
             "HomeScreen.kt",
             "CollectionScreen.kt",
-            "PreordersScreen.kt",
             "MyScreen.kt",
         ).map { name ->
             File(rootDirectory, "composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/screen/$name").readText()

@@ -1,5 +1,6 @@
 package goods.pocket.app.presentation.state
 
+import goods.pocket.app.domain.model.CollectionEntry
 import goods.pocket.app.domain.model.Event
 import goods.pocket.app.domain.model.HomeSummary
 import goods.pocket.app.domain.model.Item
@@ -16,6 +17,7 @@ data class GoodsPocketUiState(
     val selectedPrimaryDestination: AppDestination = AppDestination.Home,
     val myPage: MyPageUiModel = MyPageUiModel(),
     val collectionQuery: String = "",
+    val collectionSegment: CollectionSegment = CollectionSegment.OWNED,
     val collectionStatusFilter: ItemStatus = ItemStatus.OWNED,
     val preorderStatusFilter: PreorderStatus? = null,
     val eventTypeFilter: EventType? = null,
@@ -26,13 +28,14 @@ data class GoodsPocketUiState(
         recentActivities = emptyList(),
     ),
     val upcomingEvents: List<Event> = emptyList(),
+    val collectionEntries: List<CollectionEntry> = emptyList(),
     val collectionItems: List<Item> = emptyList(),
     val preorders: List<Preorder> = emptyList(),
     val events: List<Event> = emptyList(),
     val storageLocations: List<StorageLocation> = emptyList(),
     val appPreferences: AppPreference = AppPreference(),
     val isQuickAddOpen: Boolean = false,
-    val quickAddTarget: QuickAddTarget = QuickAddTarget.ITEM,
+    val quickAddTarget: QuickAddTarget = QuickAddTarget.COLLECTION_ENTRY,
     val activeDetail: ActiveDetail? = null,
     val activeEditor: ActiveEditor? = null,
     val pendingDelete: PendingDelete? = null,

@@ -3,10 +3,9 @@ package goods.pocket.app.presentation.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -14,71 +13,102 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import goods.pocket.app.domain.model.CollectionEntry
+import goods.pocket.app.domain.model.CollectionEntryStatus
 import goods.pocket.app.domain.model.Event
-import goods.pocket.app.domain.model.Item
-import goods.pocket.app.domain.model.ItemStatus
-import goods.pocket.app.domain.model.Preorder
-import goods.pocket.app.domain.model.PreorderStatus
 import goods.pocket.app.presentation.designsystem.GoodsPocketModalBottomSheet
 import goods.pocket.app.presentation.designsystem.GoodsPocketTonalBadge
 import goods.pocket.app.presentation.i18n.formatCurrency
 import goods.pocket.app.presentation.i18n.localizedLabel
 import goods.pocket.app.presentation.i18n.tr
 import goodspocket.composeapp.generated.resources.Res
-import goodspocket.composeapp.generated.resources.action_cancel_preorder
 import goodspocket.composeapp.generated.resources.action_delete
 import goodspocket.composeapp.generated.resources.action_edit
 import goodspocket.composeapp.generated.resources.action_mark_received
-import goodspocket.composeapp.generated.resources.common_none
 import goodspocket.composeapp.generated.resources.common_not_set
 import goodspocket.composeapp.generated.resources.common_unknown
 import goodspocket.composeapp.generated.resources.detail_category
 import goodspocket.composeapp.generated.resources.detail_character
-import goodspocket.composeapp.generated.resources.detail_date
-import goodspocket.composeapp.generated.resources.detail_deposit
-import goodspocket.composeapp.generated.resources.detail_linked_preorder
 import goodspocket.composeapp.generated.resources.detail_location
-import goodspocket.composeapp.generated.resources.detail_place
 import goodspocket.composeapp.generated.resources.detail_purchase_date
 import goodspocket.composeapp.generated.resources.detail_purchase_price
 import goodspocket.composeapp.generated.resources.detail_related_item
 import goodspocket.composeapp.generated.resources.detail_related_preorder
 import goodspocket.composeapp.generated.resources.detail_release_date
-import goodspocket.composeapp.generated.resources.detail_remaining
-import goodspocket.composeapp.generated.resources.detail_reservation_number
 import goodspocket.composeapp.generated.resources.detail_series
 import goodspocket.composeapp.generated.resources.detail_status
 import goodspocket.composeapp.generated.resources.detail_store
 import goodspocket.composeapp.generated.resources.detail_target_date
 import goodspocket.composeapp.generated.resources.detail_type
+import goodspocket.composeapp.generated.resources.field_note
 
 @Composable
-fun ItemDetailSheet(
-    item: Item,
+fun CollectionEntryDetailSheet(
+    entry: CollectionEntry,
     onDismiss: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
+    onMarkReceived: (() -> Unit)? = null,
 ) {
     DetailSheetContainer(
-        title = item.name,
+        title = entry.name,
         onDismiss = onDismiss,
     ) {
-        ItemDetailHero(item = item)
-        DetailLine(tr(Res.string.detail_category), item.category)
-        DetailLine(tr(Res.string.detail_status), item.status.localizedLabel())
-        DetailLine(tr(Res.string.detail_series), item.seriesName ?: tr(Res.string.common_unknown))
-        DetailLine(tr(Res.string.detail_character), item.characterName ?: tr(Res.string.common_unknown))
-        DetailLine(tr(Res.string.detail_store), item.purchaseStore ?: tr(Res.string.common_unknown))
-        DetailLine(tr(Res.string.detail_purchase_date), item.purchaseDate ?: tr(Res.string.common_not_set))
+        CollectionEntryDetailHero(entry = entry)
+        DetailLine(tr(Res.string.detail_category), entry.category)
+        DetailLine(tr(Res.string.detail_status), entry.status.localizedLabel())
+        DetailLine(tr(Res.string.detail_series), entry.seriesName ?: tr(Res.string.common_unknown))
+        DetailLine(tr(Res.string.detail_character), entry.characterName ?: tr(Res.string.common_unknown))
+        when (entry.status) {
+            CollectionEntryStatus.RESERVED -> {
+                DetailLine(
+                    tr(Res.string.detail_store),
+                    entry.reservationStore ?: tr(Res.string.common_unknown),
+                )
+                DetailLine(
+                    tr(Res.string.detail_release_date),
+                    entry.releaseDate ?: tr(Res.string.common_not_set),
+                )
+            }
+
+            CollectionEntryStatus.OWNED,
+            CollectionEntryStatus.PLANNED_CLEANUP,
+            -> {
+                DetailLine(
+                    tr(Res.string.detail_store),
+                    entry.purchaseStore ?: tr(Res.string.common_unknown),
+                )
+                DetailLine(
+                    tr(Res.string.detail_purchase_date),
+                    entry.purchaseDate ?: tr(Res.string.common_not_set),
+                )
+                DetailLine(
+                    tr(Res.string.detail_purchase_price),
+                    entry.purchasePrice?.let { formatCurrency(it) } ?: tr(Res.string.common_not_set),
+                )
+                DetailLine(
+                    tr(Res.string.detail_location),
+                    entry.storageLocationId ?: tr(Res.string.common_not_set),
+                )
+            }
+        }
         DetailLine(
-            tr(Res.string.detail_purchase_price),
-            item.purchasePrice?.let { amount -> formatCurrency(amount) } ?: tr(Res.string.common_not_set),
+            tr(Res.string.field_note),
+            entry.note ?: tr(Res.string.common_not_set),
         )
-        DetailLine(tr(Res.string.detail_linked_preorder), item.linkedPreorderId ?: tr(Res.string.common_none))
+        if (entry.status == CollectionEntryStatus.RESERVED && onMarkReceived != null) {
+            Button(
+                onClick = onMarkReceived,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(tr(Res.string.action_mark_received))
+            }
+        }
         SheetActionRow(
             primaryLabel = tr(Res.string.action_edit),
             onPrimary = onEdit,
@@ -90,8 +120,8 @@ fun ItemDetailSheet(
 }
 
 @Composable
-private fun ItemDetailHero(
-    item: Item,
+private fun CollectionEntryDetailHero(
+    entry: CollectionEntry,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -105,7 +135,7 @@ private fun ItemDetailHero(
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Text(
-                    text = item.name.take(1),
+                    text = entry.name.take(1),
                     style = MaterialTheme.typography.headlineLarge,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.SemiBold,
@@ -113,62 +143,28 @@ private fun ItemDetailHero(
             }
         }
         GoodsPocketTonalBadge(
-            text = item.status.localizedLabel(),
-            containerColor = itemStatusContainerColor(item.status),
-            contentColor = itemStatusContentColor(item.status),
+            text = entry.status.localizedLabel(),
+            containerColor = collectionEntryStatusContainerColor(entry.status),
+            contentColor = collectionEntryStatusContentColor(entry.status),
         )
     }
 }
 
 @Composable
-private fun itemStatusContainerColor(status: ItemStatus): androidx.compose.ui.graphics.Color {
+private fun collectionEntryStatusContainerColor(status: CollectionEntryStatus): Color {
     return when (status) {
-        ItemStatus.OWNED -> MaterialTheme.colorScheme.secondaryContainer
-        ItemStatus.PLANNED_CLEANUP -> MaterialTheme.colorScheme.tertiaryContainer
+        CollectionEntryStatus.RESERVED -> MaterialTheme.colorScheme.primaryContainer
+        CollectionEntryStatus.OWNED -> MaterialTheme.colorScheme.secondaryContainer
+        CollectionEntryStatus.PLANNED_CLEANUP -> MaterialTheme.colorScheme.tertiaryContainer
     }
 }
 
 @Composable
-private fun itemStatusContentColor(status: ItemStatus): androidx.compose.ui.graphics.Color {
+private fun collectionEntryStatusContentColor(status: CollectionEntryStatus): Color {
     return when (status) {
-        ItemStatus.OWNED -> MaterialTheme.colorScheme.onSecondaryContainer
-        ItemStatus.PLANNED_CLEANUP -> MaterialTheme.colorScheme.onTertiaryContainer
-    }
-}
-
-@Composable
-fun PreorderDetailSheet(
-    preorder: Preorder,
-    onDismiss: () -> Unit,
-    onMarkReceived: () -> Unit,
-    onEdit: () -> Unit,
-    onCancel: () -> Unit,
-) {
-    DetailSheetContainer(
-        title = preorder.name,
-        onDismiss = onDismiss,
-    ) {
-        DetailLine(tr(Res.string.detail_store), preorder.storeName)
-        DetailLine(tr(Res.string.detail_release_date), preorder.releaseDate)
-        DetailLine(tr(Res.string.detail_status), preorder.status.localizedLabel())
-        DetailLine(tr(Res.string.detail_deposit), formatCurrency(preorder.depositPrice ?: 0))
-        DetailLine(tr(Res.string.detail_remaining), formatCurrency(preorder.remainingPrice ?: 0))
-        DetailLine(tr(Res.string.detail_reservation_number), preorder.reservationNumber ?: tr(Res.string.common_not_set))
-        if (preorder.status != PreorderStatus.RECEIVED && preorder.status != PreorderStatus.CANCELED) {
-            Button(
-                onClick = onMarkReceived,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(tr(Res.string.action_mark_received))
-            }
-        }
-        SheetActionRow(
-            primaryLabel = tr(Res.string.action_edit),
-            onPrimary = onEdit,
-            secondaryLabel = tr(Res.string.action_cancel_preorder),
-            onSecondary = onCancel,
-            destructive = true,
-        )
+        CollectionEntryStatus.RESERVED -> MaterialTheme.colorScheme.onPrimaryContainer
+        CollectionEntryStatus.OWNED -> MaterialTheme.colorScheme.onSecondaryContainer
+        CollectionEntryStatus.PLANNED_CLEANUP -> MaterialTheme.colorScheme.onTertiaryContainer
     }
 }
 
@@ -185,8 +181,8 @@ fun EventDetailSheet(
     ) {
         DetailLine(tr(Res.string.detail_type), event.eventType.localizedLabel())
         DetailLine(tr(Res.string.detail_target_date), event.targetDate)
-        DetailLine(tr(Res.string.detail_related_preorder), event.relatedPreorderId ?: tr(Res.string.common_none))
-        DetailLine(tr(Res.string.detail_related_item), event.relatedItemId ?: tr(Res.string.common_none))
+        DetailLine(tr(Res.string.detail_related_preorder), event.relatedPreorderId ?: tr(Res.string.common_not_set))
+        DetailLine(tr(Res.string.detail_related_item), event.relatedItemId ?: tr(Res.string.common_not_set))
         DetailLine(tr(Res.string.detail_location), event.locationOrStore ?: tr(Res.string.common_unknown))
         SheetActionRow(
             primaryLabel = tr(Res.string.action_edit),

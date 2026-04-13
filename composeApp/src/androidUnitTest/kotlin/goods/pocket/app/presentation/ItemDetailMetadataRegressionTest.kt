@@ -8,13 +8,14 @@ import kotlin.test.assertTrue
 class ItemDetailMetadataRegressionTest {
 
     @Test
-    fun `item detail shows purchase metadata instead of linked transactions`() {
+    fun `collection entry detail keeps purchase metadata for owned entries`() {
         val detailSource = source("composeApp/src/commonMain/kotlin/goods/pocket/app/presentation/component/DetailSheet.kt")
         val koreanStrings = source("composeApp/src/commonMain/composeResources/values/strings.xml")
         val englishStrings = source("composeApp/src/commonMain/composeResources/values-en/strings.xml")
 
-        assertTrue(detailSource.contains("DetailLine(tr(Res.string.detail_purchase_date)"))
-        assertTrue(detailSource.contains("detail_purchase_price"))
+        assertTrue(detailSource.contains("CollectionEntryDetailSheet"))
+        assertTrue(detailSource.contains("tr(Res.string.detail_purchase_date)"))
+        assertTrue(detailSource.contains("tr(Res.string.detail_purchase_price)"))
         assertFalse(detailSource.contains("detail_linked_transactions"))
         assertFalse(detailSource.contains("detail_no_linked_transactions"))
         assertFalse(detailSource.contains("LinkedTransactionRow("))

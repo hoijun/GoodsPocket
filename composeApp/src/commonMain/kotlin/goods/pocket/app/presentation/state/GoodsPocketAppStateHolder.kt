@@ -6,6 +6,7 @@ import goods.pocket.app.domain.model.Item
 import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.PreorderStatus
+import goods.pocket.app.domain.model.CollectionEntryStatus
 import goods.pocket.app.domain.usecase.CancelPreorderUseCase
 import goods.pocket.app.domain.usecase.DeleteCollectionItemUseCase
 import goods.pocket.app.domain.usecase.DeleteEventUseCase
@@ -62,6 +63,10 @@ class GoodsPocketAppStateHolder(
                     destination = destination,
                     fallback = current.selectedPrimaryDestination,
                 ),
+                collectionSegment = when (destination) {
+                    AppDestination.Collection -> CollectionSegment.OWNED
+                    else -> current.collectionSegment
+                },
             )
         }
     }
@@ -96,7 +101,8 @@ class GoodsPocketAppStateHolder(
                     current.copy(
                         currentDestination = AppDestination.Collection,
                         selectedPrimaryDestination = AppDestination.Collection,
-                        activeDetail = ActiveDetail.ItemDetail(activityId),
+                        collectionSegment = CollectionSegment.OWNED,
+                        activeDetail = ActiveDetail.CollectionEntryDetail(activityId),
                     )
                 }
             }
@@ -104,9 +110,10 @@ class GoodsPocketAppStateHolder(
             activityId.startsWith("pre-") -> {
                 _state.update { current ->
                     current.copy(
-                        currentDestination = AppDestination.Preorders,
-                        selectedPrimaryDestination = AppDestination.Preorders,
-                        activeDetail = ActiveDetail.PreorderDetail(activityId),
+                        currentDestination = AppDestination.Collection,
+                        selectedPrimaryDestination = AppDestination.Collection,
+                        collectionSegment = CollectionSegment.RESERVED,
+                        activeDetail = ActiveDetail.CollectionEntryDetail(activityId),
                     )
                 }
             }
@@ -128,6 +135,52 @@ class GoodsPocketAppStateHolder(
 
     fun updateCollectionStatusFilter(status: ItemStatus) {
         _state.update { it.copy(collectionStatusFilter = status) }
+    }
+
+    fun selectCollectionSegment(segment: CollectionSegment) {
+        _state.update {
+            it.copy(
+                currentDestination = AppDestination.Collection,
+                selectedPrimaryDestination = AppDestination.Collection,
+                collectionSegment = segment,
+            )
+        }
+    }
+
+    fun markCollectionEntryReceived(entryId: String) {
+        val existing = _state.value.collectionEntries.firstOrNull { it.id == entryId } ?: return
+        if (existing.status != CollectionEntryStatus.RESERVED) return
+
+        saveCollectionItemUseCase(
+            Item(
+                id = existing.id,
+                name = existing.name,
+                category = existing.category,
+                status = ItemStatus.OWNED,
+                seriesName = existing.seriesName,
+                characterName = existing.characterName,
+                quantity = existing.quantity,
+                purchasePrice = existing.purchasePrice,
+                purchaseDate = CURRENT_DATE,
+                purchaseStore = existing.reservationStore,
+                storageLocationId = existing.storageLocationId,
+                linkedPreorderId = existing.id,
+                note = existing.note,
+                createdAt = existing.createdAt,
+                updatedAt = CURRENT_DATE,
+            ),
+        )
+        cancelPreorderUseCase(entryId)
+        reload()
+        _state.update { current ->
+            current.copy(
+                currentDestination = AppDestination.Collection,
+                selectedPrimaryDestination = AppDestination.Collection,
+                collectionStatusFilter = ItemStatus.OWNED,
+                collectionSegment = CollectionSegment.OWNED,
+                activeDetail = ActiveDetail.CollectionEntryDetail(entryId),
+            )
+        }
     }
 
     fun updatePreorderStatusFilter(status: PreorderStatus?) {
@@ -152,51 +205,41 @@ class GoodsPocketAppStateHolder(
         _state.update { it.copy(quickAddTarget = target) }
     }
 
-    fun submitItem(
+    fun submitCollectionEntry(
         name: String,
         category: String,
-        status: ItemStatus,
+        status: CollectionEntryStatus,
         seriesName: String,
         characterName: String,
         purchaseStore: String,
+        releaseDate: String,
+        reservationStore: String,
+        note: String,
     ) {
-        val newId = generateId("item")
-        saveCollectionItemUseCase(
-            Item(
-                id = newId,
-                name = name.trim(),
-                category = category.trim(),
-                status = status,
-                seriesName = seriesName.trim().ifBlank { null },
-                characterName = characterName.trim().ifBlank { null },
-                purchaseStore = purchaseStore.trim().ifBlank { null },
-                createdAt = CURRENT_DATE,
-                updatedAt = CURRENT_DATE,
-            ),
+        val newId = generateId(if (status == CollectionEntryStatus.RESERVED) "pre" else "item")
+        saveCollectionEntry(
+            entryId = newId,
+            existingStatus = null,
+            name = name,
+            category = category,
+            status = status,
+            seriesName = seriesName,
+            characterName = characterName,
+            purchaseStore = purchaseStore,
+            releaseDate = releaseDate,
+            reservationStore = reservationStore,
+            note = note,
+            createdAt = CURRENT_DATE,
         )
         reloadAndCloseSheet(
             destination = AppDestination.Collection,
-            detail = ActiveDetail.ItemDetail(newId),
-            collectionStatusOverride = status,
-        )
-    }
-
-    fun submitPreorder(name: String, storeName: String, releaseDate: String) {
-        val newId = generateId("pre")
-        savePreorderUseCase(
-            Preorder(
-                id = newId,
-                name = name.trim(),
-                storeName = storeName.trim(),
-                releaseDate = releaseDate.trim(),
-                status = PreorderStatus.ACTIVE,
-                createdAt = CURRENT_DATE,
-                updatedAt = CURRENT_DATE,
-            ),
-        )
-        reloadAndCloseSheet(
-            destination = AppDestination.Preorders,
-            detail = ActiveDetail.PreorderDetail(newId),
+            detail = ActiveDetail.CollectionEntryDetail(newId),
+            collectionStatusOverride = status.toCollectionItemStatusOrNull(),
+            collectionSegmentOverride = if (status == CollectionEntryStatus.RESERVED) {
+                CollectionSegment.RESERVED
+            } else {
+                CollectionSegment.OWNED
+            },
         )
     }
 
@@ -218,12 +261,8 @@ class GoodsPocketAppStateHolder(
         )
     }
 
-    fun openItemDetail(itemId: String) {
-        _state.update { it.copy(activeDetail = ActiveDetail.ItemDetail(itemId)) }
-    }
-
-    fun openPreorderDetail(preorderId: String) {
-        _state.update { it.copy(activeDetail = ActiveDetail.PreorderDetail(preorderId)) }
+    fun openCollectionEntryDetail(entryId: String) {
+        _state.update { it.copy(activeDetail = ActiveDetail.CollectionEntryDetail(entryId)) }
     }
 
     fun openEventDetail(eventId: String) {
@@ -234,20 +273,11 @@ class GoodsPocketAppStateHolder(
         _state.update { it.copy(activeDetail = null) }
     }
 
-    fun openItemEditor(itemId: String) {
+    fun openCollectionEntryEditor(entryId: String) {
         _state.update {
             it.copy(
                 activeDetail = null,
-                activeEditor = ActiveEditor.ItemEditor(itemId),
-            )
-        }
-    }
-
-    fun openPreorderEditor(preorderId: String) {
-        _state.update {
-            it.copy(
-                activeDetail = null,
-                activeEditor = ActiveEditor.PreorderEditor(preorderId),
+                activeEditor = ActiveEditor.CollectionEntryEditor(entryId),
             )
         }
     }
@@ -265,56 +295,46 @@ class GoodsPocketAppStateHolder(
         _state.update { it.copy(activeEditor = null) }
     }
 
-    fun saveEditedItem(
-        itemId: String,
+    fun saveEditedCollectionEntry(
+        entryId: String,
         name: String,
         category: String,
-        status: ItemStatus,
+        status: CollectionEntryStatus,
         seriesName: String,
         characterName: String,
         purchaseStore: String,
-    ) {
-        val existing = _state.value.collectionItems.firstOrNull { it.id == itemId } ?: return
-        saveCollectionItemUseCase(
-            existing.copy(
-                name = name.trim(),
-                category = category.trim(),
-                status = status,
-                seriesName = seriesName.trim().ifBlank { null },
-                characterName = characterName.trim().ifBlank { null },
-                purchaseStore = purchaseStore.trim().ifBlank { null },
-                updatedAt = CURRENT_DATE,
-            ),
-        )
-        reload()
-        _state.update {
-            it.copy(
-                activeEditor = null,
-                activeDetail = ActiveDetail.ItemDetail(itemId),
-            )
-        }
-    }
-
-    fun saveEditedPreorder(
-        preorderId: String,
-        name: String,
-        storeName: String,
         releaseDate: String,
+        reservationStore: String,
+        note: String,
     ) {
-        val existing = _state.value.preorders.firstOrNull { it.id == preorderId } ?: return
-        savePreorderUseCase(
-            existing.copy(
-                name = name.trim(),
-                storeName = storeName.trim(),
-                releaseDate = releaseDate.trim(),
-                updatedAt = CURRENT_DATE,
-            ),
+        val existing = _state.value.collectionEntries.firstOrNull { it.id == entryId } ?: return
+        saveCollectionEntry(
+            entryId = entryId,
+            existingStatus = existing.status,
+            name = name,
+            category = category,
+            status = status,
+            seriesName = seriesName,
+            characterName = characterName,
+            purchaseStore = purchaseStore,
+            releaseDate = releaseDate,
+            reservationStore = reservationStore,
+            note = note,
+            createdAt = existing.createdAt,
         )
         reload()
-        _state.update {
-            it.copy(
+        _state.update { current ->
+            current.copy(
+                currentDestination = AppDestination.Collection,
+                selectedPrimaryDestination = AppDestination.Collection,
+                collectionSegment = if (status == CollectionEntryStatus.RESERVED) {
+                    CollectionSegment.RESERVED
+                } else {
+                    CollectionSegment.OWNED
+                },
+                collectionStatusFilter = status.toCollectionItemStatusOrNull() ?: current.collectionStatusFilter,
                 activeEditor = null,
-                activeDetail = ActiveDetail.PreorderDetail(preorderId),
+                activeDetail = ActiveDetail.CollectionEntryDetail(entryId),
             )
         }
     }
@@ -343,20 +363,17 @@ class GoodsPocketAppStateHolder(
         }
     }
 
-    fun requestDeleteItem(itemId: String) {
-        _state.update {
-            it.copy(
-                activeDetail = null,
-                pendingDelete = PendingDelete.ItemDelete(itemId),
-            )
+    fun requestDeleteCollectionEntry(entryId: String) {
+        val existing = _state.value.collectionEntries.firstOrNull { it.id == entryId } ?: return
+        val pendingDelete = if (existing.status == CollectionEntryStatus.RESERVED) {
+            PendingDelete.PreorderCancel(entryId)
+        } else {
+            PendingDelete.ItemDelete(entryId)
         }
-    }
-
-    fun requestCancelPreorder(preorderId: String) {
         _state.update {
             it.copy(
                 activeDetail = null,
-                pendingDelete = PendingDelete.PreorderCancel(preorderId),
+                pendingDelete = pendingDelete,
             )
         }
     }
@@ -391,10 +408,13 @@ class GoodsPocketAppStateHolder(
             is PendingDelete.PreorderCancel -> {
                 cancelPreorderUseCase(pending.preorderId)
                 reload()
-                _state.update {
-                    it.copy(
+                _state.update { current ->
+                    current.copy(
                         pendingDelete = null,
-                        activeDetail = ActiveDetail.PreorderDetail(pending.preorderId),
+                        currentDestination = AppDestination.Collection,
+                        selectedPrimaryDestination = AppDestination.Collection,
+                        collectionSegment = CollectionSegment.RESERVED,
+                        activeDetail = null,
                     )
                 }
             }
@@ -414,29 +434,11 @@ class GoodsPocketAppStateHolder(
         }
     }
 
-    fun markPreorderReceived(preorderId: String) {
-        val newItemId = generateId("item")
-        markPreorderReceivedUseCase(
-            preorderId = preorderId,
-            receiveDate = CURRENT_DATE,
-            newItemId = newItemId,
-            languageCode = _state.value.appPreferences.languageCode,
-        )
-        reload()
-        _state.update { current ->
-            current.copy(
-                currentDestination = AppDestination.Collection,
-                selectedPrimaryDestination = AppDestination.Collection,
-                collectionStatusFilter = ItemStatus.OWNED,
-                activeDetail = ActiveDetail.ItemDetail(newItemId),
-            )
-        }
-    }
-
     private fun reloadAndCloseSheet(
         destination: AppDestination,
         detail: ActiveDetail,
         collectionStatusOverride: ItemStatus? = null,
+        collectionSegmentOverride: CollectionSegment? = null,
     ) {
         reload()
         _state.update { current ->
@@ -447,9 +449,83 @@ class GoodsPocketAppStateHolder(
                     fallback = current.selectedPrimaryDestination,
                 ),
                 collectionStatusFilter = collectionStatusOverride ?: current.collectionStatusFilter,
+                collectionSegment = collectionSegmentOverride ?: current.collectionSegment,
                 activeDetail = detail,
                 isQuickAddOpen = false,
             )
+        }
+    }
+
+    private fun saveCollectionEntry(
+        entryId: String,
+        existingStatus: CollectionEntryStatus?,
+        name: String,
+        category: String,
+        status: CollectionEntryStatus,
+        seriesName: String,
+        characterName: String,
+        purchaseStore: String,
+        releaseDate: String,
+        reservationStore: String,
+        note: String,
+        createdAt: String,
+    ) {
+        val existingEntry = _state.value.collectionEntries.firstOrNull { it.id == entryId }
+        when (status) {
+            CollectionEntryStatus.RESERVED -> {
+                savePreorderUseCase(
+                    Preorder(
+                        id = entryId,
+                        name = name.trim(),
+                        storeName = reservationStore.trim(),
+                        releaseDate = releaseDate.trim(),
+                        status = PreorderStatus.ACTIVE,
+                        seriesName = seriesName.trim().ifBlank { null },
+                        characterName = characterName.trim().ifBlank { null },
+                        note = note.trim().ifBlank { null },
+                        createdAt = createdAt,
+                        updatedAt = CURRENT_DATE,
+                    ),
+                )
+                if (existingStatus != null && existingStatus != CollectionEntryStatus.RESERVED) {
+                    deleteCollectionItemUseCase(entryId)
+                }
+            }
+
+            CollectionEntryStatus.OWNED,
+            CollectionEntryStatus.PLANNED_CLEANUP,
+            -> {
+                saveCollectionItemUseCase(
+                    Item(
+                        id = entryId,
+                        name = name.trim(),
+                        category = category.trim(),
+                        status = status.toCollectionItemStatus(),
+                        seriesName = seriesName.trim().ifBlank { null },
+                        characterName = characterName.trim().ifBlank { null },
+                        quantity = existingEntry?.quantity ?: 1,
+                        purchasePrice = existingEntry?.purchasePrice,
+                        purchaseStore = purchaseStore.trim().ifBlank { null },
+                        purchaseDate = if (existingStatus == CollectionEntryStatus.RESERVED) {
+                            CURRENT_DATE
+                        } else {
+                            existingEntry?.purchaseDate
+                        },
+                        storageLocationId = existingEntry?.storageLocationId,
+                        linkedPreorderId = if (existingStatus == CollectionEntryStatus.RESERVED) {
+                            entryId
+                        } else {
+                            null
+                        },
+                        note = note.trim().ifBlank { null },
+                        createdAt = createdAt,
+                        updatedAt = CURRENT_DATE,
+                    ),
+                )
+                if (existingStatus == CollectionEntryStatus.RESERVED) {
+                    cancelPreorderUseCase(entryId)
+                }
+            }
         }
     }
 
@@ -477,5 +553,21 @@ class GoodsPocketAppStateHolder(
         const val CURRENT_DATE = "2026-03-15"
         const val CURRENT_MONTH = "2026-03"
         private const val UPCOMING_EVENT_PREVIEW_LIMIT = 3
+    }
+}
+
+private fun CollectionEntryStatus.toCollectionItemStatus(): ItemStatus {
+    return when (this) {
+        CollectionEntryStatus.RESERVED -> error("Reserved entries cannot be mapped to ItemStatus.")
+        CollectionEntryStatus.OWNED -> ItemStatus.OWNED
+        CollectionEntryStatus.PLANNED_CLEANUP -> ItemStatus.PLANNED_CLEANUP
+    }
+}
+
+private fun CollectionEntryStatus.toCollectionItemStatusOrNull(): ItemStatus? {
+    return when (this) {
+        CollectionEntryStatus.RESERVED -> null
+        CollectionEntryStatus.OWNED -> ItemStatus.OWNED
+        CollectionEntryStatus.PLANNED_CLEANUP -> ItemStatus.PLANNED_CLEANUP
     }
 }

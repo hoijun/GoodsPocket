@@ -15,7 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import goods.pocket.app.domain.model.ItemStatus
+import goods.pocket.app.domain.model.CollectionEntryStatus
 import goods.pocket.app.domain.model.EventType
 import goods.pocket.app.presentation.designsystem.GoodsPocketFilterChip
 import goods.pocket.app.presentation.designsystem.GoodsPocketModalBottomSheet
@@ -26,10 +26,10 @@ import goods.pocket.app.presentation.state.QuickAddTarget
 import goodspocket.composeapp.generated.resources.Res
 import goodspocket.composeapp.generated.resources.action_save
 import goodspocket.composeapp.generated.resources.field_category
-import goodspocket.composeapp.generated.resources.field_event_title
 import goodspocket.composeapp.generated.resources.field_character
+import goodspocket.composeapp.generated.resources.field_event_title
 import goodspocket.composeapp.generated.resources.field_item_name
-import goodspocket.composeapp.generated.resources.field_preorder_name
+import goodspocket.composeapp.generated.resources.field_note
 import goodspocket.composeapp.generated.resources.field_release_date
 import goodspocket.composeapp.generated.resources.field_series
 import goodspocket.composeapp.generated.resources.field_status
@@ -42,19 +42,28 @@ fun QuickAddSheet(
     target: QuickAddTarget,
     onTargetChange: (QuickAddTarget) -> Unit,
     onDismiss: () -> Unit,
-    onSubmitItem: (String, String, ItemStatus, String, String, String) -> Unit,
-    onSubmitPreorder: (String, String, String) -> Unit,
+    onSubmitCollectionEntry: (
+        name: String,
+        category: String,
+        status: CollectionEntryStatus,
+        seriesName: String,
+        characterName: String,
+        purchaseStore: String,
+        releaseDate: String,
+        reservationStore: String,
+        note: String,
+    ) -> Unit,
     onSubmitEvent: (String, String, EventType) -> Unit,
 ) {
-    var itemName by remember { mutableStateOf("") }
-    var itemCategory by remember { mutableStateOf("") }
-    var itemStatus by remember { mutableStateOf(ItemStatus.OWNED) }
-    var itemSeries by remember { mutableStateOf("") }
-    var itemCharacter by remember { mutableStateOf("") }
-    var itemStore by remember { mutableStateOf("") }
-    var preorderName by remember { mutableStateOf("") }
-    var preorderStore by remember { mutableStateOf("") }
-    var preorderReleaseDate by remember { mutableStateOf("") }
+    var entryName by remember { mutableStateOf("") }
+    var entryCategory by remember { mutableStateOf("") }
+    var entryStatus by remember { mutableStateOf(CollectionEntryStatus.OWNED) }
+    var entrySeries by remember { mutableStateOf("") }
+    var entryCharacter by remember { mutableStateOf("") }
+    var purchaseStore by remember { mutableStateOf("") }
+    var releaseDate by remember { mutableStateOf("") }
+    var reservationStore by remember { mutableStateOf("") }
+    var entryNote by remember { mutableStateOf("") }
     var eventTitle by remember { mutableStateOf("") }
     var eventDate by remember { mutableStateOf("") }
     var eventType by remember { mutableStateOf(EventType.RELEASE) }
@@ -79,15 +88,15 @@ fun QuickAddSheet(
         }
 
         when (target) {
-            QuickAddTarget.ITEM -> {
+            QuickAddTarget.COLLECTION_ENTRY -> {
                 GoodsPocketInputField(
-                    value = itemName,
-                    onValueChange = { itemName = it },
+                    value = entryName,
+                    onValueChange = { entryName = it },
                     label = tr(Res.string.field_item_name),
                 )
                 GoodsPocketInputField(
-                    value = itemCategory,
-                    onValueChange = { itemCategory = it },
+                    value = entryCategory,
+                    onValueChange = { entryCategory = it },
                     label = tr(Res.string.field_category),
                 )
                 Text(
@@ -98,63 +107,76 @@ fun QuickAddSheet(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    listOf(ItemStatus.OWNED, ItemStatus.PLANNED_CLEANUP).forEach { status ->
+                    listOf(
+                        CollectionEntryStatus.RESERVED,
+                        CollectionEntryStatus.OWNED,
+                        CollectionEntryStatus.PLANNED_CLEANUP,
+                    ).forEach { status ->
                         GoodsPocketFilterChip(
-                            selected = itemStatus == status,
-                            onClick = { itemStatus = status },
+                            selected = entryStatus == status,
+                            onClick = { entryStatus = status },
                             label = status.localizedLabel(),
                         )
                     }
                 }
                 GoodsPocketInputField(
-                    value = itemSeries,
-                    onValueChange = { itemSeries = it },
+                    value = entrySeries,
+                    onValueChange = { entrySeries = it },
                     label = tr(Res.string.field_series),
                 )
                 GoodsPocketInputField(
-                    value = itemCharacter,
-                    onValueChange = { itemCharacter = it },
+                    value = entryCharacter,
+                    onValueChange = { entryCharacter = it },
                     label = tr(Res.string.field_character),
                 )
                 GoodsPocketInputField(
-                    value = itemStore,
-                    onValueChange = { itemStore = it },
+                    value = if (entryStatus == CollectionEntryStatus.RESERVED) {
+                        reservationStore
+                    } else {
+                        purchaseStore
+                    },
+                    onValueChange = {
+                        if (entryStatus == CollectionEntryStatus.RESERVED) {
+                            reservationStore = it
+                        } else {
+                            purchaseStore = it
+                        }
+                    },
                     label = tr(Res.string.field_store),
                 )
+                if (entryStatus == CollectionEntryStatus.RESERVED) {
+                    GoodsPocketInputField(
+                        value = releaseDate,
+                        onValueChange = { releaseDate = it },
+                        label = tr(Res.string.field_release_date),
+                    )
+                }
+                GoodsPocketInputField(
+                    value = entryNote,
+                    onValueChange = { entryNote = it },
+                    label = tr(Res.string.field_note),
+                )
                 SubmitButton(
-                    enabled = itemName.isNotBlank() && itemCategory.isNotBlank(),
+                    enabled = entryName.isNotBlank() &&
+                        entryCategory.isNotBlank() &&
+                        if (entryStatus == CollectionEntryStatus.RESERVED) {
+                            reservationStore.isNotBlank() && releaseDate.isNotBlank()
+                        } else {
+                            true
+                        },
                     onClick = {
-                        onSubmitItem(
-                            itemName,
-                            itemCategory,
-                            itemStatus,
-                            itemSeries,
-                            itemCharacter,
-                            itemStore,
+                        onSubmitCollectionEntry(
+                            entryName,
+                            entryCategory,
+                            entryStatus,
+                            entrySeries,
+                            entryCharacter,
+                            purchaseStore,
+                            releaseDate,
+                            reservationStore,
+                            entryNote,
                         )
                     },
-                )
-            }
-
-            QuickAddTarget.PREORDER -> {
-                GoodsPocketInputField(
-                    value = preorderName,
-                    onValueChange = { preorderName = it },
-                    label = tr(Res.string.field_preorder_name),
-                )
-                GoodsPocketInputField(
-                    value = preorderStore,
-                    onValueChange = { preorderStore = it },
-                    label = tr(Res.string.field_store),
-                )
-                GoodsPocketInputField(
-                    value = preorderReleaseDate,
-                    onValueChange = { preorderReleaseDate = it },
-                    label = tr(Res.string.field_release_date),
-                )
-                SubmitButton(
-                    enabled = preorderName.isNotBlank() && preorderStore.isNotBlank() && preorderReleaseDate.isNotBlank(),
-                    onClick = { onSubmitPreorder(preorderName, preorderStore, preorderReleaseDate) },
                 )
             }
 
