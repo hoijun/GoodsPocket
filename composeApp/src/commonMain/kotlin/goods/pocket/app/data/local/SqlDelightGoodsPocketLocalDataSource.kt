@@ -2,14 +2,11 @@ package goods.pocket.app.data.local
 
 import goods.pocket.app.data.DatabaseDriverFactory
 import goods.pocket.app.db.GoodsPocketDatabase
-import goods.pocket.app.domain.model.AppPreference
-import goods.pocket.app.domain.model.Event
-import goods.pocket.app.domain.model.EventType
-import goods.pocket.app.domain.model.Item
-import goods.pocket.app.domain.model.ItemStatus
-import goods.pocket.app.domain.model.Preorder
-import goods.pocket.app.domain.model.PreorderStatus
-import goods.pocket.app.domain.model.StorageLocation
+import goods.pocket.app.data.local.model.LocalAppPreferenceRecord
+import goods.pocket.app.data.local.model.LocalEventRecord
+import goods.pocket.app.data.local.model.LocalItemRecord
+import goods.pocket.app.data.local.model.LocalPreorderRecord
+import goods.pocket.app.data.local.model.LocalStorageLocationRecord
 
 class SqlDelightGoodsPocketLocalDataSource(
     driverFactory: DatabaseDriverFactory,
@@ -21,18 +18,18 @@ class SqlDelightGoodsPocketLocalDataSource(
         seedIfNeeded()
     }
 
-    override fun getItems(filter: String?): List<Item> {
+    override fun getItems(filter: String?): List<LocalItemRecord> {
         val rows = if (filter.isNullOrBlank()) {
             queries.selectAllItems().executeAsList()
         } else {
             queries.selectItemsByFilter(filter).executeAsList()
         }
         return rows.map { row ->
-            Item(
+            LocalItemRecord(
                 id = row.id,
                 name = row.name,
                 category = row.category,
-                status = row.status.toItemStatus(),
+                status = row.status,
                 seriesName = row.series_name,
                 characterName = row.character_name,
                 quantity = row.quantity.toInt(),
@@ -48,13 +45,13 @@ class SqlDelightGoodsPocketLocalDataSource(
         }
     }
 
-    override fun getItem(id: String): Item? {
+    override fun getItem(id: String): LocalItemRecord? {
         return queries.selectItemById(id).executeAsOneOrNull()?.let { row ->
-            Item(
+            LocalItemRecord(
                 id = row.id,
                 name = row.name,
                 category = row.category,
-                status = row.status.toItemStatus(),
+                status = row.status,
                 seriesName = row.series_name,
                 characterName = row.character_name,
                 quantity = row.quantity.toInt(),
@@ -70,12 +67,12 @@ class SqlDelightGoodsPocketLocalDataSource(
         }
     }
 
-    override fun upsertItem(item: Item) {
+    override fun upsertItem(item: LocalItemRecord) {
         queries.upsertItem(
             id = item.id,
             name = item.name,
             category = item.category,
-            status = item.status.name,
+            status = item.status,
             series_name = item.seriesName,
             character_name = item.characterName,
             quantity = item.quantity.toLong(),
@@ -98,18 +95,18 @@ class SqlDelightGoodsPocketLocalDataSource(
         return queries.countOwnedItems().executeAsOne().toInt()
     }
 
-    override fun getPreorders(status: PreorderStatus?): List<Preorder> {
+    override fun getPreorders(status: String?): List<LocalPreorderRecord> {
         val rows = when (status) {
             null -> queries.selectAllPreorders().executeAsList()
-            else -> queries.selectPreordersByStatus(status.name).executeAsList()
+            else -> queries.selectPreordersByStatus(status).executeAsList()
         }
         return rows.map { row ->
-            Preorder(
+            LocalPreorderRecord(
                 id = row.id,
                 name = row.name,
                 storeName = row.store_name,
                 releaseDate = row.release_date,
-                status = row.status.toPreorderStatus(),
+                status = row.status,
                 seriesName = row.series_name,
                 characterName = row.character_name,
                 totalPrice = row.total_price,
@@ -127,14 +124,14 @@ class SqlDelightGoodsPocketLocalDataSource(
         }
     }
 
-    override fun getPreorder(id: String): Preorder? {
+    override fun getPreorder(id: String): LocalPreorderRecord? {
         return queries.selectPreorderById(id).executeAsOneOrNull()?.let { row ->
-            Preorder(
+            LocalPreorderRecord(
                 id = row.id,
                 name = row.name,
                 storeName = row.store_name,
                 releaseDate = row.release_date,
-                status = row.status.toPreorderStatus(),
+                status = row.status,
                 seriesName = row.series_name,
                 characterName = row.character_name,
                 totalPrice = row.total_price,
@@ -152,13 +149,13 @@ class SqlDelightGoodsPocketLocalDataSource(
         }
     }
 
-    override fun upsertPreorder(preorder: Preorder) {
+    override fun upsertPreorder(preorder: LocalPreorderRecord) {
         queries.upsertPreorder(
             id = preorder.id,
             name = preorder.name,
             store_name = preorder.storeName,
             release_date = preorder.releaseDate,
-            status = preorder.status.name,
+            status = preorder.status,
             series_name = preorder.seriesName,
             character_name = preorder.characterName,
             total_price = preorder.totalPrice,
@@ -175,24 +172,52 @@ class SqlDelightGoodsPocketLocalDataSource(
         )
     }
 
+    override fun saveCollectionEntry(
+        item: LocalItemRecord?,
+        preorder: LocalPreorderRecord?,
+        changedAt: String,
+    ) {
+        require((item == null) != (preorder == null))
+        database.transaction {
+            if (item != null) {
+                upsertItem(item)
+                cancelPreorder(preorderId = item.id, canceledAt = changedAt)
+            } else if (preorder != null) {
+                upsertPreorder(preorder)
+                deleteItem(preorder.id)
+            }
+        }
+    }
+
     override fun markAsReceived(preorderId: String, receiveDate: String) {
         queries.markPreorderReceived(receive_date = receiveDate, updated_at = receiveDate, id = preorderId)
     }
 
-    override fun cancelPreorder(preorderId: String) {
-        queries.cancelPreorder(updated_at = currentTimestamp(), id = preorderId)
+    override fun cancelPreorder(preorderId: String, canceledAt: String) {
+        queries.cancelPreorder(updated_at = canceledAt, id = preorderId)
+    }
+
+    override fun replacePreorderWithItem(
+        preorderId: String,
+        item: LocalItemRecord,
+        receivedAt: String,
+    ) {
+        database.transaction {
+            upsertItem(item)
+            cancelPreorder(preorderId = preorderId, canceledAt = receivedAt)
+        }
     }
 
     override fun countActivePreorders(): Int {
         return queries.countActivePreorders().executeAsOne().toInt()
     }
 
-    override fun getUpcomingEvents(limit: Int): List<Event> {
+    override fun getUpcomingEvents(limit: Int): List<LocalEventRecord> {
         return queries.selectUpcomingEvents(limit.toLong()).executeAsList().map { row ->
-            Event(
+            LocalEventRecord(
                 id = row.id,
                 title = row.title,
-                eventType = row.event_type.toEventType(),
+                eventType = row.event_type,
                 targetDate = row.target_date,
                 relatedItemId = row.related_item_id,
                 relatedPreorderId = row.related_preorder_id,
@@ -204,16 +229,16 @@ class SqlDelightGoodsPocketLocalDataSource(
         }
     }
 
-    override fun getEvents(type: EventType?): List<Event> {
+    override fun getEvents(type: String?): List<LocalEventRecord> {
         val rows = when (type) {
             null -> queries.selectAllEvents().executeAsList()
-            else -> queries.selectEventsByType(type.name).executeAsList()
+            else -> queries.selectEventsByType(type).executeAsList()
         }
         return rows.map { row ->
-            Event(
+            LocalEventRecord(
                 id = row.id,
                 title = row.title,
-                eventType = row.event_type.toEventType(),
+                eventType = row.event_type,
                 targetDate = row.target_date,
                 relatedItemId = row.related_item_id,
                 relatedPreorderId = row.related_preorder_id,
@@ -225,11 +250,11 @@ class SqlDelightGoodsPocketLocalDataSource(
         }
     }
 
-    override fun upsertEvent(event: Event) {
+    override fun upsertEvent(event: LocalEventRecord) {
         queries.upsertEvent(
             id = event.id,
             title = event.title,
-            event_type = event.eventType.name,
+            event_type = event.eventType,
             target_date = event.targetDate,
             related_item_id = event.relatedItemId,
             related_preorder_id = event.relatedPreorderId,
@@ -244,9 +269,9 @@ class SqlDelightGoodsPocketLocalDataSource(
         queries.deleteEventById(id)
     }
 
-    override fun getStorageLocations(): List<StorageLocation> {
+    override fun getStorageLocations(): List<LocalStorageLocationRecord> {
         return queries.selectAllStorageLocations().executeAsList().map { row ->
-            StorageLocation(
+            LocalStorageLocationRecord(
                 id = row.id,
                 name = row.name,
                 parentId = row.parent_id,
@@ -256,7 +281,7 @@ class SqlDelightGoodsPocketLocalDataSource(
         }
     }
 
-    override fun upsertStorageLocation(location: StorageLocation) {
+    override fun upsertStorageLocation(location: LocalStorageLocationRecord) {
         queries.upsertStorageLocation(
             id = location.id,
             name = location.name,
@@ -270,17 +295,17 @@ class SqlDelightGoodsPocketLocalDataSource(
         queries.deleteStorageLocationById(id)
     }
 
-    override fun getAppPreferences(): AppPreference {
+    override fun getAppPreferences(): LocalAppPreferenceRecord {
         return queries.selectAppPreferences().executeAsOneOrNull()?.let { row ->
-            AppPreference(
+            LocalAppPreferenceRecord(
                 currencyCode = row.currency_code,
                 dateFormat = row.date_format,
                 languageCode = row.language_code,
             )
-        } ?: AppPreference()
+        } ?: LocalAppPreferenceRecord()
     }
 
-    override fun updateAppPreferences(preferences: AppPreference) {
+    override fun updateAppPreferences(preferences: LocalAppPreferenceRecord) {
         queries.upsertAppPreferences(
             currency_code = preferences.currencyCode,
             date_format = preferences.dateFormat,
@@ -289,35 +314,31 @@ class SqlDelightGoodsPocketLocalDataSource(
     }
 
     private fun seedIfNeeded() {
-        if (queries.selectAllItems().executeAsList().isNotEmpty()) return
+        val shouldSeed = shouldSeedGoodsPocketDatabase(
+            hasItems = queries.selectAllItems().executeAsList().isNotEmpty(),
+            hasPreorders = queries.selectAllPreorders().executeAsList().isNotEmpty(),
+            hasEvents = queries.selectAllEvents().executeAsList().isNotEmpty(),
+            hasStorageLocations = queries.selectAllStorageLocations().executeAsList().isNotEmpty(),
+            hasPreferences = queries.selectAppPreferences().executeAsOneOrNull() != null,
+        )
+        if (!shouldSeed) return
 
-        GoodsPocketSeedData.items.forEach(::upsertItem)
-        GoodsPocketSeedData.preorders.forEach(::upsertPreorder)
-        GoodsPocketSeedData.events.forEach(::upsertEvent)
-        GoodsPocketSeedData.storageLocations.forEach(::upsertStorageLocation)
-        updateAppPreferences(GoodsPocketSeedData.appPreferences)
-        queries.selectAllItems().executeAsList()
-        queries.selectAllEvents().executeAsList()
-        queries.selectAllStorageLocations().executeAsList()
-        queries.selectAppPreferences().executeAsOneOrNull() ?: updateAppPreferences(GoodsPocketSeedData.appPreferences)
-    }
-
-    private fun currentTimestamp(): String = GoodsPocketSeedData.defaultTimestamp
-
-    private fun String.toItemStatus(): ItemStatus {
-        return when (this) {
-            "PLANNED_TRANSFER" -> ItemStatus.PLANNED_CLEANUP
-            "WAITING_DELIVERY" -> ItemStatus.OWNED
-            "LOST" -> ItemStatus.OWNED
-            else -> ItemStatus.valueOf(this)
+        database.transaction {
+            GoodsPocketSeedData.items.forEach(::upsertItem)
+            GoodsPocketSeedData.preorders.forEach(::upsertPreorder)
+            GoodsPocketSeedData.events.forEach(::upsertEvent)
+            GoodsPocketSeedData.storageLocations.forEach(::upsertStorageLocation)
+            updateAppPreferences(GoodsPocketSeedData.appPreferences)
         }
     }
+}
 
-    private fun String.toPreorderStatus(): PreorderStatus {
-        return PreorderStatus.valueOf(this)
-    }
-
-    private fun String.toEventType(): EventType {
-        return EventType.valueOf(this)
-    }
+internal fun shouldSeedGoodsPocketDatabase(
+    hasItems: Boolean,
+    hasPreorders: Boolean,
+    hasEvents: Boolean,
+    hasStorageLocations: Boolean,
+    hasPreferences: Boolean,
+): Boolean {
+    return !hasItems && !hasPreorders && !hasEvents && !hasStorageLocations && !hasPreferences
 }

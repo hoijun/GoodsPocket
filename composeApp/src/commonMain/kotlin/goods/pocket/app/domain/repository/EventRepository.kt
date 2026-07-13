@@ -4,8 +4,8 @@ import goods.pocket.app.domain.model.Event
 import goods.pocket.app.domain.model.EventType
 
 interface EventRepository {
-    fun getUpcomingEvents(limit: Int): List<Event>
-    fun getEvents(type: EventType? = null): List<Event>
-    fun saveEvent(event: Event)
-    fun deleteEvent(id: String)
+    suspend fun getUpcomingEvents(limit: Int): List<Event>
+    suspend fun getEvents(type: EventType? = null): List<Event>
+    suspend fun saveEvent(event: Event)
+    suspend fun deleteEvent(id: String)
 }

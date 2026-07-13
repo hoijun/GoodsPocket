@@ -1,19 +1,7 @@
 package goods.pocket.app.presentation.screen
 
-import goods.pocket.app.domain.model.ActivityRecord
 import goods.pocket.app.domain.model.Event
 import goods.pocket.app.domain.model.EventType
-import goods.pocket.app.domain.model.Preorder
-import goods.pocket.app.domain.model.PreorderStatus
-import goods.pocket.app.presentation.state.MyPageUiModel
-
-internal data class PreorderJournalOverview(
-    val visibleCount: Int,
-    val pendingPaymentCount: Int,
-    val arrivingCount: Int,
-    val nextReleaseDate: String?,
-    val visibleRemainingTotal: Long,
-)
 
 internal data class EventJournalOverview(
     val headlineMonth: String,
@@ -33,23 +21,6 @@ internal data class MyHubQuickLinkModel(
     val badgeCount: Int? = null,
 )
 
-internal fun buildPreorderJournalOverview(
-    preorders: List<Preorder>,
-    selectedStatus: PreorderStatus?,
-): PreorderJournalOverview {
-    val visiblePreorders = preorders.visibleBy(selectedStatus).sortedBy { journalDateKey(it.releaseDate) }
-
-    return PreorderJournalOverview(
-        visibleCount = visiblePreorders.size,
-        pendingPaymentCount = visiblePreorders.count { it.status == PreorderStatus.PAYMENT_PENDING },
-        arrivingCount = visiblePreorders.count {
-            it.status == PreorderStatus.ACTIVE || it.status == PreorderStatus.PAYMENT_PENDING
-        },
-        nextReleaseDate = visiblePreorders.firstOrNull()?.releaseDate,
-        visibleRemainingTotal = visiblePreorders.sumOf { it.remainingPrice ?: it.totalPrice ?: 0L },
-    )
-}
-
 internal fun buildEventJournalOverview(
     events: List<Event>,
     selectedType: EventType?,
@@ -66,20 +37,12 @@ internal fun buildEventJournalOverview(
     )
 }
 
-internal fun buildMyHubQuickLinks(
-    myPage: MyPageUiModel,
-    recentActivities: List<ActivityRecord>,
-    upcomingEvents: List<Event>,
-): List<MyHubQuickLinkModel> {
+internal fun buildMyHubQuickLinks(): List<MyHubQuickLinkModel> {
     return listOf(
         MyHubQuickLinkModel(action = MyHubAction.SYNC_BACKUP),
         MyHubQuickLinkModel(action = MyHubAction.NOTIFICATIONS),
         MyHubQuickLinkModel(action = MyHubAction.SETTINGS),
     )
-}
-
-internal fun List<Preorder>.visibleBy(selectedStatus: PreorderStatus?): List<Preorder> {
-    return if (selectedStatus == null) this else filter { it.status == selectedStatus }
 }
 
 internal fun List<Event>.visibleBy(selectedType: EventType?): List<Event> {

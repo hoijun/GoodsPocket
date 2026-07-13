@@ -4,6 +4,10 @@ import goods.pocket.app.data.di.GoodsPocketDataModule
 import goods.pocket.app.data.di.PlatformDataModule
 import goods.pocket.app.data.di.GoodsPocketUseCaseModule
 import goods.pocket.app.presentation.state.GoodsPocketAppStateHolder
+import goods.pocket.app.presentation.state.GoodsPocketContentLoader
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
 
@@ -20,39 +24,45 @@ class GoodsPocketAppModule
 @Module
 class GoodsPocketPresentationModule {
     @Single
-    fun goodsPocketAppStateHolder(
-        getCollectionItemsUseCase: goods.pocket.app.domain.usecase.GetCollectionItemsUseCase,
-        getAppPreferencesUseCase: goods.pocket.app.domain.usecase.GetAppPreferencesUseCase,
+    fun applicationScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
+    @Single
+    fun goodsPocketContentLoader(
+        collectionRepository: goods.pocket.app.domain.repository.CollectionRepository,
+        eventRepository: goods.pocket.app.domain.repository.EventRepository,
+        settingsRepository: goods.pocket.app.domain.repository.SettingsRepository,
         getDashboardSummaryUseCase: goods.pocket.app.domain.usecase.GetDashboardSummaryUseCase,
-        getEventListUseCase: goods.pocket.app.domain.usecase.GetEventListUseCase,
-        getPreorderListUseCase: goods.pocket.app.domain.usecase.GetPreorderListUseCase,
         getRecentActivitiesUseCase: goods.pocket.app.domain.usecase.GetRecentActivitiesUseCase,
-        getStorageLocationsUseCase: goods.pocket.app.domain.usecase.GetStorageLocationsUseCase,
-        getUpcomingEventsUseCase: goods.pocket.app.domain.usecase.GetUpcomingEventsUseCase,
-        cancelPreorderUseCase: goods.pocket.app.domain.usecase.CancelPreorderUseCase,
-        deleteCollectionItemUseCase: goods.pocket.app.domain.usecase.DeleteCollectionItemUseCase,
-        deleteEventUseCase: goods.pocket.app.domain.usecase.DeleteEventUseCase,
-        markPreorderReceivedUseCase: goods.pocket.app.domain.usecase.MarkPreorderReceivedUseCase,
-        saveCollectionItemUseCase: goods.pocket.app.domain.usecase.SaveCollectionItemUseCase,
-        saveEventUseCase: goods.pocket.app.domain.usecase.SaveEventUseCase,
-        savePreorderUseCase: goods.pocket.app.domain.usecase.SavePreorderUseCase,
-        updateAppPreferencesUseCase: goods.pocket.app.domain.usecase.UpdateAppPreferencesUseCase,
-    ) = GoodsPocketAppStateHolder(
-        getCollectionItemsUseCase = getCollectionItemsUseCase,
-        getAppPreferencesUseCase = getAppPreferencesUseCase,
+        clock: goods.pocket.app.domain.service.AppClock,
+    ) = GoodsPocketContentLoader(
+        collectionRepository = collectionRepository,
+        eventRepository = eventRepository,
+        settingsRepository = settingsRepository,
         getDashboardSummaryUseCase = getDashboardSummaryUseCase,
-        getEventListUseCase = getEventListUseCase,
-        getPreorderListUseCase = getPreorderListUseCase,
         getRecentActivitiesUseCase = getRecentActivitiesUseCase,
-        getStorageLocationsUseCase = getStorageLocationsUseCase,
-        getUpcomingEventsUseCase = getUpcomingEventsUseCase,
-        cancelPreorderUseCase = cancelPreorderUseCase,
-        deleteCollectionItemUseCase = deleteCollectionItemUseCase,
-        deleteEventUseCase = deleteEventUseCase,
+        clock = clock,
+    )
+
+    @Single
+    fun goodsPocketAppStateHolder(
+        collectionRepository: goods.pocket.app.domain.repository.CollectionRepository,
+        preorderRepository: goods.pocket.app.domain.repository.PreorderRepository,
+        eventRepository: goods.pocket.app.domain.repository.EventRepository,
+        settingsRepository: goods.pocket.app.domain.repository.SettingsRepository,
+        contentLoader: GoodsPocketContentLoader,
+        markPreorderReceivedUseCase: goods.pocket.app.domain.usecase.MarkPreorderReceivedUseCase,
+        clock: goods.pocket.app.domain.service.AppClock,
+        idGenerator: goods.pocket.app.domain.service.IdGenerator,
+        coroutineScope: CoroutineScope,
+    ) = GoodsPocketAppStateHolder(
+        collectionRepository = collectionRepository,
+        preorderRepository = preorderRepository,
+        eventRepository = eventRepository,
+        settingsRepository = settingsRepository,
+        contentLoader = contentLoader,
         markPreorderReceivedUseCase = markPreorderReceivedUseCase,
-        saveCollectionItemUseCase = saveCollectionItemUseCase,
-        saveEventUseCase = saveEventUseCase,
-        savePreorderUseCase = savePreorderUseCase,
-        updateAppPreferencesUseCase = updateAppPreferencesUseCase,
+        clock = clock,
+        idGenerator = idGenerator,
+        coroutineScope = coroutineScope,
     )
 }

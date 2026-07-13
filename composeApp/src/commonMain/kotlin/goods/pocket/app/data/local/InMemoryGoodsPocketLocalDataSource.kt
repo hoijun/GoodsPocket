@@ -1,13 +1,10 @@
 package goods.pocket.app.data.local
 
-import goods.pocket.app.domain.model.AppPreference
-import goods.pocket.app.domain.model.Event
-import goods.pocket.app.domain.model.EventType
-import goods.pocket.app.domain.model.Item
-import goods.pocket.app.domain.model.ItemStatus
-import goods.pocket.app.domain.model.Preorder
-import goods.pocket.app.domain.model.PreorderStatus
-import goods.pocket.app.domain.model.StorageLocation
+import goods.pocket.app.data.local.model.LocalAppPreferenceRecord
+import goods.pocket.app.data.local.model.LocalEventRecord
+import goods.pocket.app.data.local.model.LocalItemRecord
+import goods.pocket.app.data.local.model.LocalPreorderRecord
+import goods.pocket.app.data.local.model.LocalStorageLocationRecord
 
 internal class InMemoryGoodsPocketLocalDataSource : GoodsPocketLocalDataSource {
     private val items = GoodsPocketSeedData.items.toMutableList()
@@ -16,7 +13,7 @@ internal class InMemoryGoodsPocketLocalDataSource : GoodsPocketLocalDataSource {
     private val storageLocations = GoodsPocketSeedData.storageLocations.toMutableList()
     private var appPreferences = GoodsPocketSeedData.appPreferences
 
-    override fun getItems(filter: String?): List<Item> {
+    override fun getItems(filter: String?): List<LocalItemRecord> {
         return items
             .asSequence()
             .filter { item ->
@@ -24,96 +21,120 @@ internal class InMemoryGoodsPocketLocalDataSource : GoodsPocketLocalDataSource {
                     item.name.contains(filter, ignoreCase = true) ||
                     item.seriesName.orEmpty().contains(filter, ignoreCase = true)
             }
-            .sortedWith(compareByDescending<Item> { it.updatedAt }.thenByDescending { it.createdAt })
+            .sortedWith(compareByDescending<LocalItemRecord> { it.updatedAt }.thenByDescending { it.createdAt })
             .toList()
     }
 
-    override fun getItem(id: String): Item? = items.firstOrNull { it.id == id }
+    override fun getItem(id: String): LocalItemRecord? = items.firstOrNull { it.id == id }
 
-    override fun upsertItem(item: Item) {
-        items.replaceById(item, Item::id)
+    override fun upsertItem(item: LocalItemRecord) {
+        items.replaceById(item, LocalItemRecord::id)
     }
 
     override fun deleteItem(id: String) {
         items.removeAll { it.id == id }
     }
 
-    override fun countOwnedItems(): Int = items.count { it.status == ItemStatus.OWNED }
+    override fun countOwnedItems(): Int = items.count { it.status == "OWNED" }
 
-    override fun getPreorders(status: PreorderStatus?): List<Preorder> {
+    override fun getPreorders(status: String?): List<LocalPreorderRecord> {
         return preorders
             .asSequence()
             .filter { status == null || it.status == status }
-            .sortedWith(compareBy<Preorder> { it.releaseDate }.thenByDescending { it.updatedAt })
+            .sortedWith(compareBy<LocalPreorderRecord> { it.releaseDate }.thenByDescending { it.updatedAt })
             .toList()
     }
 
-    override fun getPreorder(id: String): Preorder? = preorders.firstOrNull { it.id == id }
+    override fun getPreorder(id: String): LocalPreorderRecord? = preorders.firstOrNull { it.id == id }
 
-    override fun upsertPreorder(preorder: Preorder) {
-        preorders.replaceById(preorder, Preorder::id)
+    override fun upsertPreorder(preorder: LocalPreorderRecord) {
+        preorders.replaceById(preorder, LocalPreorderRecord::id)
+    }
+
+    override fun saveCollectionEntry(
+        item: LocalItemRecord?,
+        preorder: LocalPreorderRecord?,
+        changedAt: String,
+    ) {
+        require((item == null) != (preorder == null))
+        if (item != null) {
+            upsertItem(item)
+            cancelPreorder(preorderId = item.id, canceledAt = changedAt)
+        } else if (preorder != null) {
+            upsertPreorder(preorder)
+            deleteItem(preorder.id)
+        }
     }
 
     override fun markAsReceived(preorderId: String, receiveDate: String) {
         preorders.updateById(preorderId) { preorder ->
             preorder.copy(
-                status = PreorderStatus.RECEIVED,
+                status = "RECEIVED",
                 receiveDate = receiveDate,
                 updatedAt = receiveDate,
             )
         }
     }
 
-    override fun cancelPreorder(preorderId: String) {
+    override fun cancelPreorder(preorderId: String, canceledAt: String) {
         preorders.updateById(preorderId) { preorder ->
             preorder.copy(
-                status = PreorderStatus.CANCELED,
-                updatedAt = GoodsPocketSeedData.defaultTimestamp,
+                status = "CANCELED",
+                updatedAt = canceledAt,
             )
         }
     }
 
-    override fun countActivePreorders(): Int {
-        return preorders.count { it.status == PreorderStatus.ACTIVE || it.status == PreorderStatus.PAYMENT_PENDING }
+    override fun replacePreorderWithItem(
+        preorderId: String,
+        item: LocalItemRecord,
+        receivedAt: String,
+    ) {
+        upsertItem(item)
+        cancelPreorder(preorderId = preorderId, canceledAt = receivedAt)
     }
 
-    override fun getUpcomingEvents(limit: Int): List<Event> {
+    override fun countActivePreorders(): Int {
+        return preorders.count { it.status == "ACTIVE" || it.status == "PAYMENT_PENDING" }
+    }
+
+    override fun getUpcomingEvents(limit: Int): List<LocalEventRecord> {
         return events
-            .sortedWith(compareBy<Event> { it.targetDate }.thenByDescending { it.updatedAt })
+            .sortedWith(compareBy<LocalEventRecord> { it.targetDate }.thenByDescending { it.updatedAt })
             .take(limit)
     }
 
-    override fun getEvents(type: EventType?): List<Event> {
+    override fun getEvents(type: String?): List<LocalEventRecord> {
         return events
             .asSequence()
             .filter { type == null || it.eventType == type }
-            .sortedWith(compareBy<Event> { it.targetDate }.thenByDescending { it.updatedAt })
+            .sortedWith(compareBy<LocalEventRecord> { it.targetDate }.thenByDescending { it.updatedAt })
             .toList()
     }
 
-    override fun upsertEvent(event: Event) {
-        events.replaceById(event, Event::id)
+    override fun upsertEvent(event: LocalEventRecord) {
+        events.replaceById(event, LocalEventRecord::id)
     }
 
     override fun deleteEvent(id: String) {
         events.removeAll { it.id == id }
     }
 
-    override fun getStorageLocations(): List<StorageLocation> {
-        return storageLocations.sortedBy(StorageLocation::name)
+    override fun getStorageLocations(): List<LocalStorageLocationRecord> {
+        return storageLocations.sortedBy(LocalStorageLocationRecord::name)
     }
 
-    override fun upsertStorageLocation(location: StorageLocation) {
-        storageLocations.replaceById(location, StorageLocation::id)
+    override fun upsertStorageLocation(location: LocalStorageLocationRecord) {
+        storageLocations.replaceById(location, LocalStorageLocationRecord::id)
     }
 
     override fun deleteStorageLocation(id: String) {
         storageLocations.removeAll { it.id == id }
     }
 
-    override fun getAppPreferences(): AppPreference = appPreferences
+    override fun getAppPreferences(): LocalAppPreferenceRecord = appPreferences
 
-    override fun updateAppPreferences(preferences: AppPreference) {
+    override fun updateAppPreferences(preferences: LocalAppPreferenceRecord) {
         appPreferences = preferences
     }
 }
@@ -130,9 +151,9 @@ private fun <T> MutableList<T>.replaceById(
     }
 }
 
-private fun MutableList<Preorder>.updateById(
+private fun MutableList<LocalPreorderRecord>.updateById(
     id: String,
-    transform: (Preorder) -> Preorder,
+    transform: (LocalPreorderRecord) -> LocalPreorderRecord,
 ) {
     val index = indexOfFirst { it.id == id }
     if (index >= 0) {

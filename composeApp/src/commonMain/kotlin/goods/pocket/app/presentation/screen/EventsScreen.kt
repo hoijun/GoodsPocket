@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -25,6 +26,7 @@ import goods.pocket.app.presentation.designsystem.GoodsPocketTonalBadge
 import goods.pocket.app.presentation.designsystem.goodsPocketScreenModifier
 import goods.pocket.app.presentation.designsystem.goodsPocketSecondaryScrollContentPadding
 import goods.pocket.app.presentation.i18n.localizedLabel
+import goods.pocket.app.presentation.i18n.formatDate
 import goods.pocket.app.presentation.i18n.tr
 import goodspocket.composeapp.generated.resources.Res
 import goodspocket.composeapp.generated.resources.common_all
@@ -41,10 +43,12 @@ fun EventsScreen(
     onTypeChange: (EventType?) -> Unit,
     onEventClick: (String) -> Unit,
 ) {
-    val overview = buildEventJournalOverview(
-        events = events,
-        selectedType = selectedType,
-    )
+    val overview = remember(events, selectedType) {
+        buildEventJournalOverview(
+            events = events,
+            selectedType = selectedType,
+        )
+    }
     val visibleCount = listOfNotNull(overview.featuredEvent).size +
         overview.secondaryEvents.size +
         overview.timelineEvents.size
@@ -149,7 +153,7 @@ fun EventsScreen(
                             GoodsPocketListRow(
                                 title = event.title,
                                 subtitle = event.locationOrStore ?: tr(Res.string.common_no_linked_place),
-                                trailing = event.targetDate,
+                                trailing = formatDate(event.targetDate),
                                 onClick = { onEventClick(event.id) },
                             )
                         }
@@ -188,7 +192,7 @@ private fun FeaturedEventCard(
                 },
             )
             Text(
-                text = event.targetDate,
+                text = formatDate(event.targetDate),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -227,7 +231,7 @@ private fun SecondaryEventCard(
             fontWeight = FontWeight.SemiBold,
         )
         Text(
-            text = event.targetDate,
+            text = formatDate(event.targetDate),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

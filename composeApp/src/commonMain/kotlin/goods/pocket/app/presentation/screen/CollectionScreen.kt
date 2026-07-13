@@ -19,6 +19,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,9 +33,10 @@ import goods.pocket.app.presentation.designsystem.GoodsPocketTonalBadge
 import goods.pocket.app.presentation.designsystem.goodsPocketOutlinedFieldColors
 import goods.pocket.app.presentation.designsystem.goodsPocketPrimaryScrollContentPadding
 import goods.pocket.app.presentation.designsystem.goodsPocketScreenModifier
-import goods.pocket.app.presentation.designsystem.pixelShadow
 import goods.pocket.app.presentation.i18n.formatCurrency
+import goods.pocket.app.presentation.i18n.formatDate
 import goods.pocket.app.presentation.i18n.localizedLabel
+import goods.pocket.app.presentation.i18n.localizedCategory
 import goods.pocket.app.presentation.i18n.tr
 import goods.pocket.app.presentation.state.CollectionSegment
 import goodspocket.composeapp.generated.resources.Res
@@ -60,20 +62,11 @@ fun CollectionScreen(
     onQueryChange: (String) -> Unit,
     onEntryClick: (String) -> Unit,
 ) {
-    val queryFilteredEntries = entries.filter { entry ->
-        query.isBlank() ||
-            entry.name.contains(query, ignoreCase = true) ||
-            entry.seriesName?.contains(query, ignoreCase = true) == true
+    val visibleEntries = remember(entries, query, selectedSegment) {
+        visibleCollectionEntries(entries, query, selectedSegment)
     }
-    val visibleEntries = queryFilteredEntries.filter { entry ->
-        when (selectedSegment) {
-            CollectionSegment.OWNED -> entry.status != CollectionEntryStatus.RESERVED
-            CollectionSegment.RESERVED -> entry.status == CollectionEntryStatus.RESERVED
-            CollectionSegment.ALL -> true
-        }
-    }
-    val ownedEntries = entries.filter { it.status != CollectionEntryStatus.RESERVED }
-    val reservedEntries = entries.filter { it.status == CollectionEntryStatus.RESERVED }
+    val ownedEntries = remember(entries) { entries.filter { it.status != CollectionEntryStatus.RESERVED } }
+    val reservedEntries = remember(entries) { entries.filter { it.status == CollectionEntryStatus.RESERVED } }
     val totalSpend = ownedEntries.sumOf { it.purchasePrice ?: 0L }
     val secondarySummaryLabel = if (selectedSegment == CollectionSegment.RESERVED) {
         tr(Res.string.preorders_next_release)
@@ -81,7 +74,8 @@ fun CollectionScreen(
         tr(Res.string.collection_metric_reserved_count)
     }
     val secondarySummaryValue = if (selectedSegment == CollectionSegment.RESERVED) {
-        reservedEntries.mapNotNull(CollectionEntry::releaseDate).minOrNull() ?: tr(Res.string.common_not_set)
+        reservedEntries.mapNotNull(CollectionEntry::releaseDate).minOrNull()?.let { formatDate(it) }
+            ?: tr(Res.string.common_not_set)
     } else {
         reservedEntries.size.toString()
     }
@@ -164,11 +158,10 @@ fun CollectionScreen(
                 ) {
                     val imgShape = MaterialTheme.shapes.small
                     Surface(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .pixelShadow(MaterialTheme.colorScheme.outlineVariant, shape = imgShape),
+                        modifier = Modifier.size(48.dp),
                         color = MaterialTheme.colorScheme.surfaceContainerLow,
                         shape = imgShape,
+                        shadowElevation = 2.dp,
                         border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.outlineVariant),
                     ) {
                         Box(contentAlignment = Alignment.Center) {
@@ -196,7 +189,7 @@ fun CollectionScreen(
                             text = tr(
                                 Res.string.collection_series_category,
                                 entry.seriesName ?: tr(Res.string.common_unknown),
-                                entry.category,
+                                entry.localizedCategory(),
                             ),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface,
@@ -224,6 +217,25 @@ fun CollectionScreen(
     }
 }
 
+internal fun visibleCollectionEntries(
+    entries: List<CollectionEntry>,
+    query: String,
+    selectedSegment: CollectionSegment,
+): List<CollectionEntry> {
+    return entries.filter { entry ->
+        val matchesQuery = query.isBlank() ||
+            entry.name.contains(query, ignoreCase = true) ||
+            entry.seriesName?.contains(query, ignoreCase = true) == true ||
+            entry.characterName?.contains(query, ignoreCase = true) == true
+        val matchesSegment = when (selectedSegment) {
+            CollectionSegment.OWNED -> entry.status != CollectionEntryStatus.RESERVED
+            CollectionSegment.RESERVED -> entry.status == CollectionEntryStatus.RESERVED
+            CollectionSegment.ALL -> true
+        }
+        matchesQuery && matchesSegment
+    }
+}
+
 @Composable
 private fun CollectionSegmentCard(
     label: String,
@@ -235,7 +247,6 @@ private fun CollectionSegmentCard(
     Surface(
         modifier = Modifier
             .widthIn(min = 136.dp)
-            .pixelShadow(MaterialTheme.colorScheme.outlineVariant, shape = shape)
             .clickable(onClick = onClick),
         color = if (selected) {
             MaterialTheme.colorScheme.primaryContainer
@@ -248,6 +259,7 @@ private fun CollectionSegmentCard(
             MaterialTheme.colorScheme.onSurface
         },
         shape = shape,
+        shadowElevation = if (selected) 2.dp else 1.dp,
         border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
         Column(
@@ -282,11 +294,11 @@ private fun CollectionSummaryCard(
     val shape = MaterialTheme.shapes.small
     Surface(
         modifier = Modifier
-            .widthIn(min = 136.dp)
-            .pixelShadow(MaterialTheme.colorScheme.outlineVariant, shape = shape),
+            .widthIn(min = 136.dp),
         color = containerColor,
         contentColor = contentColor,
         shape = shape,
+        shadowElevation = 1.dp,
         border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
         Column(
@@ -331,7 +343,7 @@ private fun CollectionEntry.subtitle(): String {
         tr(
             Res.string.preorders_store_release,
             reservationStore ?: tr(Res.string.common_unknown),
-            releaseDate ?: tr(Res.string.common_not_set),
+            releaseDate?.let { formatDate(it) } ?: tr(Res.string.common_not_set),
         )
     } else {
         purchaseStore ?: storageLocationId ?: tr(Res.string.common_unknown)

@@ -24,6 +24,21 @@
     <string name="common_no_place">No place</string>
     <string name="common_no_linked_place">No linked place</string>
 
+    <string name="home_brand_title">GoodsPocket</string>
+    <string name="home_notification_label">Notifications</string>
+    <string name="home_hero_title">Happy collecting day! 🎁</string>
+    <string name="home_hero_body">Record your new goods\nand memories.</string>
+    <string name="home_today_summary_title">Today’s collection summary</string>
+    <string name="home_summary_total_goods">Total goods</string>
+    <string name="home_summary_owned">Owned</string>
+    <string name="home_summary_wishlist">Wishlist</string>
+    <string name="home_summary_sale">Sale</string>
+    <string name="home_view_all">View all</string>
+    <string name="home_recent_goods_title">Recently added goods</string>
+    <string name="home_monthly_spend_title">This month’s spend summary</string>
+    <string name="home_monthly_spend_basis">Compared to last month</string>
+    <string name="home_monthly_spend_change">vs last month +12%%</string>
+    <string name="home_upcoming_schedule_title">Upcoming schedule</string>
     <string name="home_monthly_overview">Monthly overview</string>
     <string name="home_monthly_summary_hint">Tap to inspect the current month summary.</string>
     <string name="home_stat_owned">Owned</string>
@@ -166,6 +181,8 @@
     <string name="collection_entry_status_reserved">Reserved</string>
     <string name="collection_entry_status_owned">Owned</string>
     <string name="collection_entry_status_planned_cleanup">Planned cleanup</string>
+    <string name="collection_category_reserved">Reserved goods</string>
+    <string name="collection_category_goods">Goods</string>
 
     <string name="item_status_owned">Owned</string>
     <string name="item_status_planned_cleanup">Planned cleanup</string>
@@ -180,4 +197,6 @@
     <string name="event_type_payment_due">Payment Due</string>
     <string name="event_type_delivery">Delivery</string>
     <string name="event_type_offline_event">Offline Event</string>
+    <string name="error_operation_failed">The operation could not be completed. Please try again.</string>
+    <string name="action_retry">Retry</string>
 </resources>

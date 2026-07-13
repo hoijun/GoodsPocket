@@ -1,7 +1,7 @@
 package goods.pocket.app.presentation.designsystem
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,11 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
@@ -44,16 +41,20 @@ fun GoodsPocketSectionCard(
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val baseModifier = modifier.fillMaxWidth()
+    val cardShape = MaterialTheme.shapes.medium
+    val baseModifier = modifier
+        .fillMaxWidth()
+
     val cardColors = CardDefaults.cardColors(
         containerColor = containerColor,
         contentColor = contentColor,
     )
-    val elevation = CardDefaults.cardElevation(defaultElevation = 0.dp, pressedElevation = 0.dp)
+    val elevation = CardDefaults.cardElevation(defaultElevation = 2.dp, pressedElevation = 1.dp)
     val border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
     if (onClick == null) {
         Card(
             modifier = baseModifier,
+            shape = cardShape,
             colors = cardColors,
             elevation = elevation,
             border = border,
@@ -69,7 +70,8 @@ fun GoodsPocketSectionCard(
 
     Card(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
+        modifier = baseModifier,
+        shape = cardShape,
         colors = cardColors,
         elevation = elevation,
         border = border,
@@ -110,7 +112,7 @@ fun GoodsPocketSectionHeader(
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.Bold,
         )
         if (subtitle != null) {
             Text(
@@ -149,7 +151,7 @@ fun GoodsPocketBottomSheetHandle(
             modifier = Modifier
                 .width(36.dp)
                 .height(4.dp),
-            shape = CircleShape,
+            shape = MaterialTheme.shapes.extraSmall,
             color = MaterialTheme.colorScheme.outlineVariant,
         ) {}
     }
@@ -197,7 +199,7 @@ fun GoodsPocketMetricPill(
     modifier: Modifier = Modifier,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
-    shape: Shape = CircleShape,
+    shape: Shape = MaterialTheme.shapes.small,
     contentPadding: PaddingValues = PaddingValues(horizontal = 12.dp, vertical = 10.dp),
 ) {
     Surface(
@@ -205,6 +207,7 @@ fun GoodsPocketMetricPill(
         shape = shape,
         color = containerColor,
         contentColor = contentColor,
+        shadowElevation = 2.dp,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
         Column(
@@ -214,7 +217,7 @@ fun GoodsPocketMetricPill(
             Text(
                 text = value,
                 style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold,
+                fontWeight = FontWeight.Bold,
             )
             Text(
                 text = label,
@@ -233,6 +236,7 @@ fun GoodsPocketListRow(
     trailing: String? = null,
     onClick: (() -> Unit)? = null,
 ) {
+    val shape = MaterialTheme.shapes.small
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -244,8 +248,9 @@ fun GoodsPocketListRow(
                 },
             ),
         color = MaterialTheme.colorScheme.surfaceContainerLow,
-        shape = MaterialTheme.shapes.small,
+        shape = shape,
         contentColor = MaterialTheme.colorScheme.onSurface,
+        shadowElevation = 2.dp,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
         Row(
@@ -262,7 +267,7 @@ fun GoodsPocketListRow(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Bold,
                 )
                 Text(
                     text = subtitle,
@@ -275,7 +280,7 @@ fun GoodsPocketListRow(
                     text = trailing,
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Bold,
                 )
             } else if (onClick != null) {
                 Text(
@@ -294,25 +299,31 @@ fun GoodsPocketFilterChip(
     label: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    selectedContainerColor: Color = MaterialTheme.colorScheme.primaryContainer,
+    selectedContentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
+    selectedBorderColor: Color = MaterialTheme.colorScheme.primary,
 ) {
-    FilterChip(
-        selected = selected,
+    val shape = MaterialTheme.shapes.small
+    val containerColor = if (selected) selectedContainerColor else MaterialTheme.colorScheme.surface
+    val contentColor = if (selected) selectedContentColor else MaterialTheme.colorScheme.onSurfaceVariant
+    val borderColor = if (selected) selectedBorderColor else MaterialTheme.colorScheme.outlineVariant
+
+    Surface(
         onClick = onClick,
         modifier = modifier,
-        label = { Text(label) },
-        colors = FilterChipDefaults.filterChipColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        ),
-        border = FilterChipDefaults.filterChipBorder(
-            borderColor = MaterialTheme.colorScheme.outlineVariant,
-            selectedBorderColor = MaterialTheme.colorScheme.primary,
-            enabled = true,
-            selected = selected,
-        ),
-    )
+        shape = shape,
+        color = containerColor,
+        contentColor = contentColor,
+        shadowElevation = if (selected) 2.dp else 0.dp,
+        border = BorderStroke(1.dp, borderColor),
+    ) {
+        Text(
+            text = label,
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.Bold,
+        )
+    }
 }
 
 @Composable
@@ -322,18 +333,20 @@ fun GoodsPocketTonalBadge(
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
     contentColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
 ) {
+    val shape = MaterialTheme.shapes.extraSmall
     Surface(
         modifier = modifier,
         color = containerColor,
         contentColor = contentColor,
-        shape = CircleShape,
+        shape = shape,
+        shadowElevation = 1.dp,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
         Text(
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
             text = text,
             style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.Bold,
         )
     }
 }

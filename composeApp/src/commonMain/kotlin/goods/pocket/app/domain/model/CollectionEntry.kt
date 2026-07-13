@@ -24,3 +24,6 @@ enum class CollectionEntryStatus {
     OWNED,
     PLANNED_CLEANUP,
 }
+
+const val RESERVED_COLLECTION_CATEGORY_CODE = "reserved"
+const val GOODS_COLLECTION_CATEGORY_CODE = "goods"

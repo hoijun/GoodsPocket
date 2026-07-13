@@ -29,7 +29,6 @@ import goodspocket.composeapp.generated.resources.Res
 import goodspocket.composeapp.generated.resources.my_account_management
 import goodspocket.composeapp.generated.resources.my_local_profile_label
 import goodspocket.composeapp.generated.resources.my_notifications_disabled
-import goodspocket.composeapp.generated.resources.my_notifications_enabled
 import goodspocket.composeapp.generated.resources.my_profile_hint
 import goodspocket.composeapp.generated.resources.my_summary_active_preorders
 import goodspocket.composeapp.generated.resources.my_summary_owned_items
@@ -45,16 +44,7 @@ fun MyScreen(
     myPage: MyPageUiModel,
     onOpenSettings: () -> Unit,
 ) {
-    val notificationsLabel = if (myPage.notificationsEnabled) {
-        tr(Res.string.my_notifications_enabled)
-    } else {
-        tr(Res.string.my_notifications_disabled)
-    }
-    val quickLinks = buildMyHubQuickLinks(
-        myPage = myPage,
-        recentActivities = emptyList(),
-        upcomingEvents = emptyList(),
-    )
+    val quickLinks = buildMyHubQuickLinks()
 
     LazyColumn(
         modifier = goodsPocketScreenModifier(),
@@ -129,7 +119,6 @@ fun MyScreen(
                         subtitle = quickLinkSubtitle(
                             link = link,
                             myPage = myPage,
-                            notificationsLabel = notificationsLabel,
                         ),
                         accentColor = quickLinkAccentColor(link.action),
                         onClick = when (link.action) {
@@ -244,7 +233,6 @@ private fun quickLinkTitle(action: MyHubAction): String {
 private fun quickLinkSubtitle(
     link: MyHubQuickLinkModel,
     myPage: MyPageUiModel,
-    notificationsLabel: String,
 ): String {
     return when (link.action) {
         MyHubAction.SYNC_BACKUP -> if (localizedSyncStatusLabel(myPage) == tr(Res.string.my_sync_not_connected)) {
@@ -253,7 +241,7 @@ private fun quickLinkSubtitle(
             localizedSyncStatusLabel(myPage)
         }
 
-        MyHubAction.NOTIFICATIONS -> notificationsLabel
+        MyHubAction.NOTIFICATIONS -> tr(Res.string.my_notifications_disabled)
         MyHubAction.SETTINGS -> tr(Res.string.my_utility_settings_subtitle)
     }
 }

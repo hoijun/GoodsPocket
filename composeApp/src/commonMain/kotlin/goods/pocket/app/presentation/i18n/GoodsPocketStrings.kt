@@ -5,10 +5,14 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.key
 import androidx.compose.runtime.staticCompositionLocalOf
 import goods.pocket.app.domain.model.CollectionEntryStatus
+import goods.pocket.app.domain.model.CollectionEntry
+import goods.pocket.app.domain.model.RESERVED_COLLECTION_CATEGORY_CODE
+import goods.pocket.app.domain.model.GOODS_COLLECTION_CATEGORY_CODE
 import goods.pocket.app.domain.model.EventType
 import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.PreorderStatus
-import goods.pocket.app.i18n.formatCurrencyByLanguage
+import goods.pocket.app.i18n.formatCurrencyByPreference
+import goods.pocket.app.i18n.formatDateByPreference
 import goods.pocket.app.presentation.navigation.AppDestination
 import goods.pocket.app.presentation.state.CollectionSegment
 import goods.pocket.app.presentation.state.QuickAddTarget
@@ -22,15 +26,21 @@ enum class AppLanguage(val code: String) {
 }
 
 val LocalAppLanguageCode = staticCompositionLocalOf { AppLanguage.KOREAN.code }
+val LocalCurrencyCode = staticCompositionLocalOf { "KRW" }
+val LocalDateFormat = staticCompositionLocalOf { "yyyy-MM-dd" }
 
 @Composable
 fun ProvideLocalizedResources(
     languageCode: String,
+    currencyCode: String,
+    dateFormat: String,
     content: @Composable () -> Unit,
 ) {
     val appliedLanguageCode = ApplyAppLanguage(languageCode)
     CompositionLocalProvider(
         LocalAppLanguageCode provides appliedLanguageCode,
+        LocalCurrencyCode provides currencyCode,
+        LocalDateFormat provides dateFormat,
     ) {
         key(appliedLanguageCode) {
             content()
@@ -51,7 +61,16 @@ fun tr(
 
 @Composable
 fun formatCurrency(amount: Long): String {
-    return formatCurrencyByLanguage(amount, LocalAppLanguageCode.current)
+    return formatCurrencyByPreference(
+        amount = amount,
+        currencyCode = LocalCurrencyCode.current,
+        languageCode = LocalAppLanguageCode.current,
+    )
+}
+
+@Composable
+fun formatDate(isoDate: String): String {
+    return formatDateByPreference(isoDate, LocalDateFormat.current)
 }
 
 @Composable
@@ -88,6 +107,15 @@ fun CollectionEntryStatus.localizedLabel(): String {
         CollectionEntryStatus.RESERVED -> tr(Res.string.collection_entry_status_reserved)
         CollectionEntryStatus.OWNED -> tr(Res.string.collection_entry_status_owned)
         CollectionEntryStatus.PLANNED_CLEANUP -> tr(Res.string.collection_entry_status_planned_cleanup)
+    }
+}
+
+@Composable
+fun CollectionEntry.localizedCategory(): String {
+    return when (category) {
+        RESERVED_COLLECTION_CATEGORY_CODE -> tr(Res.string.collection_category_reserved)
+        GOODS_COLLECTION_CATEGORY_CODE -> tr(Res.string.collection_category_goods)
+        else -> category
     }
 }
 

@@ -1,52 +1,62 @@
 package goods.pocket.app.presentation.screen
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import goods.pocket.app.domain.model.ActivityRecord
 import goods.pocket.app.domain.model.Event
 import goods.pocket.app.domain.model.HomeSummary
-import goods.pocket.app.presentation.designsystem.GoodsPocketHeroCard
-import goods.pocket.app.presentation.designsystem.GoodsPocketListRow
-import goods.pocket.app.presentation.designsystem.GoodsPocketSectionCard
-import goods.pocket.app.presentation.designsystem.GoodsPocketSectionHeader
-import goods.pocket.app.presentation.designsystem.GoodsPocketTonalBadge
-import goods.pocket.app.presentation.designsystem.goodsPocketPrimaryScrollContentPadding
+import goods.pocket.app.presentation.designsystem.GoodsPocketVisualTokens
 import goods.pocket.app.presentation.designsystem.goodsPocketScreenModifier
-import goods.pocket.app.presentation.i18n.formatCurrency
-import goods.pocket.app.presentation.i18n.localizedLabel
 import goods.pocket.app.presentation.i18n.tr
 import goodspocket.composeapp.generated.resources.Res
-import goodspocket.composeapp.generated.resources.home_monthly_overview
-import goodspocket.composeapp.generated.resources.home_monthly_summary_hint
-import goodspocket.composeapp.generated.resources.home_no_recent_activity
-import goodspocket.composeapp.generated.resources.home_no_upcoming_events
-import goodspocket.composeapp.generated.resources.home_owned_count_unit
-import goodspocket.composeapp.generated.resources.home_planner_events
-import goodspocket.composeapp.generated.resources.home_planner_events_count
-import goodspocket.composeapp.generated.resources.home_planner_preorders
-import goodspocket.composeapp.generated.resources.home_planner_preorders_count
-import goodspocket.composeapp.generated.resources.home_planner_quick_add
-import goodspocket.composeapp.generated.resources.home_recent_activity
-import goodspocket.composeapp.generated.resources.home_recent_activity_subtitle
-import goodspocket.composeapp.generated.resources.home_stat_active_preorder_subtitle
-import goodspocket.composeapp.generated.resources.home_stat_active_preorder
-import goodspocket.composeapp.generated.resources.home_stat_owned
-import goodspocket.composeapp.generated.resources.home_upcoming
-import goodspocket.composeapp.generated.resources.home_upcoming_subtitle
+import goodspocket.composeapp.generated.resources.home_brand_title
+import goodspocket.composeapp.generated.resources.home_hero_body
+import goodspocket.composeapp.generated.resources.home_hero_title
+import goodspocket.composeapp.generated.resources.home_summary_owned
+import goodspocket.composeapp.generated.resources.home_summary_sale
+import goodspocket.composeapp.generated.resources.home_summary_total_goods
+import goodspocket.composeapp.generated.resources.home_summary_wishlist
+import goodspocket.composeapp.generated.resources.home_today_summary_title
+
+internal val HomeOrange = Color(GoodsPocketVisualTokens.Primary)
+internal val HomeGreen = Color(GoodsPocketVisualTokens.Secondary)
+internal val HomePurple = Color(GoodsPocketVisualTokens.Wishlist)
+internal val HomeInk = Color(GoodsPocketVisualTokens.Ink)
+internal val HomeMuted = Color(GoodsPocketVisualTokens.MutedInk)
+internal val HomeWarning = Color(GoodsPocketVisualTokens.Warning)
+internal val HomeCardSurface = Color(0xFFFEFBF8)
+internal val HomeHeroSurface = Color(0xFFFEF9F5)
+internal val HomeCardBorder = Color(0xFFEFEDEC)
 
 @Composable
 fun HomeScreen(
@@ -61,241 +71,297 @@ fun HomeScreen(
 ) {
     LazyColumn(
         modifier = goodsPocketScreenModifier(),
-        contentPadding = goodsPocketPrimaryScrollContentPadding(),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
+        contentPadding = PaddingValues(top = 2.dp, bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        item { HomeBrandHeader(onNotificationsClick = onUpcomingEventsClick) }
+        item { HomeHeroCard(onClick = onQuickAddClick) }
         item {
-            SummaryOverviewRow(
+            HomeTodaySummaryCard(
                 dashboardSummary = dashboardSummary,
-            )
-        }
-        item {
-            PlannerBoardCard(
-                dashboardSummary = dashboardSummary,
-                upcomingEvents = upcomingEvents,
-                onUpcomingEventsClick = onUpcomingEventsClick,
                 onPreordersClick = onPreordersClick,
-                onQuickAddClick = onQuickAddClick,
             )
         }
         item {
-            UpcomingEventsCard(
+            HomeRecentGoodsCarousel(
+                activities = dashboardSummary.recentActivities,
+                onEntryClick = onRecentActivityClick,
+                onViewAll = onRecentActivitiesClick,
+            )
+        }
+        item { HomeMonthlySpendCard(dashboardSummary = dashboardSummary) }
+        item {
+            HomeUpcomingScheduleCard(
                 events = upcomingEvents,
                 onCardClick = onUpcomingEventsClick,
                 onEventClick = onUpcomingEventClick,
             )
         }
-        item {
-            RecentActivityCard(
-                activities = dashboardSummary.recentActivities,
-                onCardClick = onRecentActivitiesClick,
-                onActivityClick = onRecentActivityClick,
-            )
-        }
     }
 }
 
 @Composable
-private fun SummaryOverviewRow(
-    dashboardSummary: HomeSummary,
+private fun HomeBrandHeader(
+    onNotificationsClick: () -> Unit,
 ) {
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        GoodsPocketHeroCard(
-            modifier = Modifier.weight(1.15f),
-        ) {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                GoodsPocketTonalBadge(
-                    text = tr(Res.string.home_stat_owned),
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                )
-                Text(
-                    text = dashboardSummary.ownedItemCount.toString(),
-                    style = MaterialTheme.typography.displayLarge,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Text(
-                    text = tr(Res.string.home_owned_count_unit),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
-        GoodsPocketSectionCard(
-            modifier = Modifier.weight(1f),
-            containerColor = MaterialTheme.colorScheme.surface,
-        ) {
-            GoodsPocketTonalBadge(
-                text = tr(Res.string.home_monthly_overview),
-                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-            )
-            Text(
-                text = formatCurrency(dashboardSummary.monthlySpend),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold,
-            )
-            Text(
-                text = tr(Res.string.home_monthly_summary_hint),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
-
-@Composable
-private fun PlannerBoardCard(
-    dashboardSummary: HomeSummary,
-    upcomingEvents: List<Event>,
-    onUpcomingEventsClick: () -> Unit,
-    onPreordersClick: () -> Unit,
-    onQuickAddClick: () -> Unit,
-) {
-    GoodsPocketSectionCard(containerColor = MaterialTheme.colorScheme.surface) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            GoodsPocketSectionHeader(
-                title = tr(Res.string.home_stat_active_preorder),
-                subtitle = tr(
-                    Res.string.home_stat_active_preorder_subtitle,
-                    dashboardSummary.activePreorderCount,
-                ),
-            )
-            GoodsPocketTonalBadge(
-                text = dashboardSummary.activePreorderCount.toString(),
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            )
-        }
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        )
-        {
-            PlannerMiniCard(
-                title = tr(Res.string.home_planner_preorders),
-                subtitle = tr(
-                    Res.string.home_planner_preorders_count,
-                    dashboardSummary.activePreorderCount,
-                ),
-                onClick = onPreordersClick,
-            )
-            PlannerMiniCard(
-                title = tr(Res.string.home_planner_events),
-                subtitle = tr(Res.string.home_planner_events_count, upcomingEvents.size),
-                onClick = onUpcomingEventsClick,
-            )
-            PlannerMiniCard(
-                title = tr(Res.string.home_planner_quick_add),
-                subtitle = "+",
-                onClick = onQuickAddClick,
-            )
-        }
-    }
-}
-
-@Composable
-private fun PlannerMiniCard(
-    title: String,
-    subtitle: String,
-    onClick: (() -> Unit)? = null,
-) {
-    GoodsPocketSectionCard(
-        modifier = Modifier.widthIn(min = 132.dp),
-        onClick = onClick,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Surface(
-            color = MaterialTheme.colorScheme.surface,
-            shape = RoundedCornerShape(16.dp),
-        ) {
-            Text(
-                modifier = Modifier.padding(horizontal = 14.dp, vertical = 14.dp),
-                text = subtitle,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
-        }
-    }
-}
-
-@Composable
-private fun UpcomingEventsCard(
-    events: List<Event>,
-    onCardClick: () -> Unit,
-    onEventClick: (String) -> Unit,
-) {
-    GoodsPocketSectionCard(
-        onClick = onCardClick,
-        containerColor = MaterialTheme.colorScheme.surface,
-    ) {
-        GoodsPocketSectionHeader(
-            title = tr(Res.string.home_upcoming),
-            subtitle = tr(Res.string.home_upcoming_subtitle),
-        )
-        if (events.isEmpty()) {
-            EmptyStateLine(tr(Res.string.home_no_upcoming_events))
-        } else {
-            events.take(3).forEach { event ->
-                GoodsPocketListRow(
-                    title = event.title,
-                    subtitle = event.eventType.localizedLabel(),
-                    onClick = { onEventClick(event.id) },
-                    trailing = event.targetDate,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun RecentActivityCard(
-    activities: List<ActivityRecord>,
-    onCardClick: () -> Unit,
-    onActivityClick: (String) -> Unit,
-) {
-    GoodsPocketSectionCard(
-        onClick = onCardClick,
-        containerColor = MaterialTheme.colorScheme.surface,
-    ) {
-        GoodsPocketSectionHeader(
-            title = tr(Res.string.home_recent_activity),
-            subtitle = tr(Res.string.home_recent_activity_subtitle),
-        )
-        if (activities.isEmpty()) {
-            EmptyStateLine(tr(Res.string.home_no_recent_activity))
-        } else {
-            activities.take(4).forEach { activity ->
-                GoodsPocketListRow(
-                    title = activity.title,
-                    subtitle = activity.subtitle,
-                    onClick = { onActivityClick(activity.id) },
-                    trailing = activity.happenedAt,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun EmptyStateLine(text: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(top = 0.dp, bottom = 3.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = text,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            text = tr(Res.string.home_brand_title),
+            modifier = Modifier
+                .graphicsLayer(
+                    scaleX = 0.923f,
+                    scaleY = 1.125f,
+                    transformOrigin = TransformOrigin(0f, 1f),
+                )
+                .offset(x = (-1).dp, y = 4.dp),
+            style = MaterialTheme.typography.displayLarge.copy(
+                fontSize = HomeReferenceMetrics.BrandFontSize,
+                lineHeight = 26.sp,
+            ),
+            color = HomeOrange,
+            fontWeight = FontWeight.ExtraBold,
+        )
+        HomeBellButton(
+            onClick = onNotificationsClick,
         )
     }
+}
+
+@Composable
+private fun HomeBellButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .size(38.dp)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        HomeBellGlyph(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .graphicsLayer(
+                    scaleX = 1.125f,
+                    scaleY = 0.955f,
+                )
+                .offset(y = 1.5.dp),
+        )
+        Surface(
+            modifier = Modifier
+                .size(6.dp)
+                .align(Alignment.TopEnd)
+                .offset(x = (-3).dp, y = 10.dp),
+            shape = CircleShape,
+            color = HomeOrange,
+        ) {}
+    }
+}
+
+@Composable
+private fun HomeHeroCard(
+    onClick: () -> Unit,
+) {
+    Surface(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .offset(y = (-5).dp)
+            .height(120.dp),
+        shape = RoundedCornerShape(18.dp),
+        color = HomeHeroSurface,
+        contentColor = HomeInk,
+        shadowElevation = 0.dp,
+        border = BorderStroke(1.dp, HomeCardBorder),
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            HomeDeskShelfIllustration(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 6.dp, bottom = 6.dp)
+                    .width(158.dp)
+                    .height(94.dp),
+            )
+            Column(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .padding(start = 18.dp, end = 126.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(
+                    text = tr(Res.string.home_hero_title),
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontSize = 15.sp,
+                        lineHeight = 20.sp,
+                    ),
+                    color = HomeInk,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = tr(Res.string.home_hero_body),
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontSize = 12.sp,
+                        lineHeight = 19.sp,
+                    ),
+                    color = HomeMuted,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun HomeTodaySummaryCard(
+    dashboardSummary: HomeSummary,
+    onPreordersClick: () -> Unit,
+) {
+    HomeWhiteCard(
+        modifier = Modifier
+            .offset(y = (-5).dp)
+            .height(98.dp),
+        contentPadding = 0.dp,
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Text(
+                text = tr(Res.string.home_today_summary_title),
+                modifier = Modifier.padding(start = 13.dp, top = 10.dp),
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontSize = HomeReferenceMetrics.SummaryTitleFontSize,
+                    lineHeight = 17.sp,
+                ),
+                color = HomeInk,
+                fontWeight = FontWeight.Bold,
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                val totalCount = dashboardSummary.ownedItemCount + dashboardSummary.activePreorderCount
+                HomeCollectionMetric(
+                    label = tr(Res.string.home_summary_total_goods),
+                    value = totalCount.toString(),
+                    color = HomeInk,
+                    modifier = Modifier.weight(1f),
+                )
+                HomeMetricDivider()
+                HomeCollectionMetric(
+                    label = tr(Res.string.home_summary_owned),
+                    value = dashboardSummary.ownedItemCount.toString(),
+                    color = HomeGreen,
+                    modifier = Modifier.weight(1f),
+                )
+                HomeMetricDivider()
+                HomeCollectionMetric(
+                    label = tr(Res.string.home_summary_wishlist),
+                    value = dashboardSummary.activePreorderCount.toString(),
+                    color = HomePurple,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable(onClick = onPreordersClick),
+                )
+                HomeMetricDivider()
+                HomeCollectionMetric(
+                    label = tr(Res.string.home_summary_sale),
+                    value = "0",
+                    color = HomeWarning,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+internal fun HomeWhiteCard(
+    modifier: Modifier = Modifier,
+    contentPadding: androidx.compose.ui.unit.Dp = 16.dp,
+    containerColor: Color = HomeCardSurface,
+    onClick: (() -> Unit)? = null,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val cardContent: @Composable () -> Unit = {
+        Column(
+            modifier = Modifier.padding(contentPadding),
+            verticalArrangement = Arrangement.spacedBy(0.dp),
+            content = content,
+        )
+    }
+    if (onClick != null) {
+        Surface(
+            onClick = onClick,
+            modifier = modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            color = containerColor,
+            contentColor = HomeInk,
+            shadowElevation = HomeReferenceMetrics.CardShadowElevation,
+            border = BorderStroke(1.dp, HomeCardBorder),
+            content = cardContent,
+        )
+    } else {
+        Surface(
+            modifier = modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            color = containerColor,
+            contentColor = HomeInk,
+            shadowElevation = HomeReferenceMetrics.CardShadowElevation,
+            border = BorderStroke(1.dp, HomeCardBorder),
+            content = cardContent,
+        )
+    }
+}
+
+@Composable
+internal fun HomeCollectionMetric(
+    label: String,
+    value: String,
+    color: Color,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.padding(vertical = 0.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(5.dp),
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelLarge.copy(
+                fontSize = 10.sp,
+                lineHeight = 14.sp,
+            ),
+            color = HomeMuted,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.headlineMedium.copy(
+                fontSize = 20.sp,
+                lineHeight = 24.sp,
+            ),
+            color = color,
+            fontWeight = FontWeight.Bold,
+        )
+    }
+}
+
+@Composable
+internal fun HomeMetricDivider() {
+    Spacer(
+        modifier = Modifier
+            .width(1.dp)
+            .height(40.dp)
+            .background(HomeCardBorder),
+    )
 }

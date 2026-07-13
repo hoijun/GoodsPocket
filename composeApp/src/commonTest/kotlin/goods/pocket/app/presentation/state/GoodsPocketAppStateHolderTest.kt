@@ -2,28 +2,22 @@ package goods.pocket.app.presentation.state
 
 import goods.pocket.app.data.InMemoryGoodsPocketRepository
 import goods.pocket.app.domain.model.CollectionEntryStatus
+import goods.pocket.app.domain.model.AppPreference
 import goods.pocket.app.domain.model.EventType
-import goods.pocket.app.domain.model.ItemStatus
-import goods.pocket.app.domain.model.PreorderStatus
 import goods.pocket.app.presentation.navigation.AppDestination
-import goods.pocket.app.domain.usecase.CancelPreorderUseCase
-import goods.pocket.app.domain.usecase.DeleteCollectionItemUseCase
-import goods.pocket.app.domain.usecase.DeleteEventUseCase
-import goods.pocket.app.domain.usecase.GetAppPreferencesUseCase
-import goods.pocket.app.domain.usecase.GetCollectionItemsUseCase
 import goods.pocket.app.domain.usecase.GetDashboardSummaryUseCase
-import goods.pocket.app.domain.usecase.GetEventListUseCase
-import goods.pocket.app.domain.usecase.GetPreorderListUseCase
 import goods.pocket.app.domain.usecase.GetRecentActivitiesUseCase
-import goods.pocket.app.domain.usecase.GetStorageLocationsUseCase
-import goods.pocket.app.domain.usecase.GetUpcomingEventsUseCase
 import goods.pocket.app.domain.usecase.MarkPreorderReceivedUseCase
-import goods.pocket.app.domain.usecase.SaveCollectionItemUseCase
-import goods.pocket.app.domain.usecase.SaveEventUseCase
-import goods.pocket.app.domain.usecase.SavePreorderUseCase
-import goods.pocket.app.domain.usecase.UpdateAppPreferencesUseCase
+import goods.pocket.app.domain.usecase.RECEIVED_ITEM_CATEGORY_CODE
+import goods.pocket.app.domain.service.AppClock
+import goods.pocket.app.domain.service.IdGenerator
+import goods.pocket.app.domain.repository.SettingsRepository
+import goods.pocket.app.domain.repository.CollectionRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -59,11 +53,12 @@ class GoodsPocketAppStateHolderTest {
     }
 
     @Test
-    fun `primary destinations expose my instead of transactions`() {
+    fun `primary destinations expose image locked bottom tabs`() {
         assertEquals(
             listOf(
                 AppDestination.Home,
                 AppDestination.Collection,
+                AppDestination.Events,
                 AppDestination.My,
             ),
             AppDestination.primaryDestinations,
@@ -101,7 +96,6 @@ class GoodsPocketAppStateHolderTest {
 
         assertEquals("로컬 프로필", myPage.displayName)
         assertEquals("연결되지 않음", myPage.syncStatusLabel)
-        assertTrue(myPage.notificationsEnabled)
         assertEquals(2, myPage.ownedItemCount)
         assertEquals(2, myPage.activePreorderCount)
         assertEquals(106_000L, myPage.monthlySpend)
@@ -129,13 +123,13 @@ class GoodsPocketAppStateHolderTest {
     }
 
     @Test
-    fun `my still provides access to secondary screens`() {
+    fun `events overview is a primary destination`() {
         val stateHolder = newStateHolder()
 
         stateHolder.selectDestination(AppDestination.My)
         stateHolder.openEventsOverview()
         assertEquals(AppDestination.Events, stateHolder.state.value.currentDestination)
-        assertEquals(AppDestination.My, stateHolder.state.value.selectedPrimaryDestination)
+        assertEquals(AppDestination.Events, stateHolder.state.value.selectedPrimaryDestination)
     }
 
     @Test
@@ -156,7 +150,7 @@ class GoodsPocketAppStateHolderTest {
         )
 
         val after = stateHolder.state.value
-        assertEquals(before.collectionItems.size + 1, after.collectionItems.size)
+        assertEquals(before.collectionEntries.size + 1, after.collectionEntries.size)
         assertEquals(before.homeSummary.ownedItemCount + 1, after.homeSummary.ownedItemCount)
         assertEquals(AppDestination.Collection.route, after.currentDestination.route)
         assertEquals(ActiveDetail.CollectionEntryDetail::class, after.activeDetail!!::class)
@@ -194,10 +188,10 @@ class GoodsPocketAppStateHolderTest {
             note = "정리 후보",
         )
 
-        val updatedItem = stateHolder.state.value.collectionItems.first { it.id == "item-1" }
+        val updatedItem = stateHolder.state.value.collectionEntries.first { it.id == "item-1" }
         assertEquals("Updated Acrylic Stand", updatedItem.name)
         assertEquals("Figure", updatedItem.category)
-        assertEquals(ItemStatus.PLANNED_CLEANUP, updatedItem.status)
+        assertEquals(CollectionEntryStatus.PLANNED_CLEANUP, updatedItem.status)
         assertEquals("Animate International", updatedItem.purchaseStore)
         assertEquals(ActiveDetail.CollectionEntryDetail("item-1"), stateHolder.state.value.activeDetail)
     }
@@ -211,50 +205,27 @@ class GoodsPocketAppStateHolderTest {
 
         stateHolder.confirmPendingDelete()
 
-        val preorder = stateHolder.state.value.preorders.first { it.id == "pre-1" }
-        assertEquals(PreorderStatus.CANCELED, preorder.status)
+        assertNull(stateHolder.state.value.collectionEntries.firstOrNull { it.id == "pre-1" })
         assertNull(stateHolder.state.value.pendingDelete)
         assertNull(stateHolder.state.value.activeDetail)
     }
 
     @Test
-    fun collectionQueryFiltersItems() {
-        val stateHolder = newStateHolder()
+    fun `collection query is presentation state and does not reload the repository`() {
+        val repository = InMemoryGoodsPocketRepository()
+        val collectionRepository = CountingCollectionRepository(repository)
+        val stateHolder = newStateHolder(
+            repository = repository,
+            collectionRepository = collectionRepository,
+        )
+        val loadCount = collectionRepository.getEntriesCount
+        val entries = stateHolder.state.value.collectionEntries
 
         stateHolder.updateCollectionQuery("블루 아카이브")
 
-        val items = stateHolder.state.value.collectionItems
-        assertEquals(1, items.size)
-        assertEquals("item-2", items.first().id)
-    }
-
-    @Test
-    fun collectionStatusFilterDefaultsToOwned() {
-        val stateHolder = newStateHolder()
-
-        assertEquals(ItemStatus.OWNED, stateHolder.state.value.collectionStatusFilter)
-    }
-
-    @Test
-    fun collectionStatusFilterCanBeUpdatedIndependentlyFromSearchQuery() {
-        val stateHolder = newStateHolder()
-
-        stateHolder.updateCollectionStatusFilter(ItemStatus.PLANNED_CLEANUP)
-        stateHolder.updateCollectionQuery("스이세이")
-
-        assertEquals(ItemStatus.PLANNED_CLEANUP, stateHolder.state.value.collectionStatusFilter)
-        assertEquals("스이세이", stateHolder.state.value.collectionQuery)
-    }
-
-    @Test
-    fun preorderStatusFilterLimitsVisibleList() {
-        val stateHolder = newStateHolder()
-
-        stateHolder.updatePreorderStatusFilter(PreorderStatus.PAYMENT_PENDING)
-
-        val preorders = stateHolder.state.value.preorders
-        assertEquals(1, preorders.size)
-        assertEquals("pre-2", preorders.first().id)
+        assertEquals("블루 아카이브", stateHolder.state.value.collectionQuery)
+        assertEquals(entries, stateHolder.state.value.collectionEntries)
+        assertEquals(loadCount, collectionRepository.getEntriesCount)
     }
 
     @Test
@@ -265,12 +236,12 @@ class GoodsPocketAppStateHolderTest {
         stateHolder.markCollectionEntryReceived("pre-1")
 
         val after = stateHolder.state.value
-        val receivedItem = after.collectionItems.first { it.id == "pre-1" }
+        val receivedItem = after.collectionEntries.first { it.id == "pre-1" }
         assertEquals(before.homeSummary.ownedItemCount + 1, after.homeSummary.ownedItemCount)
         assertEquals(AppDestination.Collection.route, after.currentDestination.route)
         assertEquals(ActiveDetail.CollectionEntryDetail::class, after.activeDetail!!::class)
-        assertEquals("예약 굿즈", receivedItem.category)
-        assertEquals(ItemStatus.OWNED, receivedItem.status)
+        assertEquals(RECEIVED_ITEM_CATEGORY_CODE, receivedItem.category)
+        assertEquals(CollectionEntryStatus.OWNED, receivedItem.status)
     }
 
     @Test
@@ -285,26 +256,82 @@ class GoodsPocketAppStateHolderTest {
         assertEquals("컬렉션 굿즈 추가", recentActivities[2].subtitle)
     }
 
+    @Test
+    fun `failed initial load exposes a retryable failure and retry recovers`() {
+        val repository = InMemoryGoodsPocketRepository()
+        val settingsRepository = RecoveringSettingsRepository(repository)
+        val stateHolder = newStateHolder(
+            repository = repository,
+            settingsRepository = settingsRepository,
+        )
+
+        assertEquals(GoodsPocketOperation.LOAD, stateHolder.state.value.failure?.operation)
+
+        settingsRepository.shouldFail = false
+        stateHolder.retry()
+
+        assertFalse(stateHolder.state.value.isLoading)
+        assertNull(stateHolder.state.value.failure)
+        assertEquals(2, stateHolder.state.value.homeSummary.ownedItemCount)
+    }
+
     private fun newStateHolder(
         repository: InMemoryGoodsPocketRepository = InMemoryGoodsPocketRepository(),
+        collectionRepository: CollectionRepository = repository,
+        settingsRepository: SettingsRepository = repository,
     ): GoodsPocketAppStateHolder {
         return GoodsPocketAppStateHolder(
-            getCollectionItemsUseCase = GetCollectionItemsUseCase(repository),
-            getAppPreferencesUseCase = GetAppPreferencesUseCase(repository),
-            getDashboardSummaryUseCase = GetDashboardSummaryUseCase(repository, repository),
-            getEventListUseCase = GetEventListUseCase(repository),
-            getPreorderListUseCase = GetPreorderListUseCase(repository),
-            getRecentActivitiesUseCase = GetRecentActivitiesUseCase(repository, repository),
-            getStorageLocationsUseCase = GetStorageLocationsUseCase(repository),
-            getUpcomingEventsUseCase = GetUpcomingEventsUseCase(repository),
-            cancelPreorderUseCase = CancelPreorderUseCase(repository),
-            deleteCollectionItemUseCase = DeleteCollectionItemUseCase(repository),
-            deleteEventUseCase = DeleteEventUseCase(repository),
-            markPreorderReceivedUseCase = MarkPreorderReceivedUseCase(repository, repository),
-            saveCollectionItemUseCase = SaveCollectionItemUseCase(repository),
-            saveEventUseCase = SaveEventUseCase(repository),
-            savePreorderUseCase = SavePreorderUseCase(repository),
-            updateAppPreferencesUseCase = UpdateAppPreferencesUseCase(repository),
+            collectionRepository = collectionRepository,
+            preorderRepository = repository,
+            eventRepository = repository,
+            settingsRepository = settingsRepository,
+            contentLoader = GoodsPocketContentLoader(
+                collectionRepository = collectionRepository,
+                eventRepository = repository,
+                settingsRepository = settingsRepository,
+                getDashboardSummaryUseCase = GetDashboardSummaryUseCase(collectionRepository, repository),
+                getRecentActivitiesUseCase = GetRecentActivitiesUseCase(collectionRepository, repository),
+                clock = StateHolderTestClock,
+            ),
+            markPreorderReceivedUseCase = MarkPreorderReceivedUseCase(collectionRepository, StateHolderTestClock),
+            clock = StateHolderTestClock,
+            idGenerator = StateHolderTestIds,
+            coroutineScope = CoroutineScope(Dispatchers.Unconfined),
         )
+    }
+}
+
+private class CountingCollectionRepository(
+    private val delegate: CollectionRepository,
+) : CollectionRepository by delegate {
+    var getEntriesCount: Int = 0
+
+    override suspend fun getEntries(filter: String?): List<goods.pocket.app.domain.model.CollectionEntry> {
+        getEntriesCount += 1
+        return delegate.getEntries(filter)
+    }
+}
+
+private class RecoveringSettingsRepository(
+    private val delegate: SettingsRepository,
+) : SettingsRepository by delegate {
+    var shouldFail: Boolean = true
+
+    override suspend fun getAppPreferences(): AppPreference {
+        if (shouldFail) error("Test load failure")
+        return delegate.getAppPreferences()
+    }
+}
+
+private object StateHolderTestClock : AppClock {
+    override fun currentDate(): String = "2026-03-15"
+}
+
+private object StateHolderTestIds : IdGenerator {
+    private var nextValue: Int = 0
+
+    override fun generate(prefix: String): String {
+        nextValue += 1
+        return "$prefix-test-$nextValue"
     }
 }

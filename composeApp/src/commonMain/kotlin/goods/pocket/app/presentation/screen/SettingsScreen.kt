@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import goods.pocket.app.domain.model.AppPreference
@@ -23,17 +24,24 @@ import goodspocket.composeapp.generated.resources.settings_language
 import goodspocket.composeapp.generated.resources.settings_language_english
 import goodspocket.composeapp.generated.resources.settings_language_korean
 import goodspocket.composeapp.generated.resources.settings_quick_preferences
+import goodspocket.composeapp.generated.resources.action_back
 
 @Composable
 fun SettingsScreen(
     appPreferences: AppPreference,
     onLanguageChange: (String) -> Unit,
+    onBack: () -> Unit,
 ) {
     LazyColumn(
         modifier = goodsPocketScreenModifier(),
         contentPadding = goodsPocketSecondaryScrollContentPadding(),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
+        item {
+            TextButton(onClick = onBack) {
+                Text(tr(Res.string.action_back))
+            }
+        }
         item {
             GoodsPocketSectionCard(containerColor = MaterialTheme.colorScheme.surface) {
                 GoodsPocketSectionHeader(

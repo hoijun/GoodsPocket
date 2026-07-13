@@ -24,7 +24,9 @@ import goods.pocket.app.domain.model.Event
 import goods.pocket.app.presentation.designsystem.GoodsPocketModalBottomSheet
 import goods.pocket.app.presentation.designsystem.GoodsPocketTonalBadge
 import goods.pocket.app.presentation.i18n.formatCurrency
+import goods.pocket.app.presentation.i18n.formatDate
 import goods.pocket.app.presentation.i18n.localizedLabel
+import goods.pocket.app.presentation.i18n.localizedCategory
 import goods.pocket.app.presentation.i18n.tr
 import goodspocket.composeapp.generated.resources.Res
 import goodspocket.composeapp.generated.resources.action_delete
@@ -60,7 +62,7 @@ fun CollectionEntryDetailSheet(
         onDismiss = onDismiss,
     ) {
         CollectionEntryDetailHero(entry = entry)
-        DetailLine(tr(Res.string.detail_category), entry.category)
+        DetailLine(tr(Res.string.detail_category), entry.localizedCategory())
         DetailLine(tr(Res.string.detail_status), entry.status.localizedLabel())
         DetailLine(tr(Res.string.detail_series), entry.seriesName ?: tr(Res.string.common_unknown))
         DetailLine(tr(Res.string.detail_character), entry.characterName ?: tr(Res.string.common_unknown))
@@ -72,7 +74,7 @@ fun CollectionEntryDetailSheet(
                 )
                 DetailLine(
                     tr(Res.string.detail_release_date),
-                    entry.releaseDate ?: tr(Res.string.common_not_set),
+                    entry.releaseDate?.let { formatDate(it) } ?: tr(Res.string.common_not_set),
                 )
             }
 
@@ -85,7 +87,7 @@ fun CollectionEntryDetailSheet(
                 )
                 DetailLine(
                     tr(Res.string.detail_purchase_date),
-                    entry.purchaseDate ?: tr(Res.string.common_not_set),
+                    entry.purchaseDate?.let { formatDate(it) } ?: tr(Res.string.common_not_set),
                 )
                 DetailLine(
                     tr(Res.string.detail_purchase_price),
@@ -180,7 +182,7 @@ fun EventDetailSheet(
         onDismiss = onDismiss,
     ) {
         DetailLine(tr(Res.string.detail_type), event.eventType.localizedLabel())
-        DetailLine(tr(Res.string.detail_target_date), event.targetDate)
+        DetailLine(tr(Res.string.detail_target_date), formatDate(event.targetDate))
         DetailLine(tr(Res.string.detail_related_preorder), event.relatedPreorderId ?: tr(Res.string.common_not_set))
         DetailLine(tr(Res.string.detail_related_item), event.relatedItemId ?: tr(Res.string.common_not_set))
         DetailLine(tr(Res.string.detail_location), event.locationOrStore ?: tr(Res.string.common_unknown))

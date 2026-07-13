@@ -15,11 +15,11 @@ import androidx.compose.ui.unit.sp
 
 private val LightColors = buildGoodsPocketLightScheme()
 private val GoodsPocketShapes = Shapes(
-    extraSmall = RoundedCornerShape(12.dp),
-    small = RoundedCornerShape(16.dp),
-    medium = RoundedCornerShape(22.dp),
-    large = RoundedCornerShape(26.dp),
-    extraLarge = RoundedCornerShape(28.dp),
+    extraSmall = RoundedCornerShape(10.dp),
+    small = RoundedCornerShape(14.dp),
+    medium = RoundedCornerShape(16.dp),
+    large = RoundedCornerShape(24.dp),
+    extraLarge = RoundedCornerShape(30.dp),
 )
 
 private val GoodsPocketTypography = Typography(
@@ -107,7 +107,7 @@ private fun buildGoodsPocketLightScheme(): ColorScheme {
         onBackground = colorOf(GoodsPocketVisualTokens.Ink),
         surface = colorOf(GoodsPocketVisualTokens.Surface),
         onSurface = colorOf(GoodsPocketVisualTokens.Ink),
-        surfaceContainer = colorOf(0xFFF5EDF4L),
+        surfaceContainer = colorOf(GoodsPocketVisualTokens.SurfaceLow),
         surfaceContainerLow = colorOf(GoodsPocketVisualTokens.SurfaceLow),
         surfaceContainerHigh = colorOf(GoodsPocketVisualTokens.SurfaceHigh),
         surfaceContainerHighest = colorOf(GoodsPocketVisualTokens.SurfaceTint),
@@ -116,17 +116,17 @@ private fun buildGoodsPocketLightScheme(): ColorScheme {
         outline = colorOf(GoodsPocketVisualTokens.Outline),
         outlineVariant = colorOf(GoodsPocketVisualTokens.Outline),
         secondary = colorOf(GoodsPocketVisualTokens.Secondary),
-        onSecondary = colorOf(0xFF173B35L),
+        onSecondary = colorOf(0xFF0F3B2AL),
         secondaryContainer = colorOf(GoodsPocketVisualTokens.SecondaryContainer),
-        onSecondaryContainer = colorOf(0xFF173B35L),
+        onSecondaryContainer = colorOf(0xFF0F3B2AL),
         tertiary = colorOf(GoodsPocketVisualTokens.Tertiary),
-        onTertiary = colorOf(0xFF4F3A00L),
+        onTertiary = colorOf(0xFFFFFFFFL),
         tertiaryContainer = colorOf(GoodsPocketVisualTokens.TertiaryContainer),
-        onTertiaryContainer = colorOf(0xFF5E4600L),
+        onTertiaryContainer = colorOf(0xFF352260L),
         error = colorOf(GoodsPocketVisualTokens.Danger),
         onError = colorOf(0xFFFFFFFFL),
-        errorContainer = colorOf(0xFFFBE7EDL),
-        onErrorContainer = colorOf(0xFF6A3245L),
+        errorContainer = colorOf(GoodsPocketVisualTokens.PrimaryContainer),
+        onErrorContainer = colorOf(GoodsPocketVisualTokens.Ink),
     )
 }
 

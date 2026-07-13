@@ -13,7 +13,7 @@ class GetRecentActivitiesUseCase(
     private val collectionRepository: CollectionRepository,
     private val preorderRepository: PreorderRepository,
 ) {
-    operator fun invoke(limit: Int, languageCode: String = DEFAULT_LANGUAGE_CODE): List<ActivityRecord> {
+    suspend operator fun invoke(limit: Int, languageCode: String = DEFAULT_LANGUAGE_CODE): List<ActivityRecord> {
         val itemActivities = collectionRepository.getItems().map { it.toActivityRecord(languageCode) }
         val preorderActivities = preorderRepository.getPreorders().map { it.toActivityRecord(languageCode) }
         return (itemActivities + preorderActivities)

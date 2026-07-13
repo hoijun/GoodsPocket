@@ -10,157 +10,140 @@ import goods.pocket.app.domain.model.Item
 import goods.pocket.app.domain.model.ItemStatus
 import goods.pocket.app.domain.model.Preorder
 import goods.pocket.app.domain.model.PreorderStatus
-import goods.pocket.app.domain.model.StorageLocation
+import goods.pocket.app.domain.model.RESERVED_COLLECTION_CATEGORY_CODE
 import goods.pocket.app.domain.repository.CollectionRepository
 import goods.pocket.app.domain.repository.EventRepository
 import goods.pocket.app.domain.repository.PreorderRepository
 import goods.pocket.app.domain.repository.SettingsRepository
 
 class GoodsPocketRepository(
-    private val localDataSource: GoodsPocketLocalDataSource,
+    localDataSource: GoodsPocketLocalDataSource,
 ) : CollectionRepository,
     PreorderRepository,
     EventRepository,
     SettingsRepository {
+    private val localDataSource = RepositoryLocalDataSource(localDataSource)
 
-    override fun getEntries(filter: String?): List<CollectionEntry> {
-        val items = localDataSource.getItems(filter).map(Item::toCollectionEntry)
-        val preorders = localDataSource.getPreorders().mapNotNull(Preorder::toCollectionEntryOrNull)
+    override suspend fun getEntries(filter: String?): List<CollectionEntry> {
+        val items = localDataSource.getItems(filter).map { it.toDomain().toCollectionEntry() }
+        val preorders = localDataSource.getPreorders().mapNotNull { it.toDomain().toCollectionEntryOrNull() }
         return (items + preorders)
             .sortedWith(compareByDescending<CollectionEntry> { it.updatedAt }.thenByDescending { it.createdAt })
     }
 
-    override fun getEntry(id: String): CollectionEntry? {
+    override suspend fun getEntry(id: String): CollectionEntry? {
         localDataSource.getItem(id)?.let { item ->
-            return item.toCollectionEntry()
+            return item.toDomain().toCollectionEntry()
         }
-        return localDataSource.getPreorder(id)?.toCollectionEntryOrNull()
+        return localDataSource.getPreorder(id)?.toDomain()?.toCollectionEntryOrNull()
     }
 
-    override fun saveEntry(entry: CollectionEntry) {
-        when (entry.status) {
+    override suspend fun saveEntry(entry: CollectionEntry) {
+        val item = when (entry.status) {
             CollectionEntryStatus.RESERVED -> {
-                localDataSource.upsertPreorder(
-                    Preorder(
-                        id = entry.id,
-                        name = entry.name,
-                        storeName = entry.reservationStore ?: entry.purchaseStore.orEmpty(),
-                        releaseDate = entry.releaseDate ?: entry.updatedAt,
-                        status = PreorderStatus.ACTIVE,
-                        seriesName = entry.seriesName,
-                        characterName = entry.characterName,
-                        totalPrice = entry.purchasePrice,
-                        note = entry.note,
-                        createdAt = entry.createdAt,
-                        updatedAt = entry.updatedAt,
-                    ),
-                )
+                null
             }
 
             CollectionEntryStatus.OWNED,
             CollectionEntryStatus.PLANNED_CLEANUP,
             -> {
-                localDataSource.upsertItem(
-                    Item(
-                        id = entry.id,
-                        name = entry.name,
-                        category = entry.category,
-                        status = entry.status.toItemStatus(),
-                        seriesName = entry.seriesName,
-                        characterName = entry.characterName,
-                        quantity = entry.quantity,
-                        purchasePrice = entry.purchasePrice,
-                        purchaseDate = entry.purchaseDate,
-                        purchaseStore = entry.purchaseStore,
-                        storageLocationId = entry.storageLocationId,
-                        note = entry.note,
-                        createdAt = entry.createdAt,
-                        updatedAt = entry.updatedAt,
-                    ),
-                )
+                Item(
+                    id = entry.id,
+                    name = entry.name,
+                    category = entry.category,
+                    status = entry.status.toItemStatus(),
+                    seriesName = entry.seriesName,
+                    characterName = entry.characterName,
+                    quantity = entry.quantity,
+                    purchasePrice = entry.purchasePrice,
+                    purchaseDate = entry.purchaseDate,
+                    purchaseStore = entry.purchaseStore,
+                    storageLocationId = entry.storageLocationId,
+                    note = entry.note,
+                    createdAt = entry.createdAt,
+                    updatedAt = entry.updatedAt,
+                ).toLocal()
+            }
+        }
+        val preorder = if (entry.status == CollectionEntryStatus.RESERVED) {
+            Preorder(
+                id = entry.id,
+                name = entry.name,
+                storeName = entry.reservationStore ?: entry.purchaseStore.orEmpty(),
+                releaseDate = entry.releaseDate ?: entry.updatedAt,
+                status = PreorderStatus.ACTIVE,
+                seriesName = entry.seriesName,
+                characterName = entry.characterName,
+                totalPrice = entry.purchasePrice,
+                note = entry.note,
+                createdAt = entry.createdAt,
+                updatedAt = entry.updatedAt,
+            ).toLocal()
+        } else {
+            null
+        }
+        localDataSource.saveCollectionEntry(
+            item = item,
+            preorder = preorder,
+            changedAt = entry.updatedAt,
+        )
+    }
+
+    override suspend fun deleteEntry(id: String, deletedAt: String) {
+        when {
+            localDataSource.getItem(id) != null -> localDataSource.deleteItem(id)
+            localDataSource.getPreorder(id) != null -> {
+                localDataSource.cancelPreorder(id, canceledAt = deletedAt)
             }
         }
     }
 
-    override fun deleteEntry(id: String) {
-        when {
-            localDataSource.getItem(id) != null -> localDataSource.deleteItem(id)
-            localDataSource.getPreorder(id) != null -> localDataSource.cancelPreorder(id)
-        }
+    override suspend fun receiveReservedEntry(
+        preorderId: String,
+        receivedItem: Item,
+        receivedAt: String,
+    ) {
+        localDataSource.replacePreorderWithItem(
+            preorderId = preorderId,
+            item = receivedItem.toLocal(),
+            receivedAt = receivedAt,
+        )
     }
 
-    override fun markEntryReceived(id: String, receivedAt: String) {
-        if (localDataSource.getPreorder(id) != null) {
-            localDataSource.markAsReceived(preorderId = id, receiveDate = receivedAt)
-        }
+    override suspend fun getItems(filter: String?): List<Item> = localDataSource.getItems(filter).map { it.toDomain() }
+
+    override suspend fun countOwnedItems(): Int = localDataSource.countOwnedItems()
+
+    override suspend fun getPreorders(status: PreorderStatus?): List<Preorder> {
+        return localDataSource.getPreorders(status?.name).map { it.toDomain() }
     }
 
-    override fun countOwnedEntries(): Int {
-        val receivedPreorders = localDataSource.getPreorders()
-            .count { it.status == PreorderStatus.RECEIVED }
-        return localDataSource.countOwnedItems() + receivedPreorders
+    override suspend fun cancelPreorder(preorderId: String, canceledAt: String) {
+        localDataSource.cancelPreorder(preorderId, canceledAt)
     }
 
-    override fun countReservedEntries(): Int = localDataSource.countActivePreorders()
+    override suspend fun countActivePreorders(): Int = localDataSource.countActivePreorders()
 
-    override fun getItems(filter: String?): List<Item> = localDataSource.getItems(filter)
-
-    override fun getItem(id: String): Item? = localDataSource.getItem(id)
-
-    override fun saveItem(item: Item) {
-        localDataSource.upsertItem(item)
+    override suspend fun getUpcomingEvents(limit: Int): List<Event> {
+        return localDataSource.getUpcomingEvents(limit).map { it.toDomain() }
     }
 
-    override fun deleteItem(id: String) {
-        localDataSource.deleteItem(id)
+    override suspend fun getEvents(type: EventType?): List<Event> {
+        return localDataSource.getEvents(type?.name).map { it.toDomain() }
     }
 
-    override fun countOwnedItems(): Int = localDataSource.countOwnedItems()
-
-    override fun getPreorders(status: PreorderStatus?): List<Preorder> = localDataSource.getPreorders(status)
-
-    override fun getPreorder(id: String): Preorder? = localDataSource.getPreorder(id)
-
-    override fun savePreorder(preorder: Preorder) {
-        localDataSource.upsertPreorder(preorder)
+    override suspend fun saveEvent(event: Event) {
+        localDataSource.upsertEvent(event.toLocal())
     }
 
-    override fun markAsReceived(preorderId: String, receiveDate: String) {
-        localDataSource.markAsReceived(preorderId, receiveDate)
-    }
-
-    override fun cancelPreorder(preorderId: String) {
-        localDataSource.cancelPreorder(preorderId)
-    }
-
-    override fun countActivePreorders(): Int = localDataSource.countActivePreorders()
-
-    override fun getUpcomingEvents(limit: Int): List<Event> = localDataSource.getUpcomingEvents(limit)
-
-    override fun getEvents(type: EventType?): List<Event> = localDataSource.getEvents(type)
-
-    override fun saveEvent(event: Event) {
-        localDataSource.upsertEvent(event)
-    }
-
-    override fun deleteEvent(id: String) {
+    override suspend fun deleteEvent(id: String) {
         localDataSource.deleteEvent(id)
     }
 
-    override fun getStorageLocations(): List<StorageLocation> = localDataSource.getStorageLocations()
+    override suspend fun getAppPreferences(): AppPreference = localDataSource.getAppPreferences().toDomain()
 
-    override fun saveStorageLocation(location: StorageLocation) {
-        localDataSource.upsertStorageLocation(location)
-    }
-
-    override fun deleteStorageLocation(id: String) {
-        localDataSource.deleteStorageLocation(id)
-    }
-
-    override fun getAppPreferences(): AppPreference = localDataSource.getAppPreferences()
-
-    override fun updateAppPreferences(preferences: AppPreference) {
-        localDataSource.updateAppPreferences(preferences)
+    override suspend fun updateAppPreferences(preferences: AppPreference) {
+        localDataSource.updateAppPreferences(preferences.toLocal())
     }
 }
 
@@ -191,7 +174,7 @@ private fun Preorder.toCollectionEntryOrNull(): CollectionEntry? {
     return CollectionEntry(
         id = id,
         name = name,
-        category = "예약 굿즈",
+        category = RESERVED_COLLECTION_CATEGORY_CODE,
         status = status.toCollectionEntryStatus(),
         seriesName = seriesName,
         characterName = characterName,

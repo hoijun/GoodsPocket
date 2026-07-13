@@ -1,36 +1,44 @@
 package goods.pocket.app.data.local
 
-import goods.pocket.app.domain.model.AppPreference
-import goods.pocket.app.domain.model.Event
-import goods.pocket.app.domain.model.EventType
-import goods.pocket.app.domain.model.Item
-import goods.pocket.app.domain.model.Preorder
-import goods.pocket.app.domain.model.PreorderStatus
-import goods.pocket.app.domain.model.StorageLocation
+import goods.pocket.app.data.local.model.LocalAppPreferenceRecord
+import goods.pocket.app.data.local.model.LocalEventRecord
+import goods.pocket.app.data.local.model.LocalItemRecord
+import goods.pocket.app.data.local.model.LocalPreorderRecord
+import goods.pocket.app.data.local.model.LocalStorageLocationRecord
 
 interface GoodsPocketLocalDataSource {
-    fun getItems(filter: String? = null): List<Item>
-    fun getItem(id: String): Item?
-    fun upsertItem(item: Item)
+    fun getItems(filter: String? = null): List<LocalItemRecord>
+    fun getItem(id: String): LocalItemRecord?
+    fun upsertItem(item: LocalItemRecord)
     fun deleteItem(id: String)
     fun countOwnedItems(): Int
 
-    fun getPreorders(status: PreorderStatus? = null): List<Preorder>
-    fun getPreorder(id: String): Preorder?
-    fun upsertPreorder(preorder: Preorder)
+    fun getPreorders(status: String? = null): List<LocalPreorderRecord>
+    fun getPreorder(id: String): LocalPreorderRecord?
+    fun upsertPreorder(preorder: LocalPreorderRecord)
+    fun saveCollectionEntry(
+        item: LocalItemRecord?,
+        preorder: LocalPreorderRecord?,
+        changedAt: String,
+    )
     fun markAsReceived(preorderId: String, receiveDate: String)
-    fun cancelPreorder(preorderId: String)
+    fun cancelPreorder(preorderId: String, canceledAt: String)
+    fun replacePreorderWithItem(
+        preorderId: String,
+        item: LocalItemRecord,
+        receivedAt: String,
+    )
     fun countActivePreorders(): Int
 
-    fun getUpcomingEvents(limit: Int): List<Event>
-    fun getEvents(type: EventType? = null): List<Event>
-    fun upsertEvent(event: Event)
+    fun getUpcomingEvents(limit: Int): List<LocalEventRecord>
+    fun getEvents(type: String? = null): List<LocalEventRecord>
+    fun upsertEvent(event: LocalEventRecord)
     fun deleteEvent(id: String)
 
-    fun getStorageLocations(): List<StorageLocation>
-    fun upsertStorageLocation(location: StorageLocation)
+    fun getStorageLocations(): List<LocalStorageLocationRecord>
+    fun upsertStorageLocation(location: LocalStorageLocationRecord)
     fun deleteStorageLocation(id: String)
 
-    fun getAppPreferences(): AppPreference
-    fun updateAppPreferences(preferences: AppPreference)
+    fun getAppPreferences(): LocalAppPreferenceRecord
+    fun updateAppPreferences(preferences: LocalAppPreferenceRecord)
 }

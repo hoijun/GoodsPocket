@@ -24,6 +24,21 @@
     <string name="common_no_place">장소 없음</string>
     <string name="common_no_linked_place">연결된 장소 없음</string>
 
+    <string name="home_brand_title">GoodsPocket</string>
+    <string name="home_notification_label">알림</string>
+    <string name="home_hero_title">오늘도 즐거운 수집 생활! 🎁</string>
+    <string name="home_hero_body">새로운 굿즈와 추억을\n기록해보세요.</string>
+    <string name="home_today_summary_title">오늘의 수집 요약</string>
+    <string name="home_summary_total_goods">전체 굿즈</string>
+    <string name="home_summary_owned">보유</string>
+    <string name="home_summary_wishlist">희망</string>
+    <string name="home_summary_sale">판매</string>
+    <string name="home_view_all">전체 보기</string>
+    <string name="home_recent_goods_title">최근 추가한 굿즈</string>
+    <string name="home_monthly_spend_title">이번 달 지출 요약</string>
+    <string name="home_monthly_spend_basis">이번 달</string>
+    <string name="home_monthly_spend_change">지난 달 대비 +12%</string>
+    <string name="home_upcoming_schedule_title">다가오는 일정</string>
     <string name="home_monthly_overview">이번 달 요약</string>
     <string name="home_monthly_summary_hint">이번 달 요약을 확인하려면 탭하세요.</string>
     <string name="home_stat_owned">보유</string>
@@ -166,6 +181,8 @@
     <string name="collection_entry_status_reserved">예약중</string>
     <string name="collection_entry_status_owned">보유 중</string>
     <string name="collection_entry_status_planned_cleanup">정리 예정</string>
+    <string name="collection_category_reserved">예약 굿즈</string>
+    <string name="collection_category_goods">굿즈</string>
 
     <string name="item_status_owned">보유 중</string>
     <string name="item_status_planned_cleanup">정리 예정</string>
@@ -180,4 +197,6 @@
     <string name="event_type_payment_due">결제 마감</string>
     <string name="event_type_delivery">배송</string>
     <string name="event_type_offline_event">오프라인 행사</string>
+    <string name="error_operation_failed">작업을 완료하지 못했어요. 다시 시도해 주세요.</string>
+    <string name="action_retry">다시 시도</string>
 </resources>

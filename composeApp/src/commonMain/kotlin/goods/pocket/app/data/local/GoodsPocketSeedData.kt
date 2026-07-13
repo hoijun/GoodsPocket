@@ -1,24 +1,19 @@
 package goods.pocket.app.data.local
 
-import goods.pocket.app.domain.model.AppPreference
-import goods.pocket.app.domain.model.Event
-import goods.pocket.app.domain.model.EventType
-import goods.pocket.app.domain.model.Item
-import goods.pocket.app.domain.model.ItemStatus
-import goods.pocket.app.domain.model.Preorder
-import goods.pocket.app.domain.model.PreorderStatus
-import goods.pocket.app.domain.model.StorageLocation
+import goods.pocket.app.data.local.model.LocalAppPreferenceRecord
+import goods.pocket.app.data.local.model.LocalEventRecord
+import goods.pocket.app.data.local.model.LocalItemRecord
+import goods.pocket.app.data.local.model.LocalPreorderRecord
+import goods.pocket.app.data.local.model.LocalStorageLocationRecord
 
 internal object GoodsPocketSeedData {
-    const val defaultTimestamp = "2026-03-18"
-
-    val items: List<Item>
+    val items: List<LocalItemRecord>
         get() = listOf(
-            Item(
+            LocalItemRecord(
                 id = "item-1",
                 name = "호시마치 스이세이 아크릴 스탠드",
                 category = "아크릴 스탠드",
-                status = ItemStatus.OWNED,
+                status = "OWNED",
                 seriesName = "홀로라이브",
                 characterName = "스이세이",
                 purchasePrice = 18000,
@@ -28,11 +23,11 @@ internal object GoodsPocketSeedData {
                 createdAt = "2026-03-02",
                 updatedAt = "2026-03-02",
             ),
-            Item(
+            LocalItemRecord(
                 id = "item-2",
                 name = "블루 아카이브 아트북",
                 category = "도서",
-                status = ItemStatus.OWNED,
+                status = "OWNED",
                 seriesName = "블루 아카이브",
                 purchasePrice = 32000,
                 purchaseDate = "2026-03-06",
@@ -43,14 +38,14 @@ internal object GoodsPocketSeedData {
             ),
         )
 
-    val preorders: List<Preorder>
+    val preorders: List<LocalPreorderRecord>
         get() = listOf(
-            Preorder(
+            LocalPreorderRecord(
                 id = "pre-1",
                 name = "니지산지 애니버서리 배지 세트",
                 storeName = "애니플러스 샵",
                 releaseDate = "2026-03-28",
-                status = PreorderStatus.ACTIVE,
+                status = "ACTIVE",
                 totalPrice = 42000,
                 depositPrice = 10000,
                 remainingPrice = 32000,
@@ -59,12 +54,12 @@ internal object GoodsPocketSeedData {
                 createdAt = "2026-02-25",
                 updatedAt = "2026-03-10",
             ),
-            Preorder(
+            LocalPreorderRecord(
                 id = "pre-2",
                 name = "프로젝트 세카이 한정 태피스트리",
                 storeName = "멜론북스",
                 releaseDate = "2026-04-11",
-                status = PreorderStatus.PAYMENT_PENDING,
+                status = "PAYMENT_PENDING",
                 totalPrice = 56000,
                 depositPrice = 20000,
                 remainingPrice = 36000,
@@ -75,32 +70,32 @@ internal object GoodsPocketSeedData {
             ),
         )
 
-    val events: List<Event>
+    val events: List<LocalEventRecord>
         get() = listOf(
-            Event(
+            LocalEventRecord(
                 id = "event-1",
                 title = "니지산지 잔금 결제",
-                eventType = EventType.PAYMENT_DUE,
+                eventType = "PAYMENT_DUE",
                 targetDate = "2026-03-20",
                 relatedPreorderId = "pre-1",
                 locationOrStore = "애니플러스 샵",
                 createdAt = "2026-03-10",
                 updatedAt = "2026-03-10",
             ),
-            Event(
+            LocalEventRecord(
                 id = "event-2",
                 title = "니지산지 발매일",
-                eventType = EventType.RELEASE,
+                eventType = "RELEASE",
                 targetDate = "2026-03-28",
                 relatedPreorderId = "pre-1",
                 locationOrStore = "애니플러스 샵",
                 createdAt = "2026-03-10",
                 updatedAt = "2026-03-10",
             ),
-            Event(
+            LocalEventRecord(
                 id = "event-3",
                 title = "프로젝트 세카이 잔금 결제",
-                eventType = EventType.PAYMENT_DUE,
+                eventType = "PAYMENT_DUE",
                 targetDate = "2026-03-22",
                 relatedPreorderId = "pre-2",
                 locationOrStore = "멜론북스",
@@ -109,20 +104,20 @@ internal object GoodsPocketSeedData {
             ),
         )
 
-    val storageLocations: List<StorageLocation>
+    val storageLocations: List<LocalStorageLocationRecord>
         get() = listOf(
-            StorageLocation(
+            LocalStorageLocationRecord(
                 id = "loc-1",
                 name = "유리 장식장",
                 createdAt = "2026-02-01",
             ),
-            StorageLocation(
+            LocalStorageLocationRecord(
                 id = "loc-2",
                 name = "책장",
                 createdAt = "2026-02-05",
             ),
         )
 
-    val appPreferences: AppPreference
-        get() = AppPreference()
+    val appPreferences: LocalAppPreferenceRecord
+        get() = LocalAppPreferenceRecord()
 }

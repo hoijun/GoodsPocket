@@ -14,6 +14,7 @@ sealed class AppDestination(
             get() = listOf(
                 Home,
                 Collection,
+                Events,
                 My,
             )
     }

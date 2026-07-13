@@ -4,17 +4,15 @@ import goods.pocket.app.domain.model.CollectionEntry
 import goods.pocket.app.domain.model.Item
 
 interface CollectionRepository {
-    fun getEntries(filter: String? = null): List<CollectionEntry>
-    fun getEntry(id: String): CollectionEntry?
-    fun saveEntry(entry: CollectionEntry)
-    fun deleteEntry(id: String)
-    fun markEntryReceived(id: String, receivedAt: String)
-    fun countOwnedEntries(): Int
-    fun countReservedEntries(): Int
-
-    fun getItems(filter: String? = null): List<Item>
-    fun getItem(id: String): Item?
-    fun saveItem(item: Item)
-    fun deleteItem(id: String)
-    fun countOwnedItems(): Int
+    suspend fun getEntries(filter: String? = null): List<CollectionEntry>
+    suspend fun getEntry(id: String): CollectionEntry?
+    suspend fun saveEntry(entry: CollectionEntry)
+    suspend fun deleteEntry(id: String, deletedAt: String)
+    suspend fun receiveReservedEntry(
+        preorderId: String,
+        receivedItem: Item,
+        receivedAt: String,
+    )
+    suspend fun getItems(filter: String? = null): List<Item>
+    suspend fun countOwnedItems(): Int
 }

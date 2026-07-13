@@ -1,42 +1,28 @@
 package goods.pocket.app.presentation
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import goods.pocket.app.domain.model.CollectionEntryStatus
+import goods.pocket.app.presentation.designsystem.GoodsPocketImageLockedBottomBar
 import goods.pocket.app.presentation.designsystem.goodsPocketChromeFor
 import goods.pocket.app.presentation.component.CollectionEntryDetailSheet
 import goods.pocket.app.presentation.component.CollectionEntryEditorSheet
@@ -61,73 +47,44 @@ import goods.pocket.app.presentation.state.PendingDelete
 import goodspocket.composeapp.generated.resources.*
 import org.koin.compose.koinInject
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GoodsPocketApp(
     appStateHolder: GoodsPocketAppStateHolder = koinInject(),
 ) {
     val uiState by appStateHolder.state.collectAsState()
 
-    ProvideLocalizedResources(languageCode = uiState.appPreferences.languageCode) {
+    ProvideLocalizedResources(
+        languageCode = uiState.appPreferences.languageCode,
+        currencyCode = uiState.appPreferences.currencyCode,
+        dateFormat = uiState.appPreferences.dateFormat,
+    ) {
+        val snackbarHostState = remember { SnackbarHostState() }
+        val failureMessage = tr(Res.string.error_operation_failed)
+        val retryLabel = tr(Res.string.action_retry)
+        LaunchedEffect(uiState.failure) {
+            if (uiState.failure == null) return@LaunchedEffect
+            val result = snackbarHostState.showSnackbar(
+                message = failureMessage,
+                actionLabel = retryLabel,
+                duration = SnackbarDuration.Long,
+            )
+            if (result == SnackbarResult.ActionPerformed) {
+                appStateHolder.retry()
+            } else {
+                appStateHolder.dismissFailure()
+            }
+        }
         val chrome = goodsPocketChromeFor(uiState.currentDestination)
         Scaffold(
             containerColor = MaterialTheme.colorScheme.background,
-            topBar = {
-                Column {
-                    TopAppBar(
-                        expandedHeight = 56.dp,
-                        navigationIcon = {
-                            if (chrome.showBackButton) {
-                                val onBack = if (uiState.currentDestination == AppDestination.Settings) {
-                                    appStateHolder::closeSettings
-                                } else {
-                                    { appStateHolder.selectDestination(uiState.selectedPrimaryDestination) }
-                                }
-                                TextButton(onClick = onBack) {
-                                    Text(tr(Res.string.action_back))
-                                }
-                            }
-                        },
-                        title = {
-                            Text(
-                                text = uiState.currentDestination.localizedLabel(),
-                                fontWeight = FontWeight.SemiBold,
-                            )
-                        },
-                        colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.background,
-                            titleContentColor = MaterialTheme.colorScheme.onBackground,
-                            navigationIconContentColor = MaterialTheme.colorScheme.primary,
-                        ),
-                    )
-                    HorizontalDivider(
-                        thickness = 1.dp,
-                        color = MaterialTheme.colorScheme.outlineVariant,
-                    )
-                }
-            },
+            snackbarHost = { SnackbarHost(snackbarHostState) },
             bottomBar = {
                 if (chrome.showBottomBar) {
-                    GoodsPocketBottomBar(
+                    GoodsPocketImageLockedBottomBar(
                         selectedPrimaryDestination = uiState.selectedPrimaryDestination,
                         onSelectDestination = appStateHolder::selectDestination,
+                        onQuickAdd = appStateHolder::openQuickAdd,
                     )
-                }
-            },
-            floatingActionButton = {
-                if (chrome.showFab) {
-                    FloatingActionButton(
-                        onClick = { appStateHolder.openQuickAdd() },
-                        shape = MaterialTheme.shapes.large,
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                    ) {
-                        Text(
-                            text = "+",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                    }
                 }
             },
         ) { innerPadding ->
@@ -164,108 +121,20 @@ fun GoodsPocketApp(
 }
 
 @Composable
-private fun GoodsPocketBottomBar(
-    selectedPrimaryDestination: AppDestination,
-    onSelectDestination: (AppDestination) -> Unit,
-) {
-    Surface(
-        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-        color = MaterialTheme.colorScheme.surface,
-        tonalElevation = 0.dp,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-    ) {
-        NavigationBar(
-            containerColor = Color.Transparent,
-            tonalElevation = 0.dp,
-        ) {
-            AppDestination.primaryDestinations.forEach { destination ->
-                val label = destination.localizedLabel()
-                val selected = destination.route == selectedPrimaryDestination.route
-                GoodsPocketBottomBarItem(
-                    label = label,
-                    selected = selected,
-                    onClick = { onSelectDestination(destination) },
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun RowScope.GoodsPocketBottomBarItem(
-    label: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-
-    Column(
-        modifier = Modifier
-            .weight(1f)
-            .selectable(
-                selected = selected,
-                onClick = onClick,
-                role = Role.Tab,
-                interactionSource = interactionSource,
-                indication = null,
-            )
-            .padding(vertical = 10.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        BottomNavGlyph(
-            label = label,
-            selected = selected,
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium,
-            color = if (selected) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant
-            },
-        )
-    }
-}
-
-@Composable
-private fun BottomNavGlyph(
-    label: String,
-    selected: Boolean,
-) {
-    Surface(
-        shape = CircleShape,
-        color = if (selected) {
-            MaterialTheme.colorScheme.primaryContainer
-        } else {
-            MaterialTheme.colorScheme.surfaceContainerLow
-        },
-    ) {
-        Text(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp),
-            text = label.take(1),
-            style = MaterialTheme.typography.labelMedium,
-            color = if (selected) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant
-            },
-            textAlign = TextAlign.Center,
-        )
-    }
-}
-
-@Composable
 private fun GoodsPocketNavHost(
     uiState: GoodsPocketUiState,
     appStateHolder: GoodsPocketAppStateHolder,
     innerPadding: PaddingValues,
 ) {
+    val screenPadding = if (uiState.currentDestination == AppDestination.Home) {
+        homeScreenPadding(innerPadding)
+    } else {
+        innerPadding
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(innerPadding),
+            .padding(screenPadding),
     ) {
         when (uiState.currentDestination) {
             AppDestination.Home -> HomeScreen(
@@ -298,9 +167,19 @@ private fun GoodsPocketNavHost(
             AppDestination.Settings -> SettingsScreen(
                 appPreferences = uiState.appPreferences,
                 onLanguageChange = appStateHolder::updateLanguage,
+                onBack = appStateHolder::closeSettings,
             )
         }
     }
+}
+
+private fun homeScreenPadding(
+    innerPadding: PaddingValues,
+): PaddingValues {
+    return PaddingValues(
+        top = (innerPadding.calculateTopPadding() - 25.dp).coerceAtLeast(0.dp),
+        bottom = innerPadding.calculateBottomPadding(),
+    )
 }
 
 @Composable
@@ -440,35 +319,4 @@ private fun PendingDeleteDialog(
             }
         },
     )
-}
-
-@Composable
-fun ScreenPlaceholder(
-    title: String,
-    summary: String,
-    actionHint: String,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 20.dp, vertical = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
-        horizontalAlignment = Alignment.Start,
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-        )
-        Text(
-            text = summary,
-            style = MaterialTheme.typography.bodyLarge,
-        )
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = actionHint,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.primary,
-        )
-    }
 }
