@@ -43,15 +43,7 @@ My now has a normalized, image-locked contract. Read [My Image-Locked Contract](
 
 ## Settings
 
-Reference: `/Users/Hoijun/Downloads/ChatGPT Image 2026년 4월 26일 오후 09_02_42.png`
-
-Rules:
-
-- Keep Settings as an operational list reached through My.
-- Do not turn setting groups into promotional cards.
-- Reuse the warm background, `16dp` card language, low shadow, subtle outline, title weight, and dividers where supported by the reference.
-- Preserve every existing setting, toggle, navigation action, and accessibility state.
-- Measure row height, group spacing, icon box, switch geometry, and app-bar inset from the Settings reference.
+Settings now has a normalized, image-locked contract. Read [Settings Image-Locked Contract](settings.md) instead of the older exploratory reference. Do not restore unsupported notification, backup, theme, account, or informational groups.
 
 ## Detail And Editor Sheets
 

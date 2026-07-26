@@ -1,11 +1,14 @@
 package goods.pocket.app.presentation.designsystem
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import goods.pocket.app.presentation.screen.CollectionReferenceMetrics
 import goods.pocket.app.presentation.screen.EventsReferenceMetrics
 import goods.pocket.app.presentation.screen.HomeReferenceMetrics
 import goods.pocket.app.presentation.screen.MyReferenceMetrics
+import goods.pocket.app.presentation.screen.SettingsReferenceMetrics
+import goods.pocket.app.presentation.screen.SettingsReferenceColors
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -98,5 +101,27 @@ class ImageLockedMetricsContractTest {
         assertEquals(18.sp, MyReferenceMetrics.ProfileNameFontSize)
         assertEquals(20.sp, MyReferenceMetrics.SummaryValueFontSize)
         assertEquals(13.sp, MyReferenceMetrics.ManagementTitleFontSize)
+    }
+
+    @Test
+    fun `settings reference metrics keep the approved grouped row geometry`() {
+        assertEquals(16.dp, SettingsReferenceMetrics.ScreenHorizontalPadding)
+        assertEquals(31.dp, SettingsReferenceMetrics.HeaderToFirstSectionSpacing)
+        assertEquals(10.dp, SettingsReferenceMetrics.SectionTitleToCardSpacing)
+        assertEquals(72.dp, SettingsReferenceMetrics.LanguageCardHeight)
+        assertEquals(167.dp, SettingsReferenceMetrics.LanguageSegmentWidth)
+        assertEquals(31.dp, SettingsReferenceMetrics.LanguageSegmentHeight)
+        assertEquals(29.dp, SettingsReferenceMetrics.LanguageCardToFormatTitleSpacing)
+        assertEquals(120.dp, SettingsReferenceMetrics.FormatCardHeight)
+        assertEquals(60.dp, SettingsReferenceMetrics.FormatRowHeight)
+        assertEquals(31.dp, SettingsReferenceMetrics.FormatIconSize)
+        assertEquals(17.dp, SettingsReferenceMetrics.FormatIconToTextSpacing)
+        assertEquals(21.dp, SettingsReferenceMetrics.SectionTitleHorizontalPadding)
+        assertEquals(0.5.dp, SettingsReferenceMetrics.CardShadowElevation)
+        assertEquals(18.sp, SettingsReferenceMetrics.PageTitleFontSize)
+        assertEquals(14.sp, SettingsReferenceMetrics.SectionTitleFontSize)
+        assertEquals(14.sp, SettingsReferenceMetrics.LanguageLabelFontSize)
+        assertEquals(12.sp, SettingsReferenceMetrics.RowTextFontSize)
+        assertEquals(Color(0xFFE5E3E2), SettingsReferenceColors.ControlOutline)
     }
 }

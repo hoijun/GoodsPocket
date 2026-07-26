@@ -1,22 +1,19 @@
 package goods.pocket.app.presentation.screen
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import goods.pocket.app.domain.model.AppPreference
-import goods.pocket.app.presentation.designsystem.GoodsPocketFilterChip
-import goods.pocket.app.presentation.designsystem.GoodsPocketSectionCard
-import goods.pocket.app.presentation.designsystem.GoodsPocketSectionHeader
-import goods.pocket.app.presentation.designsystem.goodsPocketScreenModifier
-import goods.pocket.app.presentation.designsystem.goodsPocketSecondaryScrollContentPadding
+import goods.pocket.app.presentation.designsystem.GoodsPocketVisualTokens
 import goods.pocket.app.presentation.i18n.AppLanguage
 import goods.pocket.app.presentation.i18n.tr
 import goodspocket.composeapp.generated.resources.Res
+import goodspocket.composeapp.generated.resources.action_back
+import goodspocket.composeapp.generated.resources.nav_settings
 import goodspocket.composeapp.generated.resources.settings_currency
 import goodspocket.composeapp.generated.resources.settings_date_format
 import goodspocket.composeapp.generated.resources.settings_display_format
@@ -24,7 +21,6 @@ import goodspocket.composeapp.generated.resources.settings_language
 import goodspocket.composeapp.generated.resources.settings_language_english
 import goodspocket.composeapp.generated.resources.settings_language_korean
 import goodspocket.composeapp.generated.resources.settings_quick_preferences
-import goodspocket.composeapp.generated.resources.action_back
 
 @Composable
 fun SettingsScreen(
@@ -32,58 +28,50 @@ fun SettingsScreen(
     onLanguageChange: (String) -> Unit,
     onBack: () -> Unit,
 ) {
+    val koreanCode = AppLanguage.KOREAN.code
+    val englishCode = AppLanguage.ENGLISH.code
+
     LazyColumn(
-        modifier = goodsPocketScreenModifier(),
-        contentPadding = goodsPocketSecondaryScrollContentPadding(),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(GoodsPocketVisualTokens.Background)),
+        contentPadding = PaddingValues(bottom = SettingsReferenceMetrics.BottomContentPadding),
     ) {
         item {
-            TextButton(onClick = onBack) {
-                Text(tr(Res.string.action_back))
-            }
+            SettingsPageHeader(
+                title = tr(Res.string.nav_settings),
+                backLabel = tr(Res.string.action_back),
+                onBack = onBack,
+            )
         }
         item {
-            GoodsPocketSectionCard(containerColor = MaterialTheme.colorScheme.surface) {
-                GoodsPocketSectionHeader(
-                    title = tr(Res.string.settings_quick_preferences),
-                )
-                Text(
-                    text = tr(Res.string.settings_language),
-                    style = MaterialTheme.typography.labelLarge,
-                )
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    GoodsPocketFilterChip(
-                        selected = appPreferences.languageCode == AppLanguage.KOREAN.code,
-                        onClick = { onLanguageChange(AppLanguage.KOREAN.code) },
-                        label = tr(Res.string.settings_language_korean),
-                    )
-                    GoodsPocketFilterChip(
-                        selected = appPreferences.languageCode == AppLanguage.ENGLISH.code,
-                        onClick = { onLanguageChange(AppLanguage.ENGLISH.code) },
-                        label = tr(Res.string.settings_language_english),
-                    )
-                }
-            }
+            SettingsSectionHeader(
+                title = tr(Res.string.settings_quick_preferences),
+                topSpacing = SettingsReferenceMetrics.HeaderToFirstSectionSpacing,
+            )
         }
         item {
-            GoodsPocketSectionCard(containerColor = MaterialTheme.colorScheme.surface) {
-                GoodsPocketSectionHeader(
-                    title = tr(Res.string.settings_display_format),
-                )
-                Text(
-                    text = tr(Res.string.settings_currency, appPreferences.currencyCode),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                Text(
-                    text = tr(Res.string.settings_date_format, appPreferences.dateFormat),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+            SettingsLanguageCard(
+                label = tr(Res.string.settings_language),
+                koreanLabel = tr(Res.string.settings_language_korean),
+                englishLabel = tr(Res.string.settings_language_english),
+                selectedLanguageCode = appPreferences.languageCode,
+                koreanCode = koreanCode,
+                englishCode = englishCode,
+                onLanguageChange = onLanguageChange,
+            )
+        }
+        item {
+            SettingsSectionHeader(
+                title = tr(Res.string.settings_display_format),
+                topSpacing = SettingsReferenceMetrics.LanguageCardToFormatTitleSpacing,
+            )
+        }
+        item {
+            SettingsFormatCard(
+                currency = tr(Res.string.settings_currency, appPreferences.currencyCode),
+                dateFormat = tr(Res.string.settings_date_format, appPreferences.dateFormat),
+            )
         }
     }
 }
