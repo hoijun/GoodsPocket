@@ -6,7 +6,6 @@ import goods.pocket.app.domain.model.EventType
 internal data class EventJournalOverview(
     val headlineMonth: String,
     val featuredEvent: Event?,
-    val secondaryEvents: List<Event>,
     val timelineEvents: List<Event>,
 )
 
@@ -32,8 +31,7 @@ internal fun buildEventJournalOverview(
     return EventJournalOverview(
         headlineMonth = featuredEvent?.targetDate?.journalMonthLabel().orEmpty(),
         featuredEvent = featuredEvent,
-        secondaryEvents = remainingEvents.take(2),
-        timelineEvents = remainingEvents.drop(2),
+        timelineEvents = remainingEvents,
     )
 }
 

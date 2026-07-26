@@ -3,6 +3,7 @@ package goods.pocket.app.presentation.designsystem
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import goods.pocket.app.presentation.screen.CollectionReferenceMetrics
+import goods.pocket.app.presentation.screen.EventsReferenceMetrics
 import goods.pocket.app.presentation.screen.HomeReferenceMetrics
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -54,4 +55,23 @@ class ImageLockedMetricsContractTest {
         assertEquals(9.sp, CollectionReferenceMetrics.GoodsMetadataFontSize)
     }
 
+    @Test
+    fun `events reference metrics keep the approved timeline geometry`() {
+        assertEquals(19.dp, EventsReferenceMetrics.ScreenHorizontalPadding)
+        assertEquals(31.dp, EventsReferenceMetrics.FilterHeight)
+        assertEquals(25.dp, EventsReferenceMetrics.CountPillWidth)
+        assertEquals(2.dp, EventsReferenceMetrics.CountPillOffsetY)
+        assertEquals((-1).dp, EventsReferenceMetrics.CountTextOffsetY)
+        assertEquals(166.dp, EventsReferenceMetrics.FeaturedCardHeight)
+        assertEquals(26.dp, EventsReferenceMetrics.FeaturedTopPadding)
+        assertEquals(10.dp, EventsReferenceMetrics.FeaturedBadgeToDateSpacing)
+        assertEquals(10.dp, EventsReferenceMetrics.FeaturedDateToTitleSpacing)
+        assertEquals(8.dp, EventsReferenceMetrics.FeaturedTitleToLocationSpacing)
+        assertEquals(132.dp, EventsReferenceMetrics.TimelineCardHeight)
+        assertEquals(66.dp, EventsReferenceMetrics.TimelineRowHeight)
+        assertEquals(0.5.dp, EventsReferenceMetrics.CardShadowElevation)
+        assertEquals(18.sp, EventsReferenceMetrics.PageTitleFontSize)
+        assertEquals(20.sp, EventsReferenceMetrics.OverviewTitleFontSize)
+        assertEquals(20.sp, EventsReferenceMetrics.FeaturedTitleFontSize)
+    }
 }

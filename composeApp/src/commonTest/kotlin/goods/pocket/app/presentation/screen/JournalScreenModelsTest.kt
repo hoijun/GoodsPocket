@@ -37,8 +37,10 @@ class JournalScreenModelsTest {
 
         assertEquals("2024.05", overview.headlineMonth)
         assertEquals("payment", overview.featuredEvent?.id)
-        assertEquals(listOf("release", "offline"), overview.secondaryEvents.map(Event::id))
-        assertEquals(listOf("delivery"), overview.timelineEvents.map(Event::id))
+        assertEquals(
+            listOf("release", "offline", "delivery"),
+            overview.timelineEvents.map(Event::id),
+        )
     }
 
     @Test
