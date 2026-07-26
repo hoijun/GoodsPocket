@@ -148,6 +148,7 @@ ORDER BY target_date ASC, updated_at DESC;
 
 selectUpcomingEvents:
 SELECT * FROM events
+WHERE target_date >= ?
 ORDER BY target_date ASC, updated_at DESC
 LIMIT ?;
 

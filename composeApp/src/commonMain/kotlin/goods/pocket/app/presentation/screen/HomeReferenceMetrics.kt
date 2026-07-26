@@ -5,6 +5,7 @@ import androidx.compose.ui.unit.sp
 
 internal object HomeReferenceMetrics {
     val BrandFontSize = 22.sp
+    val SectionSpacing = 16.dp
     val SummaryTitleFontSize = 13.sp
     val CardShadowElevation = 0.25.dp
     val RecentCardShadowElevation = 0.5.dp

@@ -100,6 +100,7 @@ class GoodsPocketAppStateHolderTest {
         assertEquals(2, myPage.activePreorderCount)
         assertEquals(106_000L, myPage.monthlySpend)
         assertEquals(3, myPage.upcomingEventCount)
+        assertEquals("2026-03-15", stateHolder.state.value.currentDate)
     }
 
     @Test
@@ -123,6 +124,16 @@ class GoodsPocketAppStateHolderTest {
     }
 
     @Test
+    fun `home upcoming schedule excludes events before the injected current date`() {
+        val stateHolder = newStateHolder(clock = AfterSeedEventsClock)
+
+        val state = stateHolder.state.value
+        assertTrue(state.upcomingEvents.isEmpty())
+        assertEquals(0, state.myPage.upcomingEventCount)
+        assertEquals(3, state.events.size)
+    }
+
+    @Test
     fun `events overview is a primary destination`() {
         val stateHolder = newStateHolder()
 
@@ -130,6 +141,97 @@ class GoodsPocketAppStateHolderTest {
         stateHolder.openEventsOverview()
         assertEquals(AppDestination.Events, stateHolder.state.value.currentDestination)
         assertEquals(AppDestination.Events, stateHolder.state.value.selectedPrimaryDestination)
+    }
+
+    @Test
+    fun `home collection link clears query and selects requested segment`() {
+        val stateHolder = newStateHolder()
+        stateHolder.updateCollectionQuery("미쿠")
+
+        stateHolder.openCollectionFromHome(CollectionSegment.RESERVED)
+
+        val state = stateHolder.state.value
+        assertEquals(AppDestination.Collection, state.currentDestination)
+        assertEquals(AppDestination.Collection, state.selectedPrimaryDestination)
+        assertEquals(CollectionSegment.RESERVED, state.collectionSegment)
+        assertEquals("", state.collectionQuery)
+    }
+
+    @Test
+    fun `home event link clears filter and opens selected event`() {
+        val stateHolder = newStateHolder()
+        stateHolder.updateEventTypeFilter(EventType.DELIVERY)
+
+        stateHolder.openEventFromHome("event-1")
+
+        val state = stateHolder.state.value
+        assertEquals(AppDestination.Events, state.currentDestination)
+        assertEquals(AppDestination.Events, state.selectedPrimaryDestination)
+        assertNull(state.eventTypeFilter)
+        assertEquals(ActiveDetail.EventDetail("event-1"), state.activeDetail)
+    }
+
+    @Test
+    fun `home recent activity derives collection segment from loaded entry status`() {
+        val stateHolder = newStateHolder()
+        stateHolder.updateCollectionQuery("남아 있으면 안 됨")
+
+        stateHolder.openActivity("pre-1")
+
+        val state = stateHolder.state.value
+        assertEquals(AppDestination.Collection, state.currentDestination)
+        assertEquals(CollectionSegment.RESERVED, state.collectionSegment)
+        assertEquals("", state.collectionQuery)
+        assertEquals(ActiveDetail.CollectionEntryDetail("pre-1"), state.activeDetail)
+    }
+
+    @Test
+    fun `unknown home recent activity leaves navigation unchanged`() {
+        val stateHolder = newStateHolder()
+        val before = stateHolder.state.value
+
+        stateHolder.openActivity("missing-entry")
+
+        assertEquals(before, stateHolder.state.value)
+    }
+
+    @Test
+    fun `quick add resets target and closes every other overlay`() {
+        val stateHolder = newStateHolder()
+        stateHolder.selectQuickAddTarget(QuickAddTarget.EVENT)
+        stateHolder.openCollectionEntryDetail("item-1")
+
+        stateHolder.openQuickAdd()
+
+        val state = stateHolder.state.value
+        assertTrue(state.isQuickAddOpen)
+        assertEquals(QuickAddTarget.COLLECTION_ENTRY, state.quickAddTarget)
+        assertNull(state.activeDetail)
+        assertNull(state.activeEditor)
+        assertNull(state.pendingDelete)
+    }
+
+    @Test
+    fun `primary destination closes overlays and resets destination filters`() {
+        val stateHolder = newStateHolder()
+        stateHolder.updateCollectionQuery("미쿠")
+        stateHolder.selectCollectionSegment(CollectionSegment.RESERVED)
+        stateHolder.openCollectionEntryDetail("pre-1")
+
+        stateHolder.selectDestination(AppDestination.Collection)
+
+        val collectionState = stateHolder.state.value
+        assertEquals(CollectionSegment.OWNED, collectionState.collectionSegment)
+        assertEquals("", collectionState.collectionQuery)
+        assertNull(collectionState.activeDetail)
+
+        stateHolder.updateEventTypeFilter(EventType.DELIVERY)
+        stateHolder.openEventDetail("event-1")
+        stateHolder.selectDestination(AppDestination.Events)
+
+        val eventsState = stateHolder.state.value
+        assertNull(eventsState.eventTypeFilter)
+        assertNull(eventsState.activeDetail)
     }
 
     @Test
@@ -279,6 +381,7 @@ class GoodsPocketAppStateHolderTest {
         repository: InMemoryGoodsPocketRepository = InMemoryGoodsPocketRepository(),
         collectionRepository: CollectionRepository = repository,
         settingsRepository: SettingsRepository = repository,
+        clock: AppClock = StateHolderTestClock,
     ): GoodsPocketAppStateHolder {
         return GoodsPocketAppStateHolder(
             collectionRepository = collectionRepository,
@@ -291,10 +394,10 @@ class GoodsPocketAppStateHolderTest {
                 settingsRepository = settingsRepository,
                 getDashboardSummaryUseCase = GetDashboardSummaryUseCase(collectionRepository, repository),
                 getRecentActivitiesUseCase = GetRecentActivitiesUseCase(collectionRepository, repository),
-                clock = StateHolderTestClock,
+                clock = clock,
             ),
-            markPreorderReceivedUseCase = MarkPreorderReceivedUseCase(collectionRepository, StateHolderTestClock),
-            clock = StateHolderTestClock,
+            markPreorderReceivedUseCase = MarkPreorderReceivedUseCase(collectionRepository, clock),
+            clock = clock,
             idGenerator = StateHolderTestIds,
             coroutineScope = CoroutineScope(Dispatchers.Unconfined),
         )
@@ -325,6 +428,10 @@ private class RecoveringSettingsRepository(
 
 private object StateHolderTestClock : AppClock {
     override fun currentDate(): String = "2026-03-15"
+}
+
+private object AfterSeedEventsClock : AppClock {
+    override fun currentDate(): String = "2026-07-26"
 }
 
 private object StateHolderTestIds : IdGenerator {

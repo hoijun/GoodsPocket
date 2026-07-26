@@ -98,8 +98,9 @@ internal class InMemoryGoodsPocketLocalDataSource : GoodsPocketLocalDataSource {
         return preorders.count { it.status == "ACTIVE" || it.status == "PAYMENT_PENDING" }
     }
 
-    override fun getUpcomingEvents(limit: Int): List<LocalEventRecord> {
+    override fun getUpcomingEvents(onOrAfter: String, limit: Int): List<LocalEventRecord> {
         return events
+            .filter { it.targetDate >= onOrAfter }
             .sortedWith(compareBy<LocalEventRecord> { it.targetDate }.thenByDescending { it.updatedAt })
             .take(limit)
     }

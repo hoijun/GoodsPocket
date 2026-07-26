@@ -141,7 +141,13 @@ private fun HomeRecentGoodsCard(
 @Composable
 internal fun HomeMonthlySpendCard(
     dashboardSummary: HomeSummary,
+    currentDate: String,
 ) {
+    val month = homeMonth(currentDate)
+    val changePercent = spendingChangePercent(
+        current = dashboardSummary.monthlySpend,
+        previous = dashboardSummary.previousMonthSpend,
+    )
     HomeWhiteCard(
         modifier = Modifier.height(102.dp),
         contentPadding = 0.dp,
@@ -165,7 +171,9 @@ internal fun HomeMonthlySpendCard(
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
-                    text = tr(Res.string.home_monthly_spend_basis),
+                    text = month?.let {
+                        tr(Res.string.home_monthly_spend_basis, it.year, it.month)
+                    }.orEmpty(),
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontSize = 10.sp,
                         lineHeight = 13.sp,
@@ -182,29 +190,33 @@ internal fun HomeMonthlySpendCard(
                     color = HomeInk,
                     fontWeight = FontWeight.Bold,
                 )
-                val changeText = tr(Res.string.home_monthly_spend_change)
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(
-                        text = changeText.substringBeforeLast(" "),
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontSize = 10.sp,
-                            lineHeight = 12.sp,
-                        ),
-                        color = HomeMuted,
-                        fontWeight = FontWeight.Medium,
-                    )
-                    Text(
-                        text = changeText.substringAfterLast(" "),
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontSize = 10.sp,
-                            lineHeight = 12.sp,
-                        ),
-                        color = HomeOrange,
-                        fontWeight = FontWeight.Bold,
-                    )
+                if (changePercent != null) {
+                    val signedPercent = if (changePercent >= 0) "+$changePercent%" else "$changePercent%"
+                    val changeText = tr(Res.string.home_monthly_spend_change, signedPercent)
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(
+                            text = changeText.substringBeforeLast(" "),
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontSize = 10.sp,
+                                lineHeight = 12.sp,
+                            ),
+                            color = HomeMuted,
+                            fontWeight = FontWeight.Medium,
+                        )
+                        Text(
+                            text = changeText.substringAfterLast(" "),
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontSize = 10.sp,
+                                lineHeight = 12.sp,
+                            ),
+                            color = HomeOrange,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
                 }
             }
             HomeSpendingBars(
+                fractions = spendingBarFractions(dashboardSummary.spendingBuckets),
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(end = 13.dp, bottom = 6.dp),
@@ -216,6 +228,7 @@ internal fun HomeMonthlySpendCard(
 @Composable
 internal fun HomeUpcomingScheduleCard(
     events: List<Event>,
+    currentDate: String,
     onCardClick: () -> Unit,
     onEventClick: (String) -> Unit,
 ) {
@@ -238,7 +251,7 @@ internal fun HomeUpcomingScheduleCard(
                 ) {
                     events.take(2).forEachIndexed { index, event ->
                         HomeScheduleRow(
-                            row = event.toHomeScheduleRowModel(index),
+                            row = event.toHomeScheduleRowModel(index, currentDate),
                             onClick = { onEventClick(event.id) },
                         )
                         if (index == 0 && events.size > 1) {
@@ -429,7 +442,10 @@ private fun ActivityRecord.toRecentGoodsCardModel(): RecentGoodsCardModel {
 }
 
 @Composable
-private fun Event.toHomeScheduleRowModel(index: Int): HomeScheduleRowModel {
+private fun Event.toHomeScheduleRowModel(
+    index: Int,
+    currentDate: String,
+): HomeScheduleRowModel {
     val tone = if (eventType == EventType.OFFLINE_EVENT || index == 0) {
         GoodsPocketBadgeTone.Event
     } else {
@@ -439,7 +455,7 @@ private fun Event.toHomeScheduleRowModel(index: Int): HomeScheduleRowModel {
         badge = eventType.localizedLabel(),
         title = title,
         dateLabel = targetDate.toHomeDateLabel(),
-        dDay = "D-day",
+        dDay = dDayLabel(today = currentDate, targetDate = targetDate).orEmpty(),
         tone = tone,
     )
 }

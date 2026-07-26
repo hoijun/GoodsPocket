@@ -58,8 +58,8 @@ internal class RepositoryLocalDataSource(
 
     override fun countActivePreorders(): Int = read { delegate.countActivePreorders() }
 
-    override fun getUpcomingEvents(limit: Int): List<LocalEventRecord> =
-        read { delegate.getUpcomingEvents(limit) }
+    override fun getUpcomingEvents(onOrAfter: String, limit: Int): List<LocalEventRecord> =
+        read { delegate.getUpcomingEvents(onOrAfter = onOrAfter, limit = limit) }
 
     override fun getEvents(type: String?): List<LocalEventRecord> = read { delegate.getEvents(type) }
 

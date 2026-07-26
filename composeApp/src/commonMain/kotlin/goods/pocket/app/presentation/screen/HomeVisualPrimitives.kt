@@ -124,6 +124,7 @@ internal fun HomeViewAllChevron(
 
 @Composable
 internal fun HomeSpendingBars(
+    fractions: List<Float>,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -133,17 +134,18 @@ internal fun HomeSpendingBars(
         horizontalArrangement = Arrangement.spacedBy(7.dp),
         verticalAlignment = androidx.compose.ui.Alignment.Bottom,
     ) {
-        listOf(
-            0.26f to Color(0xFFFFE7CE),
-            0.40f to Color(0xFFFFA071),
-            0.52f to Color(0xFFFFB579),
-            0.72f to Color(0xFFFFEBDD),
-            0.82f to MaterialTheme.colorScheme.tertiary,
-            0.50f to Color(0xFFFFD39A),
-            1.0f to Color(0xFFFFEBDD),
-            0.62f to Color(0xFFFFDDB7),
-            0.82f to MaterialTheme.colorScheme.primary,
-        ).forEach { (heightFraction, color) ->
+        val colors = listOf(
+            Color(0xFFFFE7CE),
+            Color(0xFFFFA071),
+            Color(0xFFFFB579),
+            Color(0xFFFFEBDD),
+            MaterialTheme.colorScheme.tertiary,
+            Color(0xFFFFD39A),
+            Color(0xFFFFEBDD),
+            Color(0xFFFFDDB7),
+            MaterialTheme.colorScheme.primary,
+        )
+        colors.zip(fractions).forEach { (color, heightFraction) ->
             Surface(
                 modifier = Modifier
                     .width(7.dp)

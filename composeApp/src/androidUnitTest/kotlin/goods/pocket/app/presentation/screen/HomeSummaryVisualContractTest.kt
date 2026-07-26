@@ -7,6 +7,24 @@ import kotlin.test.assertTrue
 
 class HomeSummaryVisualContractTest {
     @Test
+    fun `home major sections use the locked sixteen dp spacing`() {
+        val moduleDirectory = homeModuleDirectory()
+        val screenSource = moduleDirectory
+            .resolve("src/commonMain/kotlin/goods/pocket/app/presentation/screen/HomeScreen.kt")
+            .readText()
+        val metricsSource = moduleDirectory
+            .resolve("src/commonMain/kotlin/goods/pocket/app/presentation/screen/HomeReferenceMetrics.kt")
+            .readText()
+
+        assertTrue(metricsSource.contains("val SectionSpacing = 16.dp"))
+        assertTrue(
+            screenSource.contains(
+                "verticalArrangement = Arrangement.spacedBy(HomeReferenceMetrics.SectionSpacing)",
+            ),
+        )
+    }
+
+    @Test
     fun `home summary omits the unsupported sale metric`() {
         val moduleDirectory = homeModuleDirectory()
         val screenSource = moduleDirectory

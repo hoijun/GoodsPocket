@@ -49,7 +49,7 @@ import goodspocket.composeapp.generated.resources.home_today_summary_title
 
 internal val HomeOrange = Color(GoodsPocketVisualTokens.Primary)
 internal val HomeGreen = Color(GoodsPocketVisualTokens.Secondary)
-internal val HomePurple = Color(GoodsPocketVisualTokens.Wishlist)
+internal val HomePurple = Color(GoodsPocketVisualTokens.Tertiary)
 internal val HomeInk = Color(GoodsPocketVisualTokens.Ink)
 internal val HomeMuted = Color(GoodsPocketVisualTokens.MutedInk)
 internal val HomeCardSurface = Color(0xFFFEFBF8)
@@ -60,39 +60,46 @@ internal val HomeCardBorder = Color(0xFFEFEDEC)
 fun HomeScreen(
     dashboardSummary: HomeSummary,
     upcomingEvents: List<Event>,
-    onUpcomingEventsClick: () -> Unit = {},
-    onRecentActivitiesClick: () -> Unit = {},
-    onUpcomingEventClick: (String) -> Unit = {},
-    onRecentActivityClick: (String) -> Unit = {},
-    onPreordersClick: () -> Unit = {},
-    onQuickAddClick: () -> Unit = {},
+    currentDate: String,
+    onAction: (HomeAction) -> Unit,
 ) {
     LazyColumn(
         modifier = goodsPocketScreenModifier(),
         contentPadding = PaddingValues(top = 2.dp, bottom = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(HomeReferenceMetrics.SectionSpacing),
     ) {
-        item { HomeBrandHeader(onNotificationsClick = onUpcomingEventsClick) }
-        item { HomeHeroCard(onClick = onQuickAddClick) }
+        item {
+            HomeBrandHeader(
+                showNotificationDot = upcomingEvents.isNotEmpty(),
+                onNotificationsClick = { onAction(HomeAction.OpenScheduleOverview) },
+            )
+        }
+        item { HomeHeroCard(onClick = { onAction(HomeAction.OpenQuickAdd) }) }
         item {
             HomeTodaySummaryCard(
                 dashboardSummary = dashboardSummary,
-                onPreordersClick = onPreordersClick,
+                onAction = onAction,
             )
         }
         item {
             HomeRecentGoodsCarousel(
                 activities = dashboardSummary.recentActivities,
-                onEntryClick = onRecentActivityClick,
-                onViewAll = onRecentActivitiesClick,
+                onEntryClick = { onAction(HomeAction.OpenRecentEntry(it)) },
+                onViewAll = { onAction(HomeAction.OpenRecentCollection) },
             )
         }
-        item { HomeMonthlySpendCard(dashboardSummary = dashboardSummary) }
+        item {
+            HomeMonthlySpendCard(
+                dashboardSummary = dashboardSummary,
+                currentDate = currentDate,
+            )
+        }
         item {
             HomeUpcomingScheduleCard(
                 events = upcomingEvents,
-                onCardClick = onUpcomingEventsClick,
-                onEventClick = onUpcomingEventClick,
+                currentDate = currentDate,
+                onCardClick = { onAction(HomeAction.OpenScheduleOverview) },
+                onEventClick = { onAction(HomeAction.OpenEvent(it)) },
             )
         }
     }
@@ -100,6 +107,7 @@ fun HomeScreen(
 
 @Composable
 private fun HomeBrandHeader(
+    showNotificationDot: Boolean,
     onNotificationsClick: () -> Unit,
 ) {
     Row(
@@ -126,6 +134,7 @@ private fun HomeBrandHeader(
             fontWeight = FontWeight.ExtraBold,
         )
         HomeBellButton(
+            showNotificationDot = showNotificationDot,
             onClick = onNotificationsClick,
         )
     }
@@ -133,6 +142,7 @@ private fun HomeBrandHeader(
 
 @Composable
 private fun HomeBellButton(
+    showNotificationDot: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -151,14 +161,16 @@ private fun HomeBellButton(
                 )
                 .offset(y = 1.5.dp),
         )
-        Surface(
-            modifier = Modifier
-                .size(6.dp)
-                .align(Alignment.TopEnd)
-                .offset(x = (-3).dp, y = 10.dp),
-            shape = CircleShape,
-            color = HomeOrange,
-        ) {}
+        if (showNotificationDot) {
+            Surface(
+                modifier = Modifier
+                    .size(6.dp)
+                    .align(Alignment.TopEnd)
+                    .offset(x = (-3).dp, y = 10.dp),
+                shape = CircleShape,
+                color = HomeOrange,
+            ) {}
+        }
     }
 }
 
@@ -218,7 +230,7 @@ private fun HomeHeroCard(
 @Composable
 private fun HomeTodaySummaryCard(
     dashboardSummary: HomeSummary,
-    onPreordersClick: () -> Unit,
+    onAction: (HomeAction) -> Unit,
 ) {
     HomeWhiteCard(
         modifier = Modifier
@@ -247,6 +259,7 @@ private fun HomeTodaySummaryCard(
                     value = totalCount.toString(),
                     color = HomeInk,
                     modifier = Modifier.weight(1f),
+                    onClick = { onAction(HomeAction.OpenAllCollection) },
                 )
                 HomeMetricDivider()
                 HomeCollectionMetric(
@@ -254,15 +267,15 @@ private fun HomeTodaySummaryCard(
                     value = dashboardSummary.ownedItemCount.toString(),
                     color = HomeGreen,
                     modifier = Modifier.weight(1f),
+                    onClick = { onAction(HomeAction.OpenOwnedCollection) },
                 )
                 HomeMetricDivider()
                 HomeCollectionMetric(
                     label = tr(Res.string.home_summary_reserved),
                     value = dashboardSummary.activePreorderCount.toString(),
                     color = HomeOrange,
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable(onClick = onPreordersClick),
+                    modifier = Modifier.weight(1f),
+                    onClick = { onAction(HomeAction.OpenReservedCollection) },
                 )
             }
         }
@@ -314,9 +327,12 @@ internal fun HomeCollectionMetric(
     value: String,
     color: Color,
     modifier: Modifier = Modifier,
+    onClick: () -> Unit,
 ) {
     Column(
-        modifier = modifier.padding(vertical = 0.dp),
+        modifier = modifier
+            .clickable(onClick = onClick)
+            .padding(vertical = 0.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(5.dp),
     ) {

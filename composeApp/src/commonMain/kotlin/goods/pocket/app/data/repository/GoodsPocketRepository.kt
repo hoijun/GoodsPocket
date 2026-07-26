@@ -124,8 +124,8 @@ class GoodsPocketRepository(
 
     override suspend fun countActivePreorders(): Int = localDataSource.countActivePreorders()
 
-    override suspend fun getUpcomingEvents(limit: Int): List<Event> {
-        return localDataSource.getUpcomingEvents(limit).map { it.toDomain() }
+    override suspend fun getUpcomingEvents(onOrAfter: String, limit: Int): List<Event> {
+        return localDataSource.getUpcomingEvents(onOrAfter = onOrAfter, limit = limit).map { it.toDomain() }
     }
 
     override suspend fun getEvents(type: EventType?): List<Event> {

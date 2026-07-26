@@ -38,6 +38,7 @@ import goods.pocket.app.presentation.screen.CollectionReferenceMetrics
 import goods.pocket.app.presentation.screen.EventsReferenceMetrics
 import goods.pocket.app.presentation.screen.EventsScreen
 import goods.pocket.app.presentation.screen.HomeScreen
+import goods.pocket.app.presentation.screen.HomeAction
 import goods.pocket.app.presentation.screen.MyReferenceMetrics
 import goods.pocket.app.presentation.screen.MyScreen
 import goods.pocket.app.presentation.screen.SettingsScreen
@@ -145,11 +146,27 @@ private fun GoodsPocketNavHost(
             AppDestination.Home -> HomeScreen(
                 dashboardSummary = uiState.homeSummary,
                 upcomingEvents = uiState.upcomingEvents,
-                onUpcomingEventsClick = appStateHolder::openEventsOverview,
-                onUpcomingEventClick = appStateHolder::openEventFromHome,
-                onRecentActivityClick = appStateHolder::openActivity,
-                onPreordersClick = { appStateHolder.selectCollectionSegment(CollectionSegment.RESERVED) },
-                onQuickAddClick = appStateHolder::openQuickAdd,
+                currentDate = uiState.currentDate,
+                onAction = { action ->
+                    when (action) {
+                        HomeAction.OpenScheduleOverview -> appStateHolder.openEventsOverview()
+                        HomeAction.OpenAllCollection -> {
+                            appStateHolder.openCollectionFromHome(CollectionSegment.ALL)
+                        }
+                        HomeAction.OpenOwnedCollection -> {
+                            appStateHolder.openCollectionFromHome(CollectionSegment.OWNED)
+                        }
+                        HomeAction.OpenReservedCollection -> {
+                            appStateHolder.openCollectionFromHome(CollectionSegment.RESERVED)
+                        }
+                        HomeAction.OpenRecentCollection -> {
+                            appStateHolder.openCollectionFromHome(CollectionSegment.ALL)
+                        }
+                        HomeAction.OpenQuickAdd -> appStateHolder.openQuickAdd()
+                        is HomeAction.OpenRecentEntry -> appStateHolder.openActivity(action.entryId)
+                        is HomeAction.OpenEvent -> appStateHolder.openEventFromHome(action.eventId)
+                    }
+                },
             )
             AppDestination.Collection -> CollectionScreen(
                 entries = uiState.collectionEntries,

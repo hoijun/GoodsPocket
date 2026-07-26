@@ -39,22 +39,27 @@ class GoodsPocketAppStateHolder(
 
     fun selectDestination(destination: AppDestination) {
         _state.update { current ->
-            current.copy(
+            val closed = current.withClosedOverlays()
+            closed.copy(
                 currentDestination = destination,
                 selectedPrimaryDestination = selectedPrimaryDestinationFor(
                     destination = destination,
-                    fallback = current.selectedPrimaryDestination,
+                    fallback = closed.selectedPrimaryDestination,
                 ),
                 collectionSegment = when (destination) {
                     AppDestination.Collection -> CollectionSegment.OWNED
-                    else -> current.collectionSegment
+                    else -> closed.collectionSegment
                 },
+                collectionQuery = if (destination == AppDestination.Collection) "" else closed.collectionQuery,
+                eventTypeFilter = if (destination == AppDestination.Events) null else closed.eventTypeFilter,
             )
         }
     }
 
     fun openSettings() {
-        _state.update { it.copy(currentDestination = AppDestination.Settings) }
+        _state.update {
+            it.withClosedOverlays().copy(currentDestination = AppDestination.Settings)
+        }
     }
 
     fun closeSettings() {
@@ -64,42 +69,41 @@ class GoodsPocketAppStateHolder(
     }
 
     fun openEventsOverview() {
-        selectDestination(AppDestination.Events)
+        _state.update { current ->
+            current.withClosedOverlays().copy(
+                currentDestination = AppDestination.Events,
+                selectedPrimaryDestination = AppDestination.Events,
+                eventTypeFilter = null,
+            )
+        }
     }
 
     fun openEventFromHome(eventId: String) {
         _state.update { current ->
-            current.copy(
+            current.withClosedOverlays().copy(
                 currentDestination = AppDestination.Events,
                 selectedPrimaryDestination = AppDestination.Events,
+                eventTypeFilter = null,
                 activeDetail = ActiveDetail.EventDetail(eventId),
             )
         }
     }
 
     fun openActivity(activityId: String) {
-        when {
-            activityId.startsWith("item-") -> {
-                _state.update { current ->
-                    current.copy(
-                        currentDestination = AppDestination.Collection,
-                        selectedPrimaryDestination = AppDestination.Collection,
-                        collectionSegment = CollectionSegment.OWNED,
-                        activeDetail = ActiveDetail.CollectionEntryDetail(activityId),
-                    )
-                }
-            }
-
-            activityId.startsWith("pre-") -> {
-                _state.update { current ->
-                    current.copy(
-                        currentDestination = AppDestination.Collection,
-                        selectedPrimaryDestination = AppDestination.Collection,
-                        collectionSegment = CollectionSegment.RESERVED,
-                        activeDetail = ActiveDetail.CollectionEntryDetail(activityId),
-                    )
-                }
-            }
+        val entry = _state.value.collectionEntries.firstOrNull { it.id == activityId } ?: return
+        val segment = if (entry.status == CollectionEntryStatus.RESERVED) {
+            CollectionSegment.RESERVED
+        } else {
+            CollectionSegment.OWNED
+        }
+        _state.update { current ->
+            current.withClosedOverlays().copy(
+                currentDestination = AppDestination.Collection,
+                selectedPrimaryDestination = AppDestination.Collection,
+                collectionSegment = segment,
+                collectionQuery = "",
+                activeDetail = ActiveDetail.CollectionEntryDetail(activityId),
+            )
         }
     }
 
@@ -118,11 +122,22 @@ class GoodsPocketAppStateHolder(
     }
 
     fun selectCollectionSegment(segment: CollectionSegment) {
-        _state.update {
-            it.copy(
+        _state.update { current ->
+            current.withClosedOverlays().copy(
                 currentDestination = AppDestination.Collection,
                 selectedPrimaryDestination = AppDestination.Collection,
                 collectionSegment = segment,
+            )
+        }
+    }
+
+    fun openCollectionFromHome(segment: CollectionSegment) {
+        _state.update { current ->
+            current.withClosedOverlays().copy(
+                currentDestination = AppDestination.Collection,
+                selectedPrimaryDestination = AppDestination.Collection,
+                collectionSegment = segment,
+                collectionQuery = "",
             )
         }
     }
@@ -150,7 +165,12 @@ class GoodsPocketAppStateHolder(
     }
 
     fun openQuickAdd() {
-        _state.update { it.copy(isQuickAddOpen = true) }
+        _state.update {
+            it.withClosedOverlays().copy(
+                isQuickAddOpen = true,
+                quickAddTarget = QuickAddTarget.COLLECTION_ENTRY,
+            )
+        }
     }
 
     fun closeQuickAdd() {
@@ -221,11 +241,15 @@ class GoodsPocketAppStateHolder(
     }
 
     fun openCollectionEntryDetail(entryId: String) {
-        _state.update { it.copy(activeDetail = ActiveDetail.CollectionEntryDetail(entryId)) }
+        _state.update {
+            it.withClosedOverlays().copy(activeDetail = ActiveDetail.CollectionEntryDetail(entryId))
+        }
     }
 
     fun openEventDetail(eventId: String) {
-        _state.update { it.copy(activeDetail = ActiveDetail.EventDetail(eventId)) }
+        _state.update {
+            it.withClosedOverlays().copy(activeDetail = ActiveDetail.EventDetail(eventId))
+        }
     }
 
     fun closeDetail() {
@@ -234,8 +258,7 @@ class GoodsPocketAppStateHolder(
 
     fun openCollectionEntryEditor(entryId: String) {
         _state.update {
-            it.copy(
-                activeDetail = null,
+            it.withClosedOverlays().copy(
                 activeEditor = ActiveEditor.CollectionEntryEditor(entryId),
             )
         }
@@ -243,8 +266,7 @@ class GoodsPocketAppStateHolder(
 
     fun openEventEditor(eventId: String) {
         _state.update {
-            it.copy(
-                activeDetail = null,
+            it.withClosedOverlays().copy(
                 activeEditor = ActiveEditor.EventEditor(eventId),
             )
         }
@@ -333,8 +355,7 @@ class GoodsPocketAppStateHolder(
             PendingDelete.ItemDelete(entryId)
         }
         _state.update {
-            it.copy(
-                activeDetail = null,
+            it.withClosedOverlays().copy(
                 pendingDelete = pendingDelete,
             )
         }
@@ -342,8 +363,7 @@ class GoodsPocketAppStateHolder(
 
     fun requestDeleteEvent(eventId: String) {
         _state.update {
-            it.copy(
-                activeDetail = null,
+            it.withClosedOverlays().copy(
                 pendingDelete = PendingDelete.EventDelete(eventId),
             )
         }
@@ -503,4 +523,13 @@ class GoodsPocketAppStateHolder(
     companion object {
         private const val UPCOMING_EVENT_PREVIEW_LIMIT = 3
     }
+}
+
+private fun GoodsPocketUiState.withClosedOverlays(): GoodsPocketUiState {
+    return copy(
+        isQuickAddOpen = false,
+        activeDetail = null,
+        activeEditor = null,
+        pendingDelete = null,
+    )
 }

@@ -13,8 +13,6 @@ object GoodsPocketVisualTokens {
     const val PrimaryContainer = 0xFFFFE1D5L
     const val Secondary = 0xFF36C781L
     const val SecondaryContainer = 0xFFDDF8E9L
-    const val Wishlist = 0xFF8F6EF2L
-    const val WishlistContainer = 0xFFEDE8FFL
     const val Tertiary = 0xFF8F6EF2L
     const val TertiaryContainer = 0xFFEDE8FFL
     const val Ink = 0xFF202838L

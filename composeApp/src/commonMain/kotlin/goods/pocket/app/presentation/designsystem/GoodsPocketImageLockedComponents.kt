@@ -2,7 +2,6 @@ package goods.pocket.app.presentation.designsystem
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,7 +28,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -112,7 +109,6 @@ fun GoodsPocketImageLockedBadge(
 enum class GoodsPocketBadgeTone {
     Neutral,
     Owned,
-    Wishlist,
     Reserved,
     Event,
     Danger,
@@ -182,78 +178,6 @@ fun GoodsPocketImageLockedSearchField(
         shape = MaterialTheme.shapes.large,
         colors = goodsPocketOutlinedFieldColors(),
     )
-}
-
-@Composable
-fun GoodsPocketGoodsCard(
-    title: String,
-    subtitle: String,
-    badge: String,
-    badgeTone: GoodsPocketBadgeTone,
-    favorite: Boolean,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-) {
-    Surface(
-        onClick = onClick,
-        modifier = modifier,
-        shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurface,
-        shadowElevation = 3.dp,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-    ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(0.dp),
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1.03f)
-                    .clip(MaterialTheme.shapes.medium)
-                    .background(MaterialTheme.colorScheme.surfaceContainerLow),
-            ) {
-                GoodsPocketCardArtworkSeed(
-                    title = title,
-                    modifier = Modifier.align(Alignment.Center),
-                )
-                GoodsPocketFavoriteMark(
-                    favorite = favorite,
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(10.dp),
-                )
-                if (badge.isNotBlank()) {
-                    GoodsPocketImageLockedBadge(
-                        text = badge,
-                        tone = badgeTone,
-                        modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .padding(8.dp),
-                    )
-                }
-            }
-            Column(
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 10.dp),
-                verticalArrangement = Arrangement.spacedBy(5.dp),
-            ) {
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-        }
-    }
 }
 
 @Composable
@@ -526,10 +450,6 @@ private fun GoodsPocketBadgeTone.colors(): BadgeColors {
         GoodsPocketBadgeTone.Owned -> BadgeColors(
             container = MaterialTheme.colorScheme.secondaryContainer,
             content = MaterialTheme.colorScheme.onSecondaryContainer,
-        )
-        GoodsPocketBadgeTone.Wishlist -> BadgeColors(
-            container = Color(GoodsPocketVisualTokens.WishlistContainer),
-            content = Color(GoodsPocketVisualTokens.Wishlist),
         )
         GoodsPocketBadgeTone.Reserved -> BadgeColors(
             container = MaterialTheme.colorScheme.primaryContainer,

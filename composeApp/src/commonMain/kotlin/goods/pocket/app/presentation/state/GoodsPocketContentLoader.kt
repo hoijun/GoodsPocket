@@ -35,11 +35,15 @@ class GoodsPocketContentLoader(
             monthFilter = clock.currentMonth(),
             recentActivities = recentActivities,
         )
-        val allUpcomingEvents = eventRepository.getUpcomingEvents(limit = Int.MAX_VALUE)
+        val allUpcomingEvents = eventRepository.getUpcomingEvents(
+            onOrAfter = clock.currentDate(),
+            limit = Int.MAX_VALUE,
+        )
         val collectionEntries = collectionRepository.getEntries()
         val events = eventRepository.getEvents()
         state.update { current ->
             current.copy(
+                currentDate = clock.currentDate(),
                 myPage = homeSummary.toMyPageUiModel(
                     upcomingEventCount = allUpcomingEvents.size,
                     appPreferences = appPreferences,

@@ -212,8 +212,8 @@ class SqlDelightGoodsPocketLocalDataSource(
         return queries.countActivePreorders().executeAsOne().toInt()
     }
 
-    override fun getUpcomingEvents(limit: Int): List<LocalEventRecord> {
-        return queries.selectUpcomingEvents(limit.toLong()).executeAsList().map { row ->
+    override fun getUpcomingEvents(onOrAfter: String, limit: Int): List<LocalEventRecord> {
+        return queries.selectUpcomingEvents(onOrAfter, limit.toLong()).executeAsList().map { row ->
             LocalEventRecord(
                 id = row.id,
                 title = row.title,

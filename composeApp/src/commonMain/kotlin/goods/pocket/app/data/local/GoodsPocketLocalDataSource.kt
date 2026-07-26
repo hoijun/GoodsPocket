@@ -30,7 +30,7 @@ interface GoodsPocketLocalDataSource {
     )
     fun countActivePreorders(): Int
 
-    fun getUpcomingEvents(limit: Int): List<LocalEventRecord>
+    fun getUpcomingEvents(onOrAfter: String, limit: Int): List<LocalEventRecord>
     fun getEvents(type: String? = null): List<LocalEventRecord>
     fun upsertEvent(event: LocalEventRecord)
     fun deleteEvent(id: String)

@@ -39,7 +39,7 @@ Never use the old `3dp` or `4dp` card elevation on Home. Do not stack a border, 
 | Element | Locked value |
 | --- | --- |
 | Screen horizontal padding | `16dp` |
-| Main vertical item spacing | `12dp` |
+| Main vertical item spacing | `16dp` |
 | Hero | `120dp` high, `18dp` radius |
 | Hero text start | `18dp` from card start |
 | Today summary | `98dp` high, `16dp` radius |
@@ -62,6 +62,8 @@ Never use the old `3dp` or `4dp` card elevation on Home. Do not stack a border, 
 | Center quick-add | `38dp` diameter |
 
 The Home Scaffold keeps its bottom inset unchanged and reduces only the Home top inset by `25dp`. This is destination-specific. Collection, Events, My, and Settings retain their own insets until measured against their references.
+
+The `16dp` main spacing is the approved Home adjustment between top-level sections. Keep section-internal title-to-content spacing at `8dp`; do not apply the `16dp` value inside cards or section components, and do not copy it to other screens without measuring their references.
 
 Do not move an entire scroll viewport with `Modifier.offset` to compensate for one device. Adjust Scaffold content padding so top and bottom clip boundaries remain correct.
 
