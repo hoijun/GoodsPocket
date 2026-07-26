@@ -8,9 +8,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -65,9 +65,7 @@ internal fun HomeRecentGoodsCarousel(
         } else {
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(
-                    items = activities.take(8).mapIndexed { index, activity ->
-                        activity.toRecentGoodsCardModel(index)
-                    },
+                    items = activities.take(8).map(ActivityRecord::toRecentGoodsCardModel),
                     key = RecentGoodsCardModel::id,
                 ) { model ->
                     HomeRecentGoodsCard(
@@ -101,65 +99,47 @@ private fun HomeRecentGoodsCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(HomeReferenceMetrics.RecentArtworkHeight)
-                    .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
-                    .background(model.artworkBackground),
+                    .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
             ) {
-                HomeFigureKeyringArtwork(
-                    title = model.title,
+                HomeRecentGoodsMediaPlaceholder(modifier = Modifier.fillMaxSize())
+                HomeFavoriteHeartGlyph(
                     modifier = Modifier
-                        .align(Alignment.Center)
-                        .size(70.dp),
+                        .align(Alignment.BottomEnd)
+                        .padding(8.dp)
+                        .size(12.dp),
+                    color = Color.White,
                 )
-                if (!model.accentHeart) {
-                    HomeFavoriteHeartGlyph(
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(8.dp)
-                            .size(12.dp),
-                        color = Color.White,
-                    )
-                }
             }
-            Box(modifier = Modifier.fillMaxWidth()) {
-                Column(
-                    modifier = Modifier.padding(
-                        start = 8.dp,
-                        top = 6.dp,
-                        end = if (model.accentHeart) 22.dp else 8.dp,
-                        bottom = 6.dp,
+            Column(
+                modifier = Modifier.padding(
+                    start = 8.dp,
+                    top = 6.dp,
+                    end = 8.dp,
+                    bottom = 6.dp,
+                ),
+                verticalArrangement = Arrangement.spacedBy(3.dp),
+            ) {
+                Text(
+                    text = model.subtitle,
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontSize = HomeReferenceMetrics.RecentSeriesFontSize,
+                        lineHeight = 11.sp,
                     ),
-                    verticalArrangement = Arrangement.spacedBy(3.dp),
-                ) {
-                    Text(
-                        text = model.subtitle,
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            fontSize = HomeReferenceMetrics.RecentSeriesFontSize,
-                            lineHeight = 11.sp,
-                        ),
-                        color = HomeMuted,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Text(
-                        text = model.title,
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            fontSize = HomeReferenceMetrics.RecentTitleFontSize,
-                            lineHeight = 13.sp,
-                        ),
-                        color = HomeInk,
-                        fontWeight = FontWeight.ExtraBold,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-                if (model.accentHeart) {
-                    HomeFavoriteHeartGlyph(
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(top = 9.dp, end = 8.dp)
-                            .size(11.dp),
-                    )
-                }
+                    color = HomeMuted,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = model.title,
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontSize = HomeReferenceMetrics.RecentTitleFontSize,
+                        lineHeight = 13.sp,
+                    ),
+                    color = HomeInk,
+                    fontWeight = FontWeight.ExtraBold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
             }
         }
     }
@@ -173,15 +153,13 @@ internal fun HomeMonthlySpendCard(
         modifier = Modifier.height(102.dp),
         contentPadding = 0.dp,
     ) {
-        Row(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .padding(horizontal = 13.dp, vertical = 7.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Bottom,
         ) {
             Column(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.align(Alignment.TopStart),
                 verticalArrangement = Arrangement.spacedBy(1.dp),
             ) {
                 Text(
@@ -235,8 +213,8 @@ internal fun HomeMonthlySpendCard(
             }
             HomeSpendingBars(
                 modifier = Modifier
-                    .padding(end = 13.dp)
-                    .offset(y = 12.dp),
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 13.dp, bottom = 6.dp),
             )
         }
     }
@@ -254,11 +232,13 @@ internal fun HomeUpcomingScheduleCard(
             onViewAll = onCardClick,
         )
         HomeWhiteCard(
-            onClick = onCardClick,
             contentPadding = 0.dp,
         ) {
             if (events.isEmpty()) {
-                EmptyStateLine(text = tr(Res.string.home_no_upcoming_events), onClick = onCardClick)
+                HomeEmptyStateContent(
+                    text = tr(Res.string.home_no_upcoming_events),
+                    onClick = onCardClick,
+                )
             } else {
                 Column(
                     modifier = Modifier.padding(horizontal = 11.dp, vertical = 7.dp),
@@ -302,8 +282,7 @@ private fun HomeScheduleRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        HomeScheduleArtwork(
-            title = row.title,
+        HomeScheduleMediaPlaceholder(
             modifier = Modifier
                 .size(HomeReferenceMetrics.ScheduleThumbnailSize)
                 .clip(RoundedCornerShape(10.dp)),
@@ -352,7 +331,7 @@ private fun HomeScheduleRow(
         ) {
             Text(
                 text = row.dDay,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                 style = MaterialTheme.typography.labelLarge.copy(
                     fontSize = 10.sp,
                     lineHeight = 13.sp,
@@ -381,7 +360,7 @@ private fun HomeScheduleBadge(
     ) {
         Text(
             text = text,
-        modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
             style = MaterialTheme.typography.labelSmall.copy(
                 fontSize = 9.sp,
                 lineHeight = 11.sp,
@@ -438,8 +417,6 @@ private data class RecentGoodsCardModel(
     val id: String,
     val title: String,
     val subtitle: String,
-    val artworkBackground: Color,
-    val accentHeart: Boolean,
 )
 
 private data class HomeScheduleRowModel(
@@ -450,13 +427,11 @@ private data class HomeScheduleRowModel(
     val tone: GoodsPocketBadgeTone,
 )
 
-private fun ActivityRecord.toRecentGoodsCardModel(index: Int): RecentGoodsCardModel {
+private fun ActivityRecord.toRecentGoodsCardModel(): RecentGoodsCardModel {
     return RecentGoodsCardModel(
         id = id,
         title = title,
         subtitle = subtitle,
-        artworkBackground = Color(0xFFE3DFDA),
-        accentHeart = index % 2 == 0,
     )
 }
 
@@ -490,12 +465,24 @@ private fun EmptyStateLine(
 ) {
     HomeWhiteCard(
         containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        onClick = onClick,
+        contentPadding = 0.dp,
     ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyMedium,
-            color = HomeMuted,
-        )
+        HomeEmptyStateContent(text = text, onClick = onClick)
     }
+}
+
+@Composable
+private fun HomeEmptyStateContent(
+    text: String,
+    onClick: () -> Unit,
+) {
+    Text(
+        text = text,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(16.dp),
+        style = MaterialTheme.typography.bodyMedium,
+        color = HomeMuted,
+    )
 }

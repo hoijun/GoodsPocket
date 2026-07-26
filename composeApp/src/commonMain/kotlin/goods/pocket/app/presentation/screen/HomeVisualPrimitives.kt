@@ -12,9 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -68,67 +66,37 @@ internal fun HomeBellGlyph(
 }
 
 @Composable
-internal fun HomeDeskShelfIllustration(
+internal fun HomeHeroMediaPlaceholder(
     modifier: Modifier = Modifier,
 ) {
     Canvas(modifier = modifier) {
-        drawRoundRect(
-            color = Color(0xFFE6E2DE),
-            topLeft = Offset(size.width * 0.12f, size.height * 0.20f),
-            size = Size(size.width * 0.78f, size.height * 0.58f),
-            cornerRadius = CornerRadius(18f, 18f),
-        )
-        drawRoundRect(
-            color = Color(0xFFD5D0CA),
-            topLeft = Offset(size.width * 0.22f, size.height * 0.32f),
-            size = Size(size.width * 0.58f, size.height * 0.10f),
-            cornerRadius = CornerRadius(7f, 7f),
-        )
-        drawRoundRect(
-            color = Color(0xFFCAC5BE),
-            topLeft = Offset(size.width * 0.30f, size.height * 0.52f),
-            size = Size(size.width * 0.42f, size.height * 0.08f),
-            cornerRadius = CornerRadius(7f, 7f),
+        drawRect(
+            color = Color(0xFFD7D2CC),
+            size = size,
         )
     }
 }
 
 @Composable
-internal fun HomeFigureKeyringArtwork(
-    title: String,
+internal fun HomeRecentGoodsMediaPlaceholder(
     modifier: Modifier = Modifier,
 ) {
     Canvas(modifier = modifier) {
         drawRoundRect(
             color = Color(0xFFD7D2CC),
             size = size,
-            cornerRadius = CornerRadius(20f, 20f),
-        )
-        drawRoundRect(
-            color = Color(0xFFC7C1BA),
-            topLeft = Offset(size.width * 0.24f, size.height * 0.42f),
-            size = Size(size.width * 0.52f, size.height * 0.14f),
-            cornerRadius = CornerRadius(7f, 7f),
         )
     }
 }
 
 @Composable
-internal fun HomeScheduleArtwork(
-    title: String,
+internal fun HomeScheduleMediaPlaceholder(
     modifier: Modifier = Modifier,
 ) {
     Canvas(modifier = modifier) {
         drawRoundRect(
             color = Color(0xFFD7D2CC),
             size = size,
-            cornerRadius = CornerRadius(14f, 14f),
-        )
-        drawRoundRect(
-            color = Color(0xFFC7C1BA),
-            topLeft = Offset(size.width * 0.22f, size.height * 0.43f),
-            size = Size(size.width * 0.56f, size.height * 0.14f),
-            cornerRadius = CornerRadius(6f, 6f),
         )
     }
 }

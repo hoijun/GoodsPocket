@@ -181,12 +181,8 @@ private fun HomeHeroCard(
         border = BorderStroke(1.dp, HomeCardBorder),
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            HomeDeskShelfIllustration(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 6.dp, bottom = 6.dp)
-                    .width(158.dp)
-                    .height(94.dp),
+            HomeHeroMediaPlaceholder(
+                modifier = Modifier.fillMaxSize(),
             )
             Column(
                 modifier = Modifier
