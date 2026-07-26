@@ -36,12 +36,34 @@
 - Do not perform hidden writes or unrelated state changes in functions named as reads.
 - When a function requires many related primitive parameters, introduce a focused parameter model.
 
-## Blank Lines and File Formatting
+## API and Type Design
 
-- Use exactly one blank line between top-level declarations and member declarations.
-- Inside functions, use one blank line between independent logical steps.
-- After a completed multiline call or block ending in `)` or `}`, add one blank line before the next independent statement.
-- A closing `)` or `}` alone does not require a blank line when the following code belongs to the same expression or control flow.
+- Avoid `Pair`, `Triple`, `Map<String, Any?>`, and primitive-heavy return values in production APIs; introduce a focused named type.
+- Expose read-only collection interfaces and never leak an internally mutable collection.
+- Declare explicit return and property types for public or cross-package APIs when inference could leak an implementation or platform type.
+- Use a property only when the value is cheap, deterministic, side-effect-free, and does not throw; otherwise use a function.
+- Prefer an enum or sealed hierarchy over strings or multiple Booleans for a closed state.
+
+## Exceptions and Cancellation
+
+- Catch the narrowest meaningful exception type.
+- Catch `Exception` or `Throwable` only at an application or infrastructure boundary.
+- A broad catch must rethrow `CancellationException` before translating or reporting the failure.
+- Do not use exceptions for expected absence, validation failure, or no-op outcomes; use a nullable value or a focused result type.
+- Do not silently discard an exception or replace it without preserving the original cause.
+
+## Abstractions and Scope Functions
+
+- Prefer an existing project pattern before introducing a new wrapper or abstraction.
+- Add an abstraction only when it owns an invariant or boundary, removes meaningful duplication, or clarifies multiple call sites.
+- Do not create a pass-through wrapper or helper for a single call site unless it owns a real contract.
+- Keep extension functions close to their owner or consumer and restrict their visibility.
+- Avoid nested scope functions or ambiguous `it` receivers; use a named local value or lambda parameter when meaning is not immediate.
+- Use `let`, `run`, `apply`, `also`, and `with` according to their semantic purpose, not merely to shorten code.
+
+## File Formatting
+
+- Follow the existing file-local style and use one blank line between top-level declarations and independent logical blocks.
 - Do not add a blank line before `else`, `catch`, `finally`, chained calls, or closely related statements.
 - Do not use multiple consecutive blank lines.
 - Remove trailing whitespace and end every text file with a newline.

@@ -21,6 +21,15 @@ Compose UI
                             -> Platform database driver
 ```
 
+## Repository Map
+
+- `composeApp/src/commonMain/kotlin/goods/pocket/app/domain`: domain models, repository contracts, services, and use cases
+- `composeApp/src/commonMain/kotlin/goods/pocket/app/data`: repository implementations, local persistence, runtime values, and DI
+- `composeApp/src/commonMain/kotlin/goods/pocket/app/presentation`: Compose UI, state holders, navigation, and design system
+- `composeApp/src/commonMain/sqldelight`: SQLDelight schema and queries
+- `composeApp/src/commonTest` and `composeApp/src/androidUnitTest`: shared and Android-focused tests
+- `iosApp`: native iOS host, signing, assets, and Xcode configuration
+
 ## Source Sets and Platform Boundaries
 
 - Put shared UI, domain logic, data logic, and shared DI declarations in `composeApp/src/commonMain`.

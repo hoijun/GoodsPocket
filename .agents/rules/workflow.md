@@ -9,6 +9,13 @@
 - Update relevant architecture or behavior documentation when a change makes it inaccurate.
 - Do not revive routes, screens, or architecture described only in stale documentation without confirming current usage.
 
+## Instruction Maintenance
+
+- Keep the root `AGENTS.md` as a concise router and repository-wide guardrail summary.
+- Add rules only for recurring mistakes or durable project constraints.
+- Put specialized guidance in the closest applicable rule document or nested `AGENTS.md`.
+- Keep one-off task details, temporary plans, generated prompts, and personal preferences out of repository instructions.
+
 ## Worktree Safety and Scope
 
 - Treat existing modified and untracked files as user-owned work.

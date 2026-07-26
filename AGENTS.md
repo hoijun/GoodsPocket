@@ -6,16 +6,16 @@ Before changing files, read the detailed rule documents that apply to the task.
 
 Always read:
 
-- [Architecture](.agents/rules/architecture.md)
-- [Code Conventions](.agents/rules/code-conventions.md)
 - [Workflow](.agents/rules/workflow.md)
 
 Read when the task touches the corresponding area:
 
+- Production code, module structure, source sets, dependency direction, or DI boundaries: [Architecture](.agents/rules/architecture.md)
+- Kotlin production or test code, Gradle, SQLDelight source, Compose resources, or dependency declarations: [Code Conventions](.agents/rules/code-conventions.md)
 - Domain, repository, datasource, SQLDelight, schema, seed, time, ID, or business state transitions: [Domain and Data](.agents/rules/domain-data.md)
 - Compose UI, state holder, navigation, design system, localization, or accessibility: [Presentation](.agents/rules/presentation.md)
 - Visual UI, screen layout, styling, design-system components, or reference-image alignment: [Design Rules](DESIGN.md), then every task-specific document selected by that router
-- Tests, DI checks, builds, or completion validation: [Testing and Validation](.agents/rules/testing-validation.md)
+- Tests, DI checks, builds, or completion of a code change: [Testing and Validation](.agents/rules/testing-validation.md)
 
 If a task spans multiple areas, read every relevant rule file. These linked files are mandatory project instructions, not optional reference material.
 
