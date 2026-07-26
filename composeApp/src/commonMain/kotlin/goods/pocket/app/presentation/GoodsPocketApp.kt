@@ -38,6 +38,7 @@ import goods.pocket.app.presentation.screen.CollectionReferenceMetrics
 import goods.pocket.app.presentation.screen.EventsReferenceMetrics
 import goods.pocket.app.presentation.screen.EventsScreen
 import goods.pocket.app.presentation.screen.HomeScreen
+import goods.pocket.app.presentation.screen.MyReferenceMetrics
 import goods.pocket.app.presentation.screen.MyScreen
 import goods.pocket.app.presentation.screen.SettingsScreen
 import goods.pocket.app.presentation.state.ActiveDetail
@@ -132,6 +133,7 @@ private fun GoodsPocketNavHost(
         AppDestination.Home -> homeScreenPadding(innerPadding)
         AppDestination.Collection -> collectionScreenPadding(innerPadding)
         AppDestination.Events -> eventsScreenPadding(innerPadding)
+        AppDestination.My -> myScreenPadding(innerPadding)
         else -> innerPadding
     }
     Box(
@@ -202,6 +204,17 @@ private fun eventsScreenPadding(
     return PaddingValues(
         top = (
             innerPadding.calculateTopPadding() - EventsReferenceMetrics.TopInsetReduction
+        ).coerceAtLeast(0.dp),
+        bottom = innerPadding.calculateBottomPadding(),
+    )
+}
+
+private fun myScreenPadding(
+    innerPadding: PaddingValues,
+): PaddingValues {
+    return PaddingValues(
+        top = (
+            innerPadding.calculateTopPadding() - MyReferenceMetrics.TopInsetReduction
         ).coerceAtLeast(0.dp),
         bottom = innerPadding.calculateBottomPadding(),
     )

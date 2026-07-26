@@ -5,6 +5,7 @@ import androidx.compose.ui.unit.sp
 import goods.pocket.app.presentation.screen.CollectionReferenceMetrics
 import goods.pocket.app.presentation.screen.EventsReferenceMetrics
 import goods.pocket.app.presentation.screen.HomeReferenceMetrics
+import goods.pocket.app.presentation.screen.MyReferenceMetrics
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -73,5 +74,29 @@ class ImageLockedMetricsContractTest {
         assertEquals(18.sp, EventsReferenceMetrics.PageTitleFontSize)
         assertEquals(20.sp, EventsReferenceMetrics.OverviewTitleFontSize)
         assertEquals(20.sp, EventsReferenceMetrics.FeaturedTitleFontSize)
+    }
+
+    @Test
+    fun `my reference metrics keep the approved profile and summary geometry`() {
+        assertEquals(15.dp, MyReferenceMetrics.ScreenHorizontalPadding)
+        assertEquals(32.dp, MyReferenceMetrics.TopInsetReduction)
+        assertEquals(27.dp, MyReferenceMetrics.PageTitleTopPadding)
+        assertEquals(13.dp, MyReferenceMetrics.TitleToProfileSpacing)
+        assertEquals(120.dp, MyReferenceMetrics.ProfileCardHeight)
+        assertEquals(76.dp, MyReferenceMetrics.AvatarSize)
+        assertEquals(29.dp, MyReferenceMetrics.ProfileToSummaryTitleSpacing)
+        assertEquals(10.dp, MyReferenceMetrics.SectionTitleToCardSpacing)
+        assertEquals(190.dp, MyReferenceMetrics.SummaryCardHeight)
+        assertEquals(95.dp, MyReferenceMetrics.SummaryCellHeight)
+        assertEquals(30.dp, MyReferenceMetrics.SummaryToManagementTitleSpacing)
+        assertEquals(8.dp, MyReferenceMetrics.ManagementTitleToCardSpacing)
+        assertEquals(70.dp, MyReferenceMetrics.ManagementRowHeight)
+        assertEquals(210.dp, MyReferenceMetrics.ManagementCardHeight)
+        assertEquals(0.5.dp, MyReferenceMetrics.CardShadowElevation)
+        assertEquals(18.sp, MyReferenceMetrics.PageTitleFontSize)
+        assertEquals(15.sp, MyReferenceMetrics.SectionTitleFontSize)
+        assertEquals(18.sp, MyReferenceMetrics.ProfileNameFontSize)
+        assertEquals(20.sp, MyReferenceMetrics.SummaryValueFontSize)
+        assertEquals(13.sp, MyReferenceMetrics.ManagementTitleFontSize)
     }
 }

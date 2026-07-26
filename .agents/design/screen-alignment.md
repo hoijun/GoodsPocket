@@ -39,14 +39,7 @@ Rules:
 
 ## My
 
-Reference: `/Users/Hoijun/Downloads/ChatGPT Image 2026년 4월 26일 오후 08_58_58.png`
-
-Rules:
-
-- Reuse the warm background, low shadow, subtle outline, title weight, and divider language.
-- Keep profile and statistics hierarchy compact.
-- Preserve interested-goods, activity, and settings navigation behavior.
-- Measure profile hero, statistics, carousel, activity rows, and settings entry from the My reference.
+My now has a normalized, image-locked contract. Read [My Image-Locked Contract](my.md) instead of older exploratory My references. Do not restore interested-goods or activity sections because the current My state and event contract does not expose them.
 
 ## Settings
 
