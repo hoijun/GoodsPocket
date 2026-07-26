@@ -31,8 +31,7 @@
     <string name="home_today_summary_title">Today’s collection summary</string>
     <string name="home_summary_total_goods">Total goods</string>
     <string name="home_summary_owned">Owned</string>
-    <string name="home_summary_wishlist">Wishlist</string>
-    <string name="home_summary_sale">Sale</string>
+    <string name="home_summary_reserved">Reserved</string>
     <string name="home_view_all">View all</string>
     <string name="home_recent_goods_title">Recently added goods</string>
     <string name="home_monthly_spend_title">This month’s spend summary</string>

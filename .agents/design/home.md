@@ -15,8 +15,7 @@ Read [Visual Verification](verification.md) before comparing or declaring Home c
 - Bottom navigation outline: `#F3F0EE` at `1dp`.
 - Primary orange: `#FF7445`.
 - Owned green: `#36C781`.
-- Wishlist/event purple: `#8F6EF2`.
-- Sale/warning orange: `#FFB13B`.
+- Event purple: `#8F6EF2`.
 - Strong text: `#202838`.
 - Muted text and inactive navigation: `#8A8F9B`.
 - Gray media placeholder fill: `#D7D2CC`.
@@ -45,7 +44,7 @@ Never use the old `3dp` or `4dp` card elevation on Home. Do not stack a border, 
 | Hero text start | `18dp` from card start |
 | Today summary | `98dp` high, `16dp` radius |
 | Summary title | start `13dp`, top `10dp` |
-| Summary metrics | four equal columns across the full card width |
+| Summary metrics | three equal columns across the full card width |
 | Summary divider | `1 x 40dp` |
 | Recent section header | stable `19dp` high |
 | Recent goods card | `84 x 140dp` |
@@ -91,6 +90,7 @@ Use `FontWeight.Bold` for normal hierarchy. `ExtraBold` is reserved for the bran
 - `View all` is text plus a separate thin chevron glyph, never a typed `>` character.
 - Bell, navigation, chart, placeholder, and chevron visuals are native Compose components or drawing, never cropped screenshot assets.
 - Recent goods cards have no favorite affordance because the current domain and event contract does not support favorites.
+- The third summary metric is the active reservation count, labeled `예약`, and uses the reservation orange treatment.
 - Missing media uses a gray placeholder while preserving the exact image box. Do not use initials as fake artwork.
 - Recent goods remain horizontally scrollable with stable item keys and click IDs.
 - Summary, spending, recent activity, and schedule values come from domain state. Do not hardcode reference-only values into production UI.

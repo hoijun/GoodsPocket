@@ -31,8 +31,7 @@
     <string name="home_today_summary_title">오늘의 수집 요약</string>
     <string name="home_summary_total_goods">전체 굿즈</string>
     <string name="home_summary_owned">보유</string>
-    <string name="home_summary_wishlist">희망</string>
-    <string name="home_summary_sale">판매</string>
+    <string name="home_summary_reserved">예약</string>
     <string name="home_view_all">전체 보기</string>
     <string name="home_recent_goods_title">최근 추가한 굿즈</string>
     <string name="home_monthly_spend_title">이번 달 지출 요약</string>

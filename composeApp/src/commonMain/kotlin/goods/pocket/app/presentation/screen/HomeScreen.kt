@@ -43,9 +43,8 @@ import goodspocket.composeapp.generated.resources.home_brand_title
 import goodspocket.composeapp.generated.resources.home_hero_body
 import goodspocket.composeapp.generated.resources.home_hero_title
 import goodspocket.composeapp.generated.resources.home_summary_owned
-import goodspocket.composeapp.generated.resources.home_summary_sale
+import goodspocket.composeapp.generated.resources.home_summary_reserved
 import goodspocket.composeapp.generated.resources.home_summary_total_goods
-import goodspocket.composeapp.generated.resources.home_summary_wishlist
 import goodspocket.composeapp.generated.resources.home_today_summary_title
 
 internal val HomeOrange = Color(GoodsPocketVisualTokens.Primary)
@@ -53,7 +52,6 @@ internal val HomeGreen = Color(GoodsPocketVisualTokens.Secondary)
 internal val HomePurple = Color(GoodsPocketVisualTokens.Wishlist)
 internal val HomeInk = Color(GoodsPocketVisualTokens.Ink)
 internal val HomeMuted = Color(GoodsPocketVisualTokens.MutedInk)
-internal val HomeWarning = Color(GoodsPocketVisualTokens.Warning)
 internal val HomeCardSurface = Color(0xFFFEFBF8)
 internal val HomeHeroSurface = Color(0xFFFEF9F5)
 internal val HomeCardBorder = Color(0xFFEFEDEC)
@@ -259,19 +257,12 @@ private fun HomeTodaySummaryCard(
                 )
                 HomeMetricDivider()
                 HomeCollectionMetric(
-                    label = tr(Res.string.home_summary_wishlist),
+                    label = tr(Res.string.home_summary_reserved),
                     value = dashboardSummary.activePreorderCount.toString(),
-                    color = HomePurple,
+                    color = HomeOrange,
                     modifier = Modifier
                         .weight(1f)
                         .clickable(onClick = onPreordersClick),
-                )
-                HomeMetricDivider()
-                HomeCollectionMetric(
-                    label = tr(Res.string.home_summary_sale),
-                    value = "0",
-                    color = HomeWarning,
-                    modifier = Modifier.weight(1f),
                 )
             }
         }
