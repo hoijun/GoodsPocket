@@ -102,52 +102,6 @@ internal fun HomeScheduleMediaPlaceholder(
 }
 
 @Composable
-internal fun HomeFavoriteHeartGlyph(
-    modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.primary,
-) {
-    Canvas(modifier = modifier) {
-        val heart = Path().apply {
-            moveTo(size.width * 0.50f, size.height * 0.86f)
-            cubicTo(
-                size.width * 0.10f,
-                size.height * 0.58f,
-                size.width * 0.08f,
-                size.height * 0.20f,
-                size.width * 0.34f,
-                size.height * 0.16f,
-            )
-            cubicTo(
-                size.width * 0.44f,
-                size.height * 0.14f,
-                size.width * 0.50f,
-                size.height * 0.24f,
-                size.width * 0.50f,
-                size.height * 0.30f,
-            )
-            cubicTo(
-                size.width * 0.50f,
-                size.height * 0.24f,
-                size.width * 0.56f,
-                size.height * 0.14f,
-                size.width * 0.66f,
-                size.height * 0.16f,
-            )
-            cubicTo(
-                size.width * 0.92f,
-                size.height * 0.20f,
-                size.width * 0.90f,
-                size.height * 0.58f,
-                size.width * 0.50f,
-                size.height * 0.86f,
-            )
-            close()
-        }
-        drawPath(path = heart, color = color)
-    }
-}
-
-@Composable
 internal fun HomeViewAllChevron(
     modifier: Modifier = Modifier,
 ) {

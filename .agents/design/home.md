@@ -89,7 +89,8 @@ Use `FontWeight.Bold` for normal hierarchy. `ExtraBold` is reserved for the bran
 ## Behavior
 
 - `View all` is text plus a separate thin chevron glyph, never a typed `>` character.
-- Bell, heart, navigation, chart, placeholder, and chevron visuals are native Compose components or drawing, never cropped screenshot assets.
+- Bell, navigation, chart, placeholder, and chevron visuals are native Compose components or drawing, never cropped screenshot assets.
+- Recent goods cards have no favorite affordance because the current domain and event contract does not support favorites.
 - Missing media uses a gray placeholder while preserving the exact image box. Do not use initials as fake artwork.
 - Recent goods remain horizontally scrollable with stable item keys and click IDs.
 - Summary, spending, recent activity, and schedule values come from domain state. Do not hardcode reference-only values into production UI.

@@ -102,13 +102,6 @@ private fun HomeRecentGoodsCard(
                     .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
             ) {
                 HomeRecentGoodsMediaPlaceholder(modifier = Modifier.fillMaxSize())
-                HomeFavoriteHeartGlyph(
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(8.dp)
-                        .size(12.dp),
-                    color = Color.White,
-                )
             }
             Column(
                 modifier = Modifier.padding(
