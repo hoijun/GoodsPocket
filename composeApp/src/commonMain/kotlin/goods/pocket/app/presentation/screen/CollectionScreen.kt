@@ -1,56 +1,44 @@
 package goods.pocket.app.presentation.screen
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextAlign
 import goods.pocket.app.domain.model.CollectionEntry
 import goods.pocket.app.domain.model.CollectionEntryStatus
-import goods.pocket.app.presentation.designsystem.GoodsPocketSectionCard
-import goods.pocket.app.presentation.designsystem.GoodsPocketSectionHeader
-import goods.pocket.app.presentation.designsystem.GoodsPocketTonalBadge
-import goods.pocket.app.presentation.designsystem.goodsPocketOutlinedFieldColors
-import goods.pocket.app.presentation.designsystem.goodsPocketPrimaryScrollContentPadding
-import goods.pocket.app.presentation.designsystem.goodsPocketScreenModifier
+import goods.pocket.app.presentation.designsystem.GoodsPocketVisualTokens
 import goods.pocket.app.presentation.i18n.formatCurrency
 import goods.pocket.app.presentation.i18n.formatDate
-import goods.pocket.app.presentation.i18n.localizedLabel
 import goods.pocket.app.presentation.i18n.localizedCategory
+import goods.pocket.app.presentation.i18n.localizedLabel
 import goods.pocket.app.presentation.i18n.tr
 import goods.pocket.app.presentation.state.CollectionSegment
 import goodspocket.composeapp.generated.resources.Res
 import goodspocket.composeapp.generated.resources.collection_empty_search
 import goodspocket.composeapp.generated.resources.collection_metric_monthly_spend
-import goodspocket.composeapp.generated.resources.collection_metric_reserved_count
-import goodspocket.composeapp.generated.resources.collection_search_label
+import goodspocket.composeapp.generated.resources.collection_result_count
 import goodspocket.composeapp.generated.resources.collection_search_placeholder
+import goodspocket.composeapp.generated.resources.collection_segment_owned
+import goodspocket.composeapp.generated.resources.collection_segment_reserved
 import goodspocket.composeapp.generated.resources.collection_series_category
-import goodspocket.composeapp.generated.resources.collection_status_section
-import goodspocket.composeapp.generated.resources.collection_status_section_subtitle
 import goodspocket.composeapp.generated.resources.common_not_set
 import goodspocket.composeapp.generated.resources.common_unknown
-import goodspocket.composeapp.generated.resources.preorders_next_release
+import goodspocket.composeapp.generated.resources.nav_collection
 import goodspocket.composeapp.generated.resources.preorders_store_release
 
 @Composable
@@ -65,156 +53,138 @@ fun CollectionScreen(
     val visibleEntries = remember(entries, query, selectedSegment) {
         visibleCollectionEntries(entries, query, selectedSegment)
     }
-    val ownedEntries = remember(entries) { entries.filter { it.status != CollectionEntryStatus.RESERVED } }
-    val reservedEntries = remember(entries) { entries.filter { it.status == CollectionEntryStatus.RESERVED } }
-    val totalSpend = ownedEntries.sumOf { it.purchasePrice ?: 0L }
-    val secondarySummaryLabel = if (selectedSegment == CollectionSegment.RESERVED) {
-        tr(Res.string.preorders_next_release)
-    } else {
-        tr(Res.string.collection_metric_reserved_count)
-    }
-    val secondarySummaryValue = if (selectedSegment == CollectionSegment.RESERVED) {
-        reservedEntries.mapNotNull(CollectionEntry::releaseDate).minOrNull()?.let { formatDate(it) }
-            ?: tr(Res.string.common_not_set)
-    } else {
-        reservedEntries.size.toString()
-    }
+    val summary = remember(entries) { collectionSummary(entries) }
 
-    LazyColumn(
-        modifier = goodsPocketScreenModifier(),
-        contentPadding = goodsPocketPrimaryScrollContentPadding(),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(GoodsPocketVisualTokens.Background)),
     ) {
-        item {
-            GoodsPocketSectionCard(containerColor = MaterialTheme.colorScheme.surfaceContainerLow) {
-                GoodsPocketSectionHeader(
-                    title = tr(Res.string.collection_status_section),
-                    subtitle = tr(Res.string.collection_status_section_subtitle),
-                )
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
-                    CollectionSegment.entries.forEach { segment ->
-                        CollectionSegmentCard(
-                            label = segment.localizedLabel(),
-                            value = entries.countVisibleFor(segment).toString(),
-                            selected = selectedSegment == segment,
-                            onClick = { onSegmentChange(segment) },
-                        )
-                    }
-                }
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
-                    CollectionSummaryCard(
-                        label = tr(Res.string.collection_metric_monthly_spend),
-                        value = formatCurrency(totalSpend),
-                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                    )
-                    CollectionSummaryCard(
-                        label = secondarySummaryLabel,
-                        value = secondarySummaryValue,
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    )
-                }
-            }
-        }
-        item {
-            OutlinedTextField(
-                value = query,
-                onValueChange = onQueryChange,
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(tr(Res.string.collection_search_label)) },
-                placeholder = { Text(tr(Res.string.collection_search_placeholder)) },
-                colors = goodsPocketOutlinedFieldColors(),
-                singleLine = true,
-                shape = MaterialTheme.shapes.medium,
-            )
-        }
-        if (visibleEntries.isEmpty()) {
-            item {
-                GoodsPocketSectionCard(containerColor = MaterialTheme.colorScheme.surfaceContainerLow) {
-                    Text(
-                        text = tr(Res.string.collection_empty_search),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-        }
-        items(visibleEntries, key = CollectionEntry::id) { entry ->
-            GoodsPocketSectionCard(
-                onClick = { onEntryClick(entry.id) },
-                containerColor = MaterialTheme.colorScheme.surface,
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    val imgShape = MaterialTheme.shapes.small
-                    Surface(
-                        modifier = Modifier.size(48.dp),
-                        color = MaterialTheme.colorScheme.surfaceContainerLow,
-                        shape = imgShape,
-                        shadowElevation = 2.dp,
-                        border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.outlineVariant),
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text(
-                                text = entry.name.take(1),
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.primary,
-                            )
-                        }
-                    }
-                    Column(
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(3),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = CollectionReferenceMetrics.ScreenHorizontalPadding)
+                .padding(top = CollectionReferenceMetrics.GridTop),
+            contentPadding = PaddingValues(bottom = CollectionReferenceMetrics.GridBottomClearance),
+            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(
+                CollectionReferenceMetrics.GridSpacing,
+            ),
+            verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(
+                CollectionReferenceMetrics.GridSpacing,
+            ),
+        ) {
+            if (visibleEntries.isEmpty()) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    Box(
                         modifier = Modifier
-                            .weight(1f)
-                            .padding(start = 8.dp)
-                            .padding(vertical = 6.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                            .fillMaxWidth()
+                            .height(CollectionReferenceMetrics.EmptyStateHeight),
+                        contentAlignment = Alignment.Center,
                     ) {
                         Text(
-                            text = entry.name,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
+                            text = tr(Res.string.collection_empty_search),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center,
                         )
-                        Text(
-                            text = tr(
-                                Res.string.collection_series_category,
-                                entry.seriesName ?: tr(Res.string.common_unknown),
-                                entry.localizedCategory(),
-                            ),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            GoodsPocketTonalBadge(
-                                text = entry.status.localizedLabel(),
-                                containerColor = collectionEntryStatusContainerColor(entry.status),
-                                contentColor = collectionEntryStatusContentColor(entry.status),
-                            )
-                            Text(
-                                text = entry.subtitle(),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
                     }
                 }
             }
+            items(
+                items = visibleEntries,
+                key = CollectionEntry::id,
+            ) { entry ->
+                val metadata = entry.collectionCardMetadata()
+                CollectionGoodsCard(
+                    entry = entry,
+                    metadata = when (metadata) {
+                        is CollectionCardMetadata.Catalog -> tr(
+                            Res.string.collection_series_category,
+                            metadata.seriesName ?: tr(Res.string.common_unknown),
+                            entry.localizedCategory(),
+                        )
+                        is CollectionCardMetadata.Reservation -> tr(
+                            Res.string.preorders_store_release,
+                            metadata.store ?: tr(Res.string.common_unknown),
+                            metadata.releaseDate?.let { formatDate(it) }
+                                ?: tr(Res.string.common_not_set),
+                        )
+                    },
+                    statusLabel = entry.status.localizedLabel(),
+                    onClick = { onEntryClick(entry.id) },
+                )
+            }
         }
+
+        CollectionHeader(
+            title = tr(Res.string.nav_collection),
+            segments = CollectionSegment.entries.map { it.localizedLabel() },
+            selectedSegmentIndex = CollectionSegment.entries.indexOf(selectedSegment),
+            query = query,
+            searchPlaceholder = tr(Res.string.collection_search_placeholder),
+            resultCount = tr(Res.string.collection_result_count, visibleEntries.size),
+            onSegmentChange = { index -> onSegmentChange(CollectionSegment.entries[index]) },
+            onQueryChange = onQueryChange,
+            modifier = Modifier.align(Alignment.TopCenter),
+        )
+
+        CollectionSummaryBand(
+            ownedLabel = tr(Res.string.collection_segment_owned),
+            ownedValue = summary.ownedCount.toString(),
+            reservedLabel = tr(Res.string.collection_segment_reserved),
+            reservedValue = summary.reservedCount.toString(),
+            amountLabel = tr(Res.string.collection_metric_monthly_spend),
+            amountValue = formatCurrency(summary.totalPurchaseAmount),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(
+                    horizontal = CollectionReferenceMetrics.ScreenHorizontalPadding,
+                    vertical = CollectionReferenceMetrics.SummaryBottomPadding,
+                ),
+        )
     }
+}
+
+internal sealed interface CollectionCardMetadata {
+    data class Catalog(
+        val seriesName: String?,
+        val category: String,
+    ) : CollectionCardMetadata
+
+    data class Reservation(
+        val store: String?,
+        val releaseDate: String?,
+    ) : CollectionCardMetadata
+}
+
+internal fun CollectionEntry.collectionCardMetadata(): CollectionCardMetadata {
+    return if (status == CollectionEntryStatus.RESERVED) {
+        CollectionCardMetadata.Reservation(
+            store = reservationStore,
+            releaseDate = releaseDate,
+        )
+    } else {
+        CollectionCardMetadata.Catalog(
+            seriesName = seriesName,
+            category = category,
+        )
+    }
+}
+
+internal data class CollectionSummary(
+    val ownedCount: Int,
+    val reservedCount: Int,
+    val totalPurchaseAmount: Long,
+)
+
+internal fun collectionSummary(entries: List<CollectionEntry>): CollectionSummary {
+    val ownedEntries = entries.filter { it.status != CollectionEntryStatus.RESERVED }
+    return CollectionSummary(
+        ownedCount = ownedEntries.size,
+        reservedCount = entries.count { it.status == CollectionEntryStatus.RESERVED },
+        totalPurchaseAmount = ownedEntries.sumOf { it.purchasePrice ?: 0L },
+    )
 }
 
 internal fun visibleCollectionEntries(
@@ -233,129 +203,5 @@ internal fun visibleCollectionEntries(
             CollectionSegment.ALL -> true
         }
         matchesQuery && matchesSegment
-    }
-}
-
-@Composable
-private fun CollectionSegmentCard(
-    label: String,
-    value: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-) {
-    val shape = MaterialTheme.shapes.small
-    Surface(
-        modifier = Modifier
-            .widthIn(min = 136.dp)
-            .clickable(onClick = onClick),
-        color = if (selected) {
-            MaterialTheme.colorScheme.primaryContainer
-        } else {
-            MaterialTheme.colorScheme.surface
-        },
-        contentColor = if (selected) {
-            MaterialTheme.colorScheme.onPrimaryContainer
-        } else {
-            MaterialTheme.colorScheme.onSurface
-        },
-        shape = shape,
-        shadowElevation = if (selected) 2.dp else 1.dp,
-        border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.outlineVariant),
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            Text(
-                text = value,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold,
-            )
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelMedium,
-                color = if (selected) {
-                    MaterialTheme.colorScheme.onPrimaryContainer
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                },
-            )
-        }
-    }
-}
-
-@Composable
-private fun CollectionSummaryCard(
-    label: String,
-    value: String,
-    containerColor: Color,
-    contentColor: Color,
-) {
-    val shape = MaterialTheme.shapes.small
-    Surface(
-        modifier = Modifier
-            .widthIn(min = 136.dp),
-        color = containerColor,
-        contentColor = contentColor,
-        shape = shape,
-        shadowElevation = 1.dp,
-        border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.outlineVariant),
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            Text(
-                text = value,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold,
-            )
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelMedium,
-                color = contentColor.copy(alpha = 0.84f),
-            )
-        }
-    }
-}
-
-@Composable
-private fun collectionEntryStatusContainerColor(status: CollectionEntryStatus): Color {
-    return when (status) {
-        CollectionEntryStatus.RESERVED -> MaterialTheme.colorScheme.primaryContainer
-        CollectionEntryStatus.OWNED -> MaterialTheme.colorScheme.secondaryContainer
-        CollectionEntryStatus.PLANNED_CLEANUP -> MaterialTheme.colorScheme.tertiaryContainer
-    }
-}
-
-@Composable
-private fun collectionEntryStatusContentColor(status: CollectionEntryStatus): Color {
-    return when (status) {
-        CollectionEntryStatus.RESERVED -> MaterialTheme.colorScheme.onPrimaryContainer
-        CollectionEntryStatus.OWNED -> MaterialTheme.colorScheme.onSecondaryContainer
-        CollectionEntryStatus.PLANNED_CLEANUP -> MaterialTheme.colorScheme.onTertiaryContainer
-    }
-}
-
-@Composable
-private fun CollectionEntry.subtitle(): String {
-    return if (status == CollectionEntryStatus.RESERVED) {
-        tr(
-            Res.string.preorders_store_release,
-            reservationStore ?: tr(Res.string.common_unknown),
-            releaseDate?.let { formatDate(it) } ?: tr(Res.string.common_not_set),
-        )
-    } else {
-        purchaseStore ?: storageLocationId ?: tr(Res.string.common_unknown)
-    }
-}
-
-private fun List<CollectionEntry>.countVisibleFor(segment: CollectionSegment): Int {
-    return count { entry ->
-        when (segment) {
-            CollectionSegment.OWNED -> entry.status != CollectionEntryStatus.RESERVED
-            CollectionSegment.RESERVED -> entry.status == CollectionEntryStatus.RESERVED
-            CollectionSegment.ALL -> true
-        }
     }
 }

@@ -60,6 +60,7 @@
 
     <string name="collection_search_label">컬렉션 검색</string>
     <string name="collection_search_placeholder">이름 또는 시리즈</string>
+    <string name="collection_result_count">총 %1$s개</string>
     <string name="collection_empty_search">현재 조건과 일치하는 굿즈가 없어요.</string>
     <string name="collection_status_section">굿즈 상태</string>
     <string name="collection_status_section_subtitle">보유 중과 정리 예정 굿즈를 나누고 구매 규모를 함께 확인해요.</string>

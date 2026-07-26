@@ -60,6 +60,7 @@
 
     <string name="collection_search_label">Search collection</string>
     <string name="collection_search_placeholder">Name or series</string>
+    <string name="collection_result_count">%1$s total</string>
     <string name="collection_empty_search">No items match the current collection filters.</string>
     <string name="collection_status_section">Item status</string>
     <string name="collection_status_section_subtitle">Switch between owned and planned cleanup items and review purchase scale together.</string>

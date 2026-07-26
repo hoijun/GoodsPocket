@@ -2,6 +2,7 @@ package goods.pocket.app.presentation.designsystem
 
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import goods.pocket.app.presentation.screen.CollectionReferenceMetrics
 import goods.pocket.app.presentation.screen.HomeReferenceMetrics
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -27,9 +28,30 @@ class ImageLockedMetricsContractTest {
     @Test
     fun `bottom navigation metrics keep the approved footprint`() {
         assertEquals(38.dp, ImageLockedNavigationMetrics.QuickAddDiameter)
+        assertEquals(4.dp, ImageLockedNavigationMetrics.QuickAddTopPadding)
         assertEquals(0.5.dp, ImageLockedNavigationMetrics.QuickAddShadowElevation)
         assertEquals((-13).dp, ImageLockedNavigationMetrics.ItemVerticalOffset)
         assertEquals(9.sp, ImageLockedNavigationMetrics.LabelFontSize)
         assertEquals(24.dp, ImageLockedNavigationMetrics.IconSize)
     }
+
+    @Test
+    fun `collection owned reference metrics keep the approved grid geometry`() {
+        assertEquals(16.dp, CollectionReferenceMetrics.ScreenHorizontalPadding)
+        assertEquals(32.dp, CollectionReferenceMetrics.TopInsetReduction)
+        assertEquals(16.dp, CollectionReferenceMetrics.TitleToSegmentSpacing)
+        assertEquals(38.dp, CollectionReferenceMetrics.SegmentHeight)
+        assertEquals(39.dp, CollectionReferenceMetrics.SearchHeight)
+        assertEquals(19.dp, CollectionReferenceMetrics.SearchToCountSpacing)
+        assertEquals(10.dp, CollectionReferenceMetrics.GridSpacing)
+        assertEquals(201.dp, CollectionReferenceMetrics.GridTop)
+        assertEquals(222.dp, CollectionReferenceMetrics.GoodsCardHeight)
+        assertEquals(135.dp, CollectionReferenceMetrics.GoodsMediaHeight)
+        assertEquals(66.dp, CollectionReferenceMetrics.SummaryHeight)
+        assertEquals(0.5.dp, CollectionReferenceMetrics.CardShadowElevation)
+        assertEquals(18.sp, CollectionReferenceMetrics.TitleFontSize)
+        assertEquals(11.sp, CollectionReferenceMetrics.GoodsNameFontSize)
+        assertEquals(9.sp, CollectionReferenceMetrics.GoodsMetadataFontSize)
+    }
+
 }

@@ -34,6 +34,7 @@ import goods.pocket.app.presentation.i18n.localizedLabel
 import goods.pocket.app.presentation.i18n.tr
 import goods.pocket.app.presentation.navigation.AppDestination
 import goods.pocket.app.presentation.screen.CollectionScreen
+import goods.pocket.app.presentation.screen.CollectionReferenceMetrics
 import goods.pocket.app.presentation.screen.EventsScreen
 import goods.pocket.app.presentation.screen.HomeScreen
 import goods.pocket.app.presentation.screen.MyScreen
@@ -126,10 +127,10 @@ private fun GoodsPocketNavHost(
     appStateHolder: GoodsPocketAppStateHolder,
     innerPadding: PaddingValues,
 ) {
-    val screenPadding = if (uiState.currentDestination == AppDestination.Home) {
-        homeScreenPadding(innerPadding)
-    } else {
-        innerPadding
+    val screenPadding = when (uiState.currentDestination) {
+        AppDestination.Home -> homeScreenPadding(innerPadding)
+        AppDestination.Collection -> collectionScreenPadding(innerPadding)
+        else -> innerPadding
     }
     Box(
         modifier = Modifier
@@ -178,6 +179,17 @@ private fun homeScreenPadding(
 ): PaddingValues {
     return PaddingValues(
         top = (innerPadding.calculateTopPadding() - 25.dp).coerceAtLeast(0.dp),
+        bottom = innerPadding.calculateBottomPadding(),
+    )
+}
+
+private fun collectionScreenPadding(
+    innerPadding: PaddingValues,
+): PaddingValues {
+    return PaddingValues(
+        top = (
+            innerPadding.calculateTopPadding() - CollectionReferenceMetrics.TopInsetReduction
+        ).coerceAtLeast(0.dp),
         bottom = innerPadding.calculateBottomPadding(),
     )
 }

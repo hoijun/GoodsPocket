@@ -12,7 +12,8 @@ Always read:
 Read when the task touches the corresponding area:
 
 - Home screen or Home-specific shared chrome: [Home Image-Locked Contract](.agents/design/home.md) and [Visual Verification](.agents/design/verification.md)
-- Collection, Events, My, Settings, or screen-to-reference alignment: [Screen Alignment](.agents/design/screen-alignment.md), [Shared Components](.agents/design/components.md), and [Visual Verification](.agents/design/verification.md)
+- Collection screen: [Collection Image-Locked Contract](.agents/design/collection.md), [Shared Components](.agents/design/components.md), and [Visual Verification](.agents/design/verification.md)
+- Events, My, Settings, or screen-to-reference alignment: [Screen Alignment](.agents/design/screen-alignment.md), [Shared Components](.agents/design/components.md), and [Visual Verification](.agents/design/verification.md)
 - Cards, lists, search, filters, navigation, badges, empty/loading states, or iconography: [Shared Components](.agents/design/components.md)
 - Inputs, quick entry, detail/edit sheets, or bottom sheets: [Sheets and Forms](.agents/design/sheets-forms.md)
 - Screenshot capture, normalized comparison, pixel tolerance, or visual completion: [Visual Verification](.agents/design/verification.md)

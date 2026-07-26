@@ -301,7 +301,7 @@ fun GoodsPocketImageLockedBottomBar(
             onClick = onQuickAdd,
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .padding(top = 6.dp),
+                .padding(top = ImageLockedNavigationMetrics.QuickAddTopPadding),
         )
     }
 }
