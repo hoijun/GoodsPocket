@@ -150,6 +150,8 @@
     <string name="editor_item_title">굿즈 수정</string>
     <string name="editor_preorder_title">예약 수정</string>
     <string name="editor_collection_entry_title">컬렉션 항목 수정</string>
+    <string name="editor_owned_title">컬렉션 편집</string>
+    <string name="editor_owned_save">변경사항 저장</string>
     <string name="editor_event_title">이벤트 수정</string>
 
     <string name="detail_category">카테고리</string>

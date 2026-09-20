@@ -299,6 +299,7 @@ class GoodsPocketAppStateHolderTest {
 
         stateHolder.closeEditor()
         assertNull(stateHolder.state.value.activeEditor)
+        assertEquals(ActiveDetail.CollectionEntryDetail("item-1"), stateHolder.state.value.activeDetail)
     }
 
     @Test

@@ -150,6 +150,8 @@
     <string name="editor_item_title">Edit Item</string>
     <string name="editor_preorder_title">Edit Preorder</string>
     <string name="editor_collection_entry_title">Edit Collection Entry</string>
+    <string name="editor_owned_title">Edit Collection</string>
+    <string name="editor_owned_save">Save Changes</string>
     <string name="editor_event_title">Edit Event</string>
 
     <string name="detail_category">Category</string>

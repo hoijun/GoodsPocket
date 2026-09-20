@@ -273,7 +273,16 @@ class GoodsPocketAppStateHolder(
     }
 
     fun closeEditor() {
-        _state.update { it.copy(activeEditor = null) }
+        _state.update { current ->
+            val editor = current.activeEditor ?: return@update current
+            current.copy(
+                activeEditor = null,
+                activeDetail = when (editor) {
+                    is ActiveEditor.CollectionEntryEditor -> ActiveDetail.CollectionEntryDetail(editor.entryId)
+                    is ActiveEditor.EventEditor -> current.activeDetail
+                },
+            )
+        }
     }
 
     fun saveEditedCollectionEntry(
