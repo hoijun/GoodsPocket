@@ -5,21 +5,17 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import goods.pocket.app.domain.model.CollectionEntryStatus
 import goods.pocket.app.presentation.designsystem.GoodsPocketImageLockedBottomBar
@@ -29,6 +25,7 @@ import goods.pocket.app.presentation.component.CollectionEntryEditorSheet
 import goods.pocket.app.presentation.component.EventDetailSheet
 import goods.pocket.app.presentation.component.EventEditorSheet
 import goods.pocket.app.presentation.component.QuickAddSheet
+import goods.pocket.app.presentation.component.DeleteConfirmationDialog
 import goods.pocket.app.presentation.i18n.ProvideLocalizedResources
 import goods.pocket.app.presentation.i18n.localizedLabel
 import goods.pocket.app.presentation.i18n.tr
@@ -183,6 +180,7 @@ private fun GoodsPocketNavHost(
             AppDestination.Events -> EventsScreen(
                 events = uiState.events,
                 selectedType = uiState.eventTypeFilter,
+                currentDate = uiState.currentDate,
                 onTypeChange = appStateHolder::updateEventTypeFilter,
                 onEventClick = appStateHolder::openEventDetail,
             )
@@ -262,6 +260,7 @@ private fun ActiveDetailSheet(
             val event = uiState.events.firstOrNull { it.id == detail.eventId } ?: return
             EventDetailSheet(
                 event = event,
+                entries = uiState.collectionEntries,
                 onDismiss = appStateHolder::closeDetail,
                 onEdit = { appStateHolder.openEventEditor(event.id) },
                 onDelete = { appStateHolder.requestDeleteEvent(event.id) },
@@ -343,35 +342,14 @@ private fun PendingDeleteDialog(
         }
     }
 
-    AlertDialog(
-        onDismissRequest = appStateHolder::dismissPendingDelete,
-        containerColor = MaterialTheme.colorScheme.surface,
-        iconContentColor = MaterialTheme.colorScheme.error,
-        titleContentColor = MaterialTheme.colorScheme.onSurface,
-        textContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-        title = {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
+    DeleteConfirmationDialog(
+        title = title,
+        body = body,
+        confirmLabel = when (pendingDelete) {
+            is PendingDelete.PreorderCancel -> tr(Res.string.action_cancel_preorder)
+            else -> tr(Res.string.action_delete)
         },
-        text = { Text(body, style = MaterialTheme.typography.bodyMedium) },
-        confirmButton = {
-            TextButton(onClick = appStateHolder::confirmPendingDelete) {
-                Text(
-                    when (pendingDelete) {
-                        is PendingDelete.PreorderCancel -> tr(Res.string.action_cancel_preorder)
-                        else -> tr(Res.string.action_delete)
-                    },
-                    color = MaterialTheme.colorScheme.error,
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = appStateHolder::dismissPendingDelete) {
-                Text(tr(Res.string.action_cancel))
-            }
-        },
+        onDismiss = appStateHolder::dismissPendingDelete,
+        onConfirm = appStateHolder::confirmPendingDelete,
     )
 }

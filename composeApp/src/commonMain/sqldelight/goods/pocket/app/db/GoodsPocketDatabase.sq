@@ -11,6 +11,7 @@ CREATE TABLE items (
   purchase_store TEXT,
   storage_location_id TEXT,
   linked_preorder_id TEXT,
+  related_link TEXT,
   note TEXT,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
@@ -19,6 +20,7 @@ CREATE TABLE items (
 CREATE TABLE preorders (
   id TEXT NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
+  category TEXT,
   store_name TEXT NOT NULL,
   release_date TEXT NOT NULL,
   status TEXT NOT NULL,
@@ -32,6 +34,7 @@ CREATE TABLE preorders (
   payment_due_date TEXT,
   receive_date TEXT,
   reservation_number TEXT,
+  related_link TEXT,
   note TEXT,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
@@ -85,9 +88,9 @@ WHERE id = ?;
 upsertItem:
 INSERT OR REPLACE INTO items (
   id, name, category, status, series_name, character_name, quantity, purchase_price,
-  purchase_date, purchase_store, storage_location_id, linked_preorder_id, note, created_at, updated_at
+  purchase_date, purchase_store, storage_location_id, linked_preorder_id, related_link, note, created_at, updated_at
 ) VALUES (
-  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 );
 
 deleteItemById:
@@ -113,11 +116,11 @@ WHERE id = ?;
 
 upsertPreorder:
 INSERT OR REPLACE INTO preorders (
-  id, name, store_name, release_date, status, series_name, character_name, total_price,
+  id, name, category, store_name, release_date, status, series_name, character_name, total_price,
   deposit_price, remaining_price, shipping_fee, order_date, payment_due_date, receive_date,
-  reservation_number, note, created_at, updated_at
+  reservation_number, related_link, note, created_at, updated_at
 ) VALUES (
-  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 );
 
 markPreorderReceived:

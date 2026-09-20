@@ -93,6 +93,18 @@ Letter spacing is `0` for every Collection text style.
 - Missing media contains no initials, text, generated artwork, or screenshot crop.
 - Empty and no-result states preserve the same header, controls, summary, and navigation geometry.
 
+### Detail Sheet States
+
+- Owned and reserved entries use the same `CollectionEntryDetailSheet` hierarchy and geometry.
+- `design/references/sheets/collection-detail-owned.png` is the single geometry reference for both states.
+- Do not generate a separate reserved-detail image when only status copy, metadata, or actions change.
+- Reserved detail keeps the real reservation transition callback; it never changes status directly in UI code.
+- Owned metadata shows purchase date, purchase store, purchase amount, related link, storage location, and memo.
+- Reserved metadata shows expected release date, reservation store, total preorder amount, related link, and memo.
+- The edit action remains present, but its future redesign is outside the current detail-field task.
+- Keep actions in a fixed footer above the system inset; scroll media and metadata within the remaining sheet height.
+- Capture the real reserved card state and obtain user approval before locking its visible metadata fields and copy.
+
 ## Chrome
 
 - Collection is a primary destination with no back button or notification bell.

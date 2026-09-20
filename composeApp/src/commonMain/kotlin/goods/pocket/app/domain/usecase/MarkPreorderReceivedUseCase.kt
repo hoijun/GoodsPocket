@@ -21,7 +21,8 @@ class MarkPreorderReceivedUseCase(
         val receivedItem = Item(
             id = entry.id,
             name = entry.name,
-            category = RECEIVED_ITEM_CATEGORY_CODE,
+            category = entry.category.takeUnless { it == goods.pocket.app.domain.model.RESERVED_COLLECTION_CATEGORY_CODE }
+                ?: RECEIVED_ITEM_CATEGORY_CODE,
             status = ItemStatus.OWNED,
             seriesName = entry.seriesName,
             characterName = entry.characterName,
@@ -31,6 +32,7 @@ class MarkPreorderReceivedUseCase(
             purchaseStore = entry.reservationStore ?: entry.purchaseStore,
             storageLocationId = entry.storageLocationId,
             linkedPreorderId = entry.id,
+            relatedLink = entry.relatedLink,
             note = entry.note,
             createdAt = entry.createdAt,
             updatedAt = receivedAt,

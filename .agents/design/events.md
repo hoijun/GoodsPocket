@@ -55,7 +55,8 @@ Additional domain rows scroll above the fixed bottom navigation.
 ## State And Behavior
 
 - `null` selects `전체`; existing `EventType` values keep `onTypeChange` callbacks.
-- The nearest visible event is featured; every remaining event appears in date order in the timeline.
+- Filter by type before ordering. Feature the earliest valid event on or after the supplied current date, or the latest past event when none is upcoming. The timeline places remaining upcoming events ascending, past events descending, and malformed dates last in stable input order.
+- The overview month follows the supplied current date even when the filter is empty; do not infer the current month from an event or call a clock in the composable.
 - Featured card and rows call `onEventClick(event.id)`.
 - Month, count, labels, titles, locations, and dates remain domain-derived and localized.
 - Empty states keep the title, overview, filters, and navigation geometry.

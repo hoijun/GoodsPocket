@@ -15,6 +15,7 @@ import goods.pocket.app.domain.repository.SettingsRepository
 import goods.pocket.app.domain.repository.CollectionRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -43,13 +44,38 @@ class GoodsPocketAppStateHolderTest {
     }
 
     @Test
+    fun `collection detail opens and closes without changing segment or query`() {
+        val stateHolder = newStateHolder()
+        stateHolder.selectCollectionSegment(CollectionSegment.RESERVED)
+        stateHolder.updateCollectionQuery("프로젝트")
+
+        stateHolder.openCollectionEntryDetail("pre-1")
+
+        val detailState = stateHolder.state.value
+        assertEquals(CollectionSegment.RESERVED, detailState.collectionSegment)
+        assertEquals("프로젝트", detailState.collectionQuery)
+        assertEquals(ActiveDetail.CollectionEntryDetail("pre-1"), detailState.activeDetail)
+
+        stateHolder.closeDetail()
+
+        val closedState = stateHolder.state.value
+        assertEquals(CollectionSegment.RESERVED, closedState.collectionSegment)
+        assertEquals("프로젝트", closedState.collectionQuery)
+        assertNull(closedState.activeDetail)
+    }
+
+    @Test
     fun `marking a reserved collection entry as received keeps the same id and switches it to owned`() {
         val stateHolder = newStateHolder()
+        stateHolder.selectCollectionSegment(CollectionSegment.RESERVED)
 
         stateHolder.markCollectionEntryReceived("pre-1")
 
-        val updated = stateHolder.state.value.collectionEntries.first { it.id == "pre-1" }
+        val state = stateHolder.state.value
+        val updated = state.collectionEntries.first { it.id == "pre-1" }
         assertEquals(CollectionEntryStatus.OWNED, updated.status)
+        assertEquals(CollectionSegment.OWNED, state.collectionSegment)
+        assertEquals(ActiveDetail.CollectionEntryDetail("pre-1"), state.activeDetail)
     }
 
     @Test
@@ -144,17 +170,19 @@ class GoodsPocketAppStateHolderTest {
     }
 
     @Test
-    fun `home collection link clears query and selects requested segment`() {
+    fun `home collection links clear query and select every requested segment`() {
         val stateHolder = newStateHolder()
-        stateHolder.updateCollectionQuery("미쿠")
 
-        stateHolder.openCollectionFromHome(CollectionSegment.RESERVED)
+        CollectionSegment.entries.forEach { segment ->
+            stateHolder.updateCollectionQuery("미쿠")
+            stateHolder.openCollectionFromHome(segment)
 
-        val state = stateHolder.state.value
-        assertEquals(AppDestination.Collection, state.currentDestination)
-        assertEquals(AppDestination.Collection, state.selectedPrimaryDestination)
-        assertEquals(CollectionSegment.RESERVED, state.collectionSegment)
-        assertEquals("", state.collectionQuery)
+            val state = stateHolder.state.value
+            assertEquals(AppDestination.Collection, state.currentDestination)
+            assertEquals(AppDestination.Collection, state.selectedPrimaryDestination)
+            assertEquals(segment, state.collectionSegment)
+            assertEquals("", state.collectionQuery)
+        }
     }
 
     @Test
@@ -274,6 +302,60 @@ class GoodsPocketAppStateHolderTest {
     }
 
     @Test
+    fun `event quick add clears the active filter and opens the newly saved event`() {
+        val stateHolder = newStateHolder()
+        stateHolder.selectDestination(AppDestination.Events)
+        val filter = EventType.entries.first { it != EventType.DELIVERY }
+        stateHolder.updateEventTypeFilter(filter)
+        stateHolder.openQuickAdd()
+        stateHolder.selectQuickAddTarget(QuickAddTarget.EVENT)
+        assertEquals(filter, stateHolder.state.value.eventTypeFilter)
+
+        stateHolder.submitEvent("New delivery", "2026-03-28", EventType.DELIVERY)
+
+        val state = stateHolder.state.value
+        val saved = state.events.single { it.title == "New delivery" }
+        assertEquals(EventType.DELIVERY, saved.eventType)
+        assertEquals(AppDestination.Events, state.currentDestination)
+        assertEquals(AppDestination.Events, state.selectedPrimaryDestination)
+        assertEquals(ActiveDetail.EventDetail(saved.id), state.activeDetail)
+        assertFalse(state.isQuickAddOpen)
+        assertNull(state.eventTypeFilter)
+    }
+
+    @Test
+    fun `editing a collection entry preserves its related link through save and reload`() = runTest {
+        val repository = InMemoryGoodsPocketRepository()
+        val original = requireNotNull(repository.getEntry("item-1")).copy(
+            relatedLink = "https://example.com/items/item-1",
+        )
+        repository.saveEntry(original)
+        val stateHolder = newStateHolder(repository = repository)
+        stateHolder.openCollectionEntryEditor(original.id)
+
+        stateHolder.saveEditedCollectionEntry(
+            entryId = original.id,
+            name = "Updated linked item",
+            category = original.category,
+            status = original.status,
+            seriesName = original.seriesName.orEmpty(),
+            characterName = original.characterName.orEmpty(),
+            purchaseStore = original.purchaseStore.orEmpty(),
+            releaseDate = original.releaseDate.orEmpty(),
+            reservationStore = original.reservationStore.orEmpty(),
+            note = "Updated note",
+        )
+
+        val saved = requireNotNull(repository.getEntry(original.id))
+        assertEquals("Updated linked item", saved.name)
+        assertEquals("Updated note", saved.note)
+        assertEquals(original.relatedLink, saved.relatedLink)
+        assertEquals(saved, stateHolder.state.value.collectionEntries.single { it.id == original.id })
+        val reloaded = newStateHolder(repository = repository)
+        assertEquals(saved, reloaded.state.value.collectionEntries.single { it.id == original.id })
+    }
+
+    @Test
     fun editedItemIsReflectedInState() {
         val stateHolder = newStateHolder()
 
@@ -310,6 +392,105 @@ class GoodsPocketAppStateHolderTest {
         assertNull(stateHolder.state.value.collectionEntries.firstOrNull { it.id == "pre-1" })
         assertNull(stateHolder.state.value.pendingDelete)
         assertNull(stateHolder.state.value.activeDetail)
+    }
+
+    @Test
+    fun `dismissing item deletion restores the same detail and host state`() {
+        val stateHolder = newStateHolder()
+        stateHolder.selectCollectionSegment(CollectionSegment.OWNED)
+        stateHolder.updateCollectionQuery("item query")
+        stateHolder.updateEventTypeFilter(EventType.DELIVERY)
+        stateHolder.openCollectionEntryDetail("item-1")
+        val before = stateHolder.state.value
+
+        stateHolder.requestDeleteCollectionEntry("item-1")
+
+        assertEquals(
+            before.copy(activeDetail = null, pendingDelete = PendingDelete.ItemDelete("item-1")),
+            stateHolder.state.value,
+        )
+
+        stateHolder.dismissPendingDelete()
+
+        assertEquals(before, stateHolder.state.value)
+    }
+
+    @Test
+    fun `dismissing preorder cancellation restores the same detail and host state`() {
+        val stateHolder = newStateHolder()
+        stateHolder.selectCollectionSegment(CollectionSegment.RESERVED)
+        stateHolder.updateCollectionQuery("preorder query")
+        stateHolder.updateEventTypeFilter(EventType.DELIVERY)
+        stateHolder.openCollectionEntryDetail("pre-1")
+        val before = stateHolder.state.value
+
+        stateHolder.requestDeleteCollectionEntry("pre-1")
+
+        assertEquals(
+            before.copy(activeDetail = null, pendingDelete = PendingDelete.PreorderCancel("pre-1")),
+            stateHolder.state.value,
+        )
+
+        stateHolder.dismissPendingDelete()
+
+        assertEquals(before, stateHolder.state.value)
+    }
+
+    @Test
+    fun `dismissing event deletion restores the same detail and host state`() {
+        val stateHolder = newStateHolder()
+        stateHolder.selectCollectionSegment(CollectionSegment.RESERVED)
+        stateHolder.selectDestination(AppDestination.Events)
+        stateHolder.updateCollectionQuery("retained query")
+        stateHolder.updateEventTypeFilter(EventType.DELIVERY)
+        stateHolder.openEventDetail("event-1")
+        val before = stateHolder.state.value
+
+        stateHolder.requestDeleteEvent("event-1")
+
+        assertEquals(
+            before.copy(activeDetail = null, pendingDelete = PendingDelete.EventDelete("event-1")),
+            stateHolder.state.value,
+        )
+
+        stateHolder.dismissPendingDelete()
+
+        assertEquals(before, stateHolder.state.value)
+    }
+
+    @Test
+    fun `dismissing without a pending deletion leaves state unchanged`() {
+        val stateHolder = newStateHolder()
+        stateHolder.selectCollectionSegment(CollectionSegment.RESERVED)
+        stateHolder.updateCollectionQuery("retained query")
+        stateHolder.updateEventTypeFilter(EventType.DELIVERY)
+        val hostState = stateHolder.state.value
+
+        stateHolder.dismissPendingDelete()
+
+        assertEquals(hostState, stateHolder.state.value)
+
+        stateHolder.openCollectionEntryDetail("pre-1")
+        val detailState = stateHolder.state.value
+
+        stateHolder.dismissPendingDelete()
+
+        assertEquals(detailState, stateHolder.state.value)
+    }
+
+    @Test
+    fun `dismissing collection deletion keeps the entry and selected segment`() {
+        val stateHolder = newStateHolder()
+        stateHolder.selectCollectionSegment(CollectionSegment.RESERVED)
+        val entries = stateHolder.state.value.collectionEntries
+
+        stateHolder.requestDeleteCollectionEntry("pre-1")
+        stateHolder.dismissPendingDelete()
+
+        val state = stateHolder.state.value
+        assertEquals(entries, state.collectionEntries)
+        assertEquals(CollectionSegment.RESERVED, state.collectionSegment)
+        assertNull(state.pendingDelete)
     }
 
     @Test
@@ -377,6 +558,63 @@ class GoodsPocketAppStateHolderTest {
         assertEquals(2, stateHolder.state.value.homeSummary.ownedItemCount)
     }
 
+    @Test
+    fun `failed quick add keeps the sheet and retries the same entry once`() = runTest {
+        val repository = InMemoryGoodsPocketRepository()
+        val recovering = RecoveringCollectionRepository(repository)
+        val stateHolder = newStateHolder(repository, collectionRepository = recovering)
+        val before = repository.getEntries()
+        stateHolder.openQuickAdd()
+        recovering.shouldFail = true
+
+        stateHolder.submitCollectionEntry(
+            name = "Retry item", category = "goods", status = CollectionEntryStatus.OWNED,
+            seriesName = "", characterName = "", purchaseStore = "", releaseDate = "",
+            reservationStore = "", note = "Kept draft",
+        )
+
+        assertEquals(GoodsPocketOperation.SAVE, stateHolder.state.value.failure?.operation)
+        assertTrue(stateHolder.state.value.isQuickAddOpen)
+        assertEquals(before, repository.getEntries())
+        recovering.shouldFail = false
+        stateHolder.retry()
+
+        val saved = repository.getEntries().single { it.name == "Retry item" }
+        assertEquals(listOf(saved.id, saved.id), recovering.savedIds)
+        assertEquals(before.size + 1, repository.getEntries().size)
+        assertEquals("Kept draft", saved.note)
+        assertNull(stateHolder.state.value.failure)
+        assertFalse(stateHolder.state.value.isQuickAddOpen)
+        assertEquals(AppDestination.Collection, stateHolder.state.value.currentDestination)
+        assertEquals(ActiveDetail.CollectionEntryDetail(saved.id), stateHolder.state.value.activeDetail)
+    }
+
+    @Test
+    fun `failed delete preserves confirmation and retries only the requested entry`() = runTest {
+        val repository = InMemoryGoodsPocketRepository()
+        val recovering = RecoveringCollectionRepository(repository)
+        val stateHolder = newStateHolder(repository, collectionRepository = recovering)
+        val before = repository.getEntries()
+        stateHolder.openCollectionEntryDetail("item-1")
+        stateHolder.requestDeleteCollectionEntry("item-1")
+        val pending = stateHolder.state.value.pendingDelete
+        recovering.shouldFail = true
+
+        stateHolder.confirmPendingDelete()
+
+        assertEquals(GoodsPocketOperation.DELETE, stateHolder.state.value.failure?.operation)
+        assertEquals(pending, stateHolder.state.value.pendingDelete)
+        assertEquals(before, repository.getEntries())
+        recovering.shouldFail = false
+        stateHolder.retry()
+
+        assertEquals(before.filterNot { it.id == "item-1" }, repository.getEntries())
+        assertNull(stateHolder.state.value.failure)
+        assertNull(stateHolder.state.value.pendingDelete)
+        assertNull(stateHolder.state.value.activeDetail)
+        assertEquals(AppDestination.Collection, stateHolder.state.value.currentDestination)
+    }
+
     private fun newStateHolder(
         repository: InMemoryGoodsPocketRepository = InMemoryGoodsPocketRepository(),
         collectionRepository: CollectionRepository = repository,
@@ -412,6 +650,24 @@ private class CountingCollectionRepository(
     override suspend fun getEntries(filter: String?): List<goods.pocket.app.domain.model.CollectionEntry> {
         getEntriesCount += 1
         return delegate.getEntries(filter)
+    }
+}
+
+private class RecoveringCollectionRepository(
+    private val delegate: CollectionRepository,
+) : CollectionRepository by delegate {
+    var shouldFail: Boolean = false
+    val savedIds = mutableListOf<String>()
+
+    override suspend fun saveEntry(entry: goods.pocket.app.domain.model.CollectionEntry) {
+        savedIds += entry.id
+        if (shouldFail) error("Test save failure")
+        delegate.saveEntry(entry)
+    }
+
+    override suspend fun deleteEntry(id: String, deletedAt: String) {
+        if (shouldFail) error("Test delete failure")
+        delegate.deleteEntry(id, deletedAt)
     }
 }
 

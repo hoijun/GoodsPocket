@@ -14,6 +14,7 @@ data class CollectionEntry(
     val storageLocationId: String? = null,
     val releaseDate: String? = null,
     val reservationStore: String? = null,
+    val relatedLink: String? = null,
     val note: String? = null,
     val createdAt: String,
     val updatedAt: String,

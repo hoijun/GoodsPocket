@@ -33,14 +33,57 @@ class JournalScreenModelsTest {
                 ),
             ),
             selectedType = null,
+            currentDate = "2024-05-21",
         )
 
         assertEquals("2024.05", overview.headlineMonth)
-        assertEquals("payment", overview.featuredEvent?.id)
+        assertEquals("release", overview.featuredEvent?.id)
         assertEquals(
-            listOf("release", "offline", "delivery"),
+            listOf("offline", "delivery", "payment"),
             overview.timelineEvents.map(Event::id),
         )
+    }
+
+    @Test
+    fun `all past events promote the latest valid date before malformed dates`() {
+        val overview = buildEventJournalOverview(
+            events = listOf(
+                event("invalid", EventType.RELEASE, "2026-02-30"),
+                event("older", EventType.RELEASE, "2026-06-01"),
+                event("latest", EventType.RELEASE, "2026-07-20"),
+                event("unknown", EventType.RELEASE, "unknown"),
+            ),
+            selectedType = null,
+            currentDate = "2026-07-26",
+        )
+        assertEquals("latest", overview.featuredEvent?.id)
+        assertEquals(listOf("older", "invalid", "unknown"), overview.timelineEvents.map(Event::id))
+        assertEquals("2026.07", overview.headlineMonth)
+    }
+
+    @Test
+    fun `type filter is applied before choosing todays highlight`() {
+        val overview = buildEventJournalOverview(
+            events = listOf(
+                event("other", EventType.DELIVERY, "2026-07-26"),
+                event("today", EventType.RELEASE, "2026-07-26"),
+                event("next", EventType.RELEASE, "2026-07-27"),
+            ),
+            selectedType = EventType.RELEASE,
+            currentDate = "2026-07-26",
+        )
+        assertEquals("today", overview.featuredEvent?.id)
+        assertEquals(listOf("next"), overview.timelineEvents.map(Event::id))
+    }
+
+    @Test
+    fun `empty and unmatched filters preserve current month`() {
+        for (events in listOf(emptyList(), listOf(event("other", EventType.DELIVERY, "2026-08-01")))) {
+            val overview = buildEventJournalOverview(events, EventType.RELEASE, "2026-07-26")
+            assertEquals(null, overview.featuredEvent)
+            assertEquals(emptyList(), overview.timelineEvents)
+            assertEquals("2026.07", overview.headlineMonth)
+        }
     }
 
     @Test

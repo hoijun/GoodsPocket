@@ -2,6 +2,14 @@
 <resources>
     <string name="nav_home">Home</string>
     <string name="nav_collection">Collection</string>
+    <string name="quick_add_item_name">Item name</string>
+    <string name="quick_add_store">Store</string>
+    <string name="quick_add_reservation_store">Reservation store</string>
+    <string name="quick_add_release_date">Expected release date</string>
+    <string name="quick_add_owned">Owned</string>
+    <string name="quick_add_reserved">Reserved</string>
+    <string name="quick_add_event_name">Event name</string>
+    <string name="quick_add_event_type">Event type</string>
     <string name="nav_my">My</string>
     <string name="nav_events">Events</string>
     <string name="nav_settings">Settings</string>
@@ -139,7 +147,6 @@
     <string name="field_character">Character</string>
     <string name="field_note">Note</string>
     <string name="field_title">Title</string>
-
     <string name="editor_item_title">Edit Item</string>
     <string name="editor_preorder_title">Edit Preorder</string>
     <string name="editor_collection_entry_title">Edit Collection Entry</string>
@@ -152,6 +159,14 @@
     <string name="detail_store">Store</string>
     <string name="detail_purchase_date">Purchase date</string>
     <string name="detail_purchase_price">Purchase price</string>
+    <string name="detail_collection_purchase_date">Purchase date</string>
+    <string name="detail_collection_purchase_store">Purchased at</string>
+    <string name="detail_collection_purchase_price">Purchase amount</string>
+    <string name="detail_collection_storage_location">Storage location</string>
+    <string name="detail_expected_release_date">Expected release date</string>
+    <string name="detail_reservation_store">Reserved at</string>
+    <string name="detail_reservation_amount">Total preorder amount</string>
+    <string name="detail_related_link">Related link</string>
     <string name="detail_linked_preorder">Linked preorder</string>
     <string name="detail_release_date">Release date</string>
     <string name="detail_deposit">Deposit</string>

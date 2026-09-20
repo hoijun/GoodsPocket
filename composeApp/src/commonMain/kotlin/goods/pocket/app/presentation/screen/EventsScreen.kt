@@ -26,11 +26,12 @@ import goodspocket.composeapp.generated.resources.nav_events
 fun EventsScreen(
     events: List<Event>,
     selectedType: EventType?,
+    currentDate: String,
     onTypeChange: (EventType?) -> Unit,
     onEventClick: (String) -> Unit,
 ) {
-    val overview = remember(events, selectedType) {
-        buildEventJournalOverview(events, selectedType)
+    val overview = remember(events, selectedType, currentDate) {
+        buildEventJournalOverview(events, selectedType, currentDate)
     }
     val filters = listOf<EventType?>(
         null,

@@ -52,4 +52,13 @@ class CollectionEntryRepositoryTest {
 
         assertNull(repository.getEntry("pre-2"))
     }
+
+    @Test
+    fun `reserved category survives save and reload`() = runTest {
+        val entry = checkNotNull(repository.getEntry("pre-1"))
+
+        repository.saveEntry(entry.copy(category = "배지"))
+
+        assertEquals("배지", repository.getEntry("pre-1")?.category)
+    }
 }

@@ -9,6 +9,34 @@ import kotlin.test.assertEquals
 class CollectionProjectionTest {
 
     @Test
+    fun `segments project owned cleanup reserved and all entries`() {
+        val entries = listOf(
+            entry("owned", "Acrylic stand", "Hololive", "Suisei", CollectionEntryStatus.OWNED),
+            entry(
+                "cleanup",
+                "Art book",
+                "Blue Archive",
+                "Hina",
+                CollectionEntryStatus.PLANNED_CLEANUP,
+            ),
+            entry("reserved", "Birthday set", "Hololive", "Miko", CollectionEntryStatus.RESERVED),
+        )
+
+        assertEquals(
+            listOf("owned", "cleanup"),
+            visibleCollectionEntries(entries, "", CollectionSegment.OWNED).map { it.id },
+        )
+        assertEquals(
+            listOf("reserved"),
+            visibleCollectionEntries(entries, "", CollectionSegment.RESERVED).map { it.id },
+        )
+        assertEquals(
+            listOf("owned", "cleanup", "reserved"),
+            visibleCollectionEntries(entries, "", CollectionSegment.ALL).map { it.id },
+        )
+    }
+
+    @Test
     fun `query and segment are projected from the unified collection list`() {
         val entries = listOf(
             entry("item-1", "Acrylic stand", "Hololive", "Suisei", CollectionEntryStatus.OWNED),
@@ -23,6 +51,49 @@ class CollectionProjectionTest {
         assertEquals(
             listOf("pre-1"),
             visibleCollectionEntries(entries, "hololive", CollectionSegment.RESERVED).map { it.id },
+        )
+        assertEquals(
+            listOf("item-1"),
+            visibleCollectionEntries(entries, "ACRYLIC", CollectionSegment.ALL).map { it.id },
+        )
+    }
+
+    @Test
+    fun `empty and no result projections keep the complete collection summary independent`() {
+        val entries = listOf(
+            entry(
+                id = "item-1",
+                name = "Acrylic stand",
+                series = "Hololive",
+                character = "Suisei",
+                status = CollectionEntryStatus.OWNED,
+                purchasePrice = 18_000,
+            ),
+            entry(
+                id = "pre-1",
+                name = "Birthday set",
+                series = "Hololive",
+                character = "Miko",
+                status = CollectionEntryStatus.RESERVED,
+                purchasePrice = 42_000,
+            ),
+        )
+
+        assertEquals(
+            emptyList(),
+            visibleCollectionEntries(emptyList(), "", CollectionSegment.ALL),
+        )
+        assertEquals(
+            emptyList(),
+            visibleCollectionEntries(entries, "no match", CollectionSegment.ALL),
+        )
+        assertEquals(
+            CollectionSummary(
+                ownedCount = 1,
+                reservedCount = 1,
+                totalPurchaseAmount = 18_000,
+            ),
+            collectionSummary(entries),
         )
     }
 

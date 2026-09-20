@@ -1,0 +1,5 @@
+ALTER TABLE items ADD COLUMN related_link TEXT;
+
+ALTER TABLE preorders ADD COLUMN category TEXT;
+
+ALTER TABLE preorders ADD COLUMN related_link TEXT;

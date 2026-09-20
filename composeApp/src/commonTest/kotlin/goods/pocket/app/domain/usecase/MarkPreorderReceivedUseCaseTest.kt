@@ -26,6 +26,7 @@ class MarkPreorderReceivedUseCaseTest {
         assertEquals("pre-1", repository.receivedPreorderId)
         assertEquals("pre-1", repository.receivedItem?.id)
         assertEquals("pre-1", repository.receivedItem?.linkedPreorderId)
+        assertEquals("배지", repository.receivedItem?.category)
         assertEquals("2026-07-13", repository.receivedItem?.purchaseDate)
         assertEquals("2026-07-13", repository.receivedAt)
     }
@@ -95,7 +96,7 @@ private fun reservedEntry(): CollectionEntry {
     return CollectionEntry(
         id = "pre-1",
         name = "Reserved goods",
-        category = "preorder",
+        category = "배지",
         status = CollectionEntryStatus.RESERVED,
         seriesName = "Series",
         characterName = "Character",

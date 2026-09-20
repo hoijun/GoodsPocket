@@ -370,7 +370,15 @@ class GoodsPocketAppStateHolder(
     }
 
     fun dismissPendingDelete() {
-        _state.update { it.copy(pendingDelete = null) }
+        _state.update { current ->
+            val detail = when (val pending = current.pendingDelete) {
+                is PendingDelete.ItemDelete -> ActiveDetail.CollectionEntryDetail(pending.itemId)
+                is PendingDelete.PreorderCancel -> ActiveDetail.CollectionEntryDetail(pending.preorderId)
+                is PendingDelete.EventDelete -> ActiveDetail.EventDetail(pending.eventId)
+                null -> return@update current
+            }
+            current.copy(pendingDelete = null, activeDetail = detail)
+        }
     }
 
     fun confirmPendingDelete() {
@@ -436,6 +444,7 @@ class GoodsPocketAppStateHolder(
                     fallback = current.selectedPrimaryDestination,
                 ),
                 collectionSegment = collectionSegmentOverride ?: current.collectionSegment,
+                eventTypeFilter = if (destination == AppDestination.Events) null else current.eventTypeFilter,
                 activeDetail = detail,
                 isQuickAddOpen = false,
             )
@@ -481,6 +490,7 @@ class GoodsPocketAppStateHolder(
                 storageLocationId = existingEntry?.storageLocationId,
                 releaseDate = releaseDate.trim().ifBlank { null },
                 reservationStore = reservationStore.trim().ifBlank { null },
+                relatedLink = existingEntry?.relatedLink,
                 note = note.trim().ifBlank { null },
                 createdAt = createdAt,
                 updatedAt = changedAt,

@@ -13,6 +13,7 @@ data class LocalItemRecord(
     val purchaseStore: String? = null,
     val storageLocationId: String? = null,
     val linkedPreorderId: String? = null,
+    val relatedLink: String? = null,
     val note: String? = null,
     val createdAt: String,
     val updatedAt: String,
@@ -21,6 +22,7 @@ data class LocalItemRecord(
 data class LocalPreorderRecord(
     val id: String,
     val name: String,
+    val category: String? = null,
     val storeName: String,
     val releaseDate: String,
     val status: String,
@@ -34,6 +36,7 @@ data class LocalPreorderRecord(
     val paymentDueDate: String? = null,
     val receiveDate: String? = null,
     val reservationNumber: String? = null,
+    val relatedLink: String? = null,
     val note: String? = null,
     val createdAt: String,
     val updatedAt: String,

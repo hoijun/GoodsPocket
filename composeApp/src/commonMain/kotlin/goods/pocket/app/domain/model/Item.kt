@@ -13,6 +13,7 @@ data class Item(
     val purchaseStore: String? = null,
     val storageLocationId: String? = null,
     val linkedPreorderId: String? = null,
+    val relatedLink: String? = null,
     val note: String? = null,
     val createdAt: String,
     val updatedAt: String,

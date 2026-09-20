@@ -1,41 +1,40 @@
 package goods.pocket.app.presentation.component
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import goods.pocket.app.domain.model.CollectionEntryStatus
 import goods.pocket.app.domain.model.EventType
-import goods.pocket.app.presentation.designsystem.GoodsPocketFilterChip
-import goods.pocket.app.presentation.designsystem.GoodsPocketModalBottomSheet
-import goods.pocket.app.presentation.designsystem.goodsPocketOutlinedFieldColors
 import goods.pocket.app.presentation.i18n.localizedLabel
 import goods.pocket.app.presentation.i18n.tr
 import goods.pocket.app.presentation.state.QuickAddTarget
 import goodspocket.composeapp.generated.resources.Res
-import goodspocket.composeapp.generated.resources.action_save
 import goodspocket.composeapp.generated.resources.field_category
 import goodspocket.composeapp.generated.resources.field_character
-import goodspocket.composeapp.generated.resources.field_event_title
-import goodspocket.composeapp.generated.resources.field_item_name
 import goodspocket.composeapp.generated.resources.field_note
-import goodspocket.composeapp.generated.resources.field_release_date
 import goodspocket.composeapp.generated.resources.field_series
 import goodspocket.composeapp.generated.resources.field_status
-import goodspocket.composeapp.generated.resources.field_store
 import goodspocket.composeapp.generated.resources.field_target_date
-import goodspocket.composeapp.generated.resources.quick_add_title
+import goodspocket.composeapp.generated.resources.nav_collection
+import goodspocket.composeapp.generated.resources.nav_events
+import goodspocket.composeapp.generated.resources.quick_add_item_name
+import goodspocket.composeapp.generated.resources.quick_add_store
+import goodspocket.composeapp.generated.resources.quick_add_reservation_store
+import goodspocket.composeapp.generated.resources.quick_add_release_date
+import goodspocket.composeapp.generated.resources.quick_add_owned
+import goodspocket.composeapp.generated.resources.quick_add_reserved
+import goodspocket.composeapp.generated.resources.quick_add_event_name
+import goodspocket.composeapp.generated.resources.quick_add_event_type
 
 @Composable
 fun QuickAddSheet(
@@ -55,190 +54,57 @@ fun QuickAddSheet(
     ) -> Unit,
     onSubmitEvent: (String, String, EventType) -> Unit,
 ) {
-    var entryName by remember { mutableStateOf("") }
-    var entryCategory by remember { mutableStateOf("") }
-    var entryStatus by remember { mutableStateOf(CollectionEntryStatus.OWNED) }
-    var entrySeries by remember { mutableStateOf("") }
-    var entryCharacter by remember { mutableStateOf("") }
-    var purchaseStore by remember { mutableStateOf("") }
-    var releaseDate by remember { mutableStateOf("") }
-    var reservationStore by remember { mutableStateOf("") }
-    var entryNote by remember { mutableStateOf("") }
-    var eventTitle by remember { mutableStateOf("") }
-    var eventDate by remember { mutableStateOf("") }
-    var eventType by remember { mutableStateOf(EventType.RELEASE) }
-
-    GoodsPocketModalBottomSheet(
-        title = tr(Res.string.quick_add_title),
+    var entry by remember { mutableStateOf(CollectionDraft()) }
+    var event by remember { mutableStateOf(EventDraft()) }
+    val isCollection = target == QuickAddTarget.COLLECTION_ENTRY
+    QuickAddReferenceSheet(
+        canSubmit = if (isCollection) entry.canSubmit else event.canSubmit,
         onDismiss = onDismiss,
-        titleFontWeight = FontWeight.SemiBold,
-        contentSpacing = 14.dp,
+        onSubmit = {
+            if (isCollection) {
+                onSubmitCollectionEntry(entry.name, entry.category, entry.status, entry.seriesName,
+                    entry.characterName, entry.purchaseStore, entry.releaseDate, entry.reservationStore, entry.note)
+            } else {
+                onSubmitEvent(event.title, event.targetDate, event.eventType)
+            }
+        },
     ) {
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            QuickAddTarget.entries.forEach { entry ->
-                GoodsPocketFilterChip(
-                    selected = target == entry,
-                    onClick = { onTargetChange(entry) },
-                    label = entry.localizedLabel(),
-                )
+        QuickAddSegments(
+            labels = listOf(tr(Res.string.nav_collection), tr(Res.string.nav_events)),
+            selectedIndex = if (isCollection) 0 else 1,
+            onSelected = { onTargetChange(if (it == 0) QuickAddTarget.COLLECTION_ENTRY else QuickAddTarget.EVENT) },
+            modifier = Modifier.padding(bottom = 5.dp),
+        )
+        if (isCollection) {
+            QuickAddField(entry.name, tr(Res.string.quick_add_item_name), { entry = entry.copy(name = it) }, minHeight = 40.dp)
+            QuickAddField(entry.category, tr(Res.string.field_category), { entry = entry.copy(category = it) })
+            val statuses = listOf(CollectionEntryStatus.OWNED, CollectionEntryStatus.RESERVED, CollectionEntryStatus.PLANNED_CLEANUP)
+            Column(Modifier.padding(bottom = 4.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
+                Text(tr(Res.string.field_status), color = Color(0xFF8A8F9B), fontSize = 13.sp, lineHeight = 14.sp)
+                QuickAddSegments(listOf(tr(Res.string.quick_add_owned), tr(Res.string.quick_add_reserved), CollectionEntryStatus.PLANNED_CLEANUP.localizedLabel()), statuses.indexOf(entry.status),
+                    { entry = entry.copy(status = statuses[it]) }, outlined = true)
+            }
+            QuickAddField(entry.seriesName, tr(Res.string.field_series), { entry = entry.copy(seriesName = it) })
+            QuickAddField(entry.characterName, tr(Res.string.field_character), { entry = entry.copy(characterName = it) })
+            QuickAddField(
+                if (entry.isReserved) entry.reservationStore else entry.purchaseStore,
+                tr(if (entry.isReserved) Res.string.quick_add_reservation_store else Res.string.quick_add_store),
+                { entry = if (entry.isReserved) entry.copy(reservationStore = it) else entry.copy(purchaseStore = it) },
+                minHeight = 44.dp,
+            )
+            if (entry.isReserved) {
+                QuickAddField(entry.releaseDate, tr(Res.string.quick_add_release_date), { entry = entry.copy(releaseDate = it) })
+            }
+            QuickAddField(entry.note, tr(Res.string.field_note), { entry = entry.copy(note = it) }, multiline = true)
+        } else {
+            QuickAddField(event.title, tr(Res.string.quick_add_event_name), { event = event.copy(title = it) }, minHeight = 40.dp)
+            QuickAddField(event.targetDate, tr(Res.string.field_target_date), { event = event.copy(targetDate = it) })
+            val types = listOf(EventType.RELEASE, EventType.PAYMENT_DUE, EventType.DELIVERY)
+            Column(verticalArrangement = Arrangement.spacedBy(7.dp)) {
+                Text(tr(Res.string.quick_add_event_type), color = Color(0xFF8A8F9B), fontSize = 13.sp, lineHeight = 14.sp)
+                QuickAddSegments(types.map { it.localizedLabel() }, types.indexOf(event.eventType),
+                    { event = event.copy(eventType = types[it]) }, outlined = true)
             }
         }
-
-        when (target) {
-            QuickAddTarget.COLLECTION_ENTRY -> {
-                GoodsPocketInputField(
-                    value = entryName,
-                    onValueChange = { entryName = it },
-                    label = tr(Res.string.field_item_name),
-                )
-                GoodsPocketInputField(
-                    value = entryCategory,
-                    onValueChange = { entryCategory = it },
-                    label = tr(Res.string.field_category),
-                )
-                Text(
-                    text = tr(Res.string.field_status),
-                    style = MaterialTheme.typography.labelLarge,
-                )
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    listOf(
-                        CollectionEntryStatus.RESERVED,
-                        CollectionEntryStatus.OWNED,
-                        CollectionEntryStatus.PLANNED_CLEANUP,
-                    ).forEach { status ->
-                        GoodsPocketFilterChip(
-                            selected = entryStatus == status,
-                            onClick = { entryStatus = status },
-                            label = status.localizedLabel(),
-                        )
-                    }
-                }
-                GoodsPocketInputField(
-                    value = entrySeries,
-                    onValueChange = { entrySeries = it },
-                    label = tr(Res.string.field_series),
-                )
-                GoodsPocketInputField(
-                    value = entryCharacter,
-                    onValueChange = { entryCharacter = it },
-                    label = tr(Res.string.field_character),
-                )
-                GoodsPocketInputField(
-                    value = if (entryStatus == CollectionEntryStatus.RESERVED) {
-                        reservationStore
-                    } else {
-                        purchaseStore
-                    },
-                    onValueChange = {
-                        if (entryStatus == CollectionEntryStatus.RESERVED) {
-                            reservationStore = it
-                        } else {
-                            purchaseStore = it
-                        }
-                    },
-                    label = tr(Res.string.field_store),
-                )
-                if (entryStatus == CollectionEntryStatus.RESERVED) {
-                    GoodsPocketInputField(
-                        value = releaseDate,
-                        onValueChange = { releaseDate = it },
-                        label = tr(Res.string.field_release_date),
-                    )
-                }
-                GoodsPocketInputField(
-                    value = entryNote,
-                    onValueChange = { entryNote = it },
-                    label = tr(Res.string.field_note),
-                )
-                SubmitButton(
-                    enabled = entryName.isNotBlank() &&
-                        entryCategory.isNotBlank() &&
-                        if (entryStatus == CollectionEntryStatus.RESERVED) {
-                            reservationStore.isNotBlank() && releaseDate.isNotBlank()
-                        } else {
-                            true
-                        },
-                    onClick = {
-                        onSubmitCollectionEntry(
-                            entryName,
-                            entryCategory,
-                            entryStatus,
-                            entrySeries,
-                            entryCharacter,
-                            purchaseStore,
-                            releaseDate,
-                            reservationStore,
-                            entryNote,
-                        )
-                    },
-                )
-            }
-
-            QuickAddTarget.EVENT -> {
-                GoodsPocketInputField(
-                    value = eventTitle,
-                    onValueChange = { eventTitle = it },
-                    label = tr(Res.string.field_event_title),
-                )
-                GoodsPocketInputField(
-                    value = eventDate,
-                    onValueChange = { eventDate = it },
-                    label = tr(Res.string.field_target_date),
-                )
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    listOf(EventType.RELEASE, EventType.PAYMENT_DUE, EventType.DELIVERY).forEach { type ->
-                        GoodsPocketFilterChip(
-                            selected = eventType == type,
-                            onClick = { eventType = type },
-                            label = type.localizedLabel(),
-                        )
-                    }
-                }
-                SubmitButton(
-                    enabled = eventTitle.isNotBlank() && eventDate.isNotBlank(),
-                    onClick = { onSubmitEvent(eventTitle, eventDate, eventType) },
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun GoodsPocketInputField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = Modifier.fillMaxWidth(),
-        label = { Text(label) },
-        colors = goodsPocketOutlinedFieldColors(),
-        shape = MaterialTheme.shapes.small,
-        singleLine = true,
-    )
-}
-
-@Composable
-private fun SubmitButton(
-    enabled: Boolean,
-    onClick: () -> Unit,
-) {
-    Button(
-        onClick = onClick,
-        enabled = enabled,
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Text(tr(Res.string.action_save))
     }
 }
