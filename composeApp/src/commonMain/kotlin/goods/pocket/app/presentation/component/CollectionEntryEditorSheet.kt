@@ -179,14 +179,20 @@ private fun EditorLabel(label: String) {
 }
 
 @Composable
-private fun EditorField(value: String, label: String, onValueChange: (String) -> Unit, multiline: Boolean = false) {
+internal fun EditorField(
+    value: String,
+    label: String,
+    onValueChange: (String) -> Unit,
+    multiline: Boolean = false,
+    outlineColor: Color = EditorOutline,
+) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         EditorLabel(label)
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
             modifier = Modifier.fillMaxWidth().heightIn(min = if (multiline) 54.dp else 34.dp)
-                .border(1.dp, EditorOutline, RoundedCornerShape(8.dp))
+                .border(1.dp, outlineColor, RoundedCornerShape(8.dp))
                 .semantics { contentDescription = label }.padding(horizontal = 12.dp, vertical = 8.dp),
             singleLine = !multiline,
             textStyle = TextStyle(color = EditorInk, fontSize = 14.sp, lineHeight = 18.sp,

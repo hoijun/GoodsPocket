@@ -153,6 +153,9 @@
     <string name="editor_owned_title">Edit Collection</string>
     <string name="editor_owned_save">Save Changes</string>
     <string name="editor_event_title">Edit Event</string>
+    <string name="editor_event_heading">Edit Event</string>
+    <string name="editor_event_date">Scheduled Date</string>
+    <string name="editor_event_offline">Offline</string>
 
     <string name="detail_category">Category</string>
     <string name="detail_status">Status</string>

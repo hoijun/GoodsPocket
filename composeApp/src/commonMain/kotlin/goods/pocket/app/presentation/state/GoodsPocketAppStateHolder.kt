@@ -279,7 +279,7 @@ class GoodsPocketAppStateHolder(
                 activeEditor = null,
                 activeDetail = when (editor) {
                     is ActiveEditor.CollectionEntryEditor -> ActiveDetail.CollectionEntryDetail(editor.entryId)
-                    is ActiveEditor.EventEditor -> current.activeDetail
+                    is ActiveEditor.EventEditor -> ActiveDetail.EventDetail(editor.eventId)
                 },
             )
         }

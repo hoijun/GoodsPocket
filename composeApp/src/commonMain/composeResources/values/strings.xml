@@ -153,6 +153,9 @@
     <string name="editor_owned_title">컬렉션 편집</string>
     <string name="editor_owned_save">변경사항 저장</string>
     <string name="editor_event_title">이벤트 수정</string>
+    <string name="editor_event_heading">이벤트 편집</string>
+    <string name="editor_event_date">예정일</string>
+    <string name="editor_event_offline">오프라인</string>
 
     <string name="detail_category">카테고리</string>
     <string name="detail_status">상태</string>

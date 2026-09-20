@@ -4,6 +4,8 @@ import goods.pocket.app.data.InMemoryGoodsPocketRepository
 import goods.pocket.app.domain.model.CollectionEntryStatus
 import goods.pocket.app.domain.model.AppPreference
 import goods.pocket.app.domain.model.EventType
+import goods.pocket.app.domain.model.Event
+import goods.pocket.app.domain.repository.EventRepository
 import goods.pocket.app.presentation.navigation.AppDestination
 import goods.pocket.app.domain.usecase.GetDashboardSummaryUseCase
 import goods.pocket.app.domain.usecase.GetRecentActivitiesUseCase
@@ -300,6 +302,20 @@ class GoodsPocketAppStateHolderTest {
         stateHolder.closeEditor()
         assertNull(stateHolder.state.value.activeEditor)
         assertEquals(ActiveDetail.CollectionEntryDetail("item-1"), stateHolder.state.value.activeDetail)
+    }
+
+    @Test
+    fun cancelEventEditorRestoresDetailAndHostFilter() {
+        val stateHolder = newStateHolder()
+        stateHolder.selectDestination(AppDestination.Events)
+        stateHolder.updateEventTypeFilter(EventType.RELEASE)
+        stateHolder.openEventDetail("event-1")
+        val before = stateHolder.state.value
+        stateHolder.openEventEditor("event-1")
+
+        stateHolder.closeEditor()
+
+        assertEquals(before, stateHolder.state.value)
     }
 
     @Test
@@ -616,20 +632,56 @@ class GoodsPocketAppStateHolderTest {
         assertEquals(AppDestination.Collection, stateHolder.state.value.currentDestination)
     }
 
+    @Test
+    fun eventEditFailurePreservesRecordsAndRetrySavesSameEvent() = runTest {
+        val repository = InMemoryGoodsPocketRepository()
+        val recovering = RecoveringEventRepository(repository)
+        newStateHolder(repository, eventRepository = recovering)
+        val original = repository.getEvents().first()
+        val enriched = original.copy(memo = "Preserved memo", locationOrStore = "Preserved location")
+        repository.saveEvent(enriched)
+        val editor = newStateHolder(repository, eventRepository = recovering)
+        val before = repository.getEvents()
+        editor.selectDestination(AppDestination.Events)
+        editor.updateEventTypeFilter(EventType.RELEASE)
+        editor.openEventEditor(enriched.id)
+        recovering.shouldFail = true
+
+        editor.saveEditedEvent(enriched.id, " Updated title ", " 2026-10-15 ", EventType.OFFLINE_EVENT)
+
+        assertEquals(GoodsPocketOperation.UPDATE, editor.state.value.failure?.operation)
+        assertEquals(ActiveEditor.EventEditor(enriched.id), editor.state.value.activeEditor)
+        assertEquals(before, repository.getEvents())
+        recovering.shouldFail = false
+        editor.retry()
+
+        val expected = enriched.copy(title = "Updated title", targetDate = "2026-10-15",
+            eventType = EventType.OFFLINE_EVENT, updatedAt = StateHolderTestClock.currentDate())
+        assertEquals(expected, repository.getEvents().single { it.id == enriched.id })
+        assertEquals(before.filterNot { it.id == enriched.id }, repository.getEvents().filterNot { it.id == enriched.id })
+        assertEquals(listOf(enriched.id, enriched.id), recovering.savedIds)
+        assertNull(editor.state.value.failure)
+        assertNull(editor.state.value.activeEditor)
+        assertEquals(ActiveDetail.EventDetail(enriched.id), editor.state.value.activeDetail)
+        assertEquals(EventType.RELEASE, editor.state.value.eventTypeFilter)
+        assertEquals(expected, newStateHolder(repository).state.value.events.single { it.id == enriched.id })
+    }
+
     private fun newStateHolder(
         repository: InMemoryGoodsPocketRepository = InMemoryGoodsPocketRepository(),
         collectionRepository: CollectionRepository = repository,
         settingsRepository: SettingsRepository = repository,
         clock: AppClock = StateHolderTestClock,
+        eventRepository: EventRepository = repository,
     ): GoodsPocketAppStateHolder {
         return GoodsPocketAppStateHolder(
             collectionRepository = collectionRepository,
             preorderRepository = repository,
-            eventRepository = repository,
+            eventRepository = eventRepository,
             settingsRepository = settingsRepository,
             contentLoader = GoodsPocketContentLoader(
                 collectionRepository = collectionRepository,
-                eventRepository = repository,
+                eventRepository = eventRepository,
                 settingsRepository = settingsRepository,
                 getDashboardSummaryUseCase = GetDashboardSummaryUseCase(collectionRepository, repository),
                 getRecentActivitiesUseCase = GetRecentActivitiesUseCase(collectionRepository, repository),
@@ -669,6 +721,19 @@ private class RecoveringCollectionRepository(
     override suspend fun deleteEntry(id: String, deletedAt: String) {
         if (shouldFail) error("Test delete failure")
         delegate.deleteEntry(id, deletedAt)
+    }
+}
+
+private class RecoveringEventRepository(
+    private val delegate: EventRepository,
+) : EventRepository by delegate {
+    var shouldFail = false
+    val savedIds = mutableListOf<String>()
+
+    override suspend fun saveEvent(event: Event) {
+        savedIds += event.id
+        if (shouldFail) error("Test event update failure")
+        delegate.saveEvent(event)
     }
 }
 
