@@ -83,6 +83,11 @@ kotlin {
         androidUnitTest.dependencies {
             implementation(libs.sqldelight.sqlite.driver)
         }
+        androidInstrumentedTest.dependencies {
+            implementation(libs.kotlin.testJunit)
+            implementation(libs.androidx.testExt.junit)
+            implementation(libs.androidx.test.runner)
+        }
         val iosArm64Main by getting {
             dependencies {
                 implementation(libs.sqldelight.native.driver)
@@ -110,6 +115,7 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     packaging {
         resources {
