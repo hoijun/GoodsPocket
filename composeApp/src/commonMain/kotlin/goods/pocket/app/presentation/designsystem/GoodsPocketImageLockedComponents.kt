@@ -40,6 +40,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.semantics.Role
@@ -237,9 +238,7 @@ fun GoodsPocketImageLockedBottomBar(
             }
             GoodsPocketCenteredQuickAddButton(
                 onClick = onQuickAdd,
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = ImageLockedNavigationMetrics.QuickAddTopPadding),
+                modifier = Modifier.align(Alignment.Center),
             )
         }
     }
@@ -260,14 +259,24 @@ fun GoodsPocketCenteredQuickAddButton(onClick: () -> Unit, modifier: Modifier = 
         shadowElevation = ImageLockedNavigationMetrics.QuickAddShadowElevation,
     ) {
         Box(contentAlignment = Alignment.Center) {
-            Text(
-                text = "+",
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontSize = 18.sp,
-                    lineHeight = 22.sp,
-                ),
-                fontWeight = FontWeight.Bold,
-            )
+            Canvas(Modifier.size(18.dp)) {
+                val inset = 2.5.dp.toPx()
+                val stroke = 2.5.dp.toPx()
+                drawLine(
+                    Color.White,
+                    Offset(inset, center.y),
+                    Offset(size.width - inset, center.y),
+                    strokeWidth = stroke,
+                    cap = StrokeCap.Round,
+                )
+                drawLine(
+                    Color.White,
+                    Offset(center.x, inset),
+                    Offset(center.x, size.height - inset),
+                    strokeWidth = stroke,
+                    cap = StrokeCap.Round,
+                )
+            }
         }
     }
 }

@@ -165,7 +165,7 @@ internal fun HomeMonthlySpendCard(dashboardSummary: HomeSummary, currentDate: St
     ) {
         Box(
             modifier = (if (isExpandedText) Modifier.fillMaxWidth() else Modifier.fillMaxSize())
-                .padding(horizontal = 13.dp, vertical = 7.dp),
+                .padding(start = 13.dp, end = 13.dp, top = 12.dp, bottom = 7.dp),
         ) {
             Column(
                 modifier = Modifier
@@ -177,17 +177,17 @@ internal fun HomeMonthlySpendCard(dashboardSummary: HomeSummary, currentDate: St
                             0.dp
                         },
                     ),
-                verticalArrangement = Arrangement.spacedBy(1.dp),
             ) {
                 Text(
                     text = tr(Res.string.home_monthly_spend_title),
                     style = MaterialTheme.typography.titleLarge.copy(
-                        fontSize = 13.sp,
+                        fontSize = 12.sp,
                         lineHeight = 17.sp,
                     ),
                     color = HomeInk,
                     fontWeight = FontWeight.Bold,
                 )
+                Spacer(Modifier.height(9.dp))
                 Text(
                     text = month?.let {
                         tr(Res.string.home_monthly_spend_basis, it.year, it.month)
@@ -199,16 +199,18 @@ internal fun HomeMonthlySpendCard(dashboardSummary: HomeSummary, currentDate: St
                     color = HomeMuted,
                     fontWeight = FontWeight.Medium,
                 )
+                Spacer(Modifier.height(4.dp))
                 Text(
                     text = formatCurrency(dashboardSummary.monthlySpend),
                     style = MaterialTheme.typography.headlineMedium.copy(
-                        fontSize = 18.sp,
+                        fontSize = 16.sp,
                         lineHeight = 20.sp,
                     ),
                     color = HomeInk,
                     fontWeight = FontWeight.Bold,
                 )
                 if (changePercent != null) {
+                    Spacer(Modifier.height(4.dp))
                     val signedPercent = if (changePercent >=
                         0
                     ) {
@@ -221,8 +223,8 @@ internal fun HomeMonthlySpendCard(dashboardSummary: HomeSummary, currentDate: St
                         Text(
                             text = changeText.substringBeforeLast(" "),
                             style = MaterialTheme.typography.bodyMedium.copy(
-                                fontSize = 10.sp,
-                                lineHeight = 12.sp,
+                                fontSize = 11.sp,
+                                lineHeight = 14.sp,
                             ),
                             color = HomeMuted,
                             fontWeight = FontWeight.Medium,
@@ -230,8 +232,8 @@ internal fun HomeMonthlySpendCard(dashboardSummary: HomeSummary, currentDate: St
                         Text(
                             text = changeText.substringAfterLast(" "),
                             style = MaterialTheme.typography.bodyMedium.copy(
-                                fontSize = 10.sp,
-                                lineHeight = 12.sp,
+                                fontSize = 11.sp,
+                                lineHeight = 14.sp,
                             ),
                             color = HomeOrange,
                             fontWeight = FontWeight.Bold,

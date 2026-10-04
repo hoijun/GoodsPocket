@@ -37,7 +37,7 @@ Do not use pure white as the default image-locked card fill. Reserve `#FFFFFF` f
 - Hero card: `18dp` radius, `#FEF9F5`, `1dp #EFEDEC` border, `0dp` shadow.
 - Compact goods card: `8dp` radius, `#FEFBF8`, `1dp #EFEDEC` border, `0.5dp` shadow.
 - Bottom navigation: flat `#FFFCF8`, `0dp` shadow, `1dp #F3F0EE` top border.
-- Center quick-add: `38dp` orange circle with `0.5dp` shadow.
+- Center quick-add: `38dp` orange circle. Use standard `1dp` elevation, selected by the user after comparing it with the original and `2dp` variants.
 - Badges and D-day treatments: filled pastel containers without borders or extra shadows.
 
 Never use the old `3dp` or `4dp` card elevation on Home. Do not stack a border, tonal elevation, and visible drop shadow on one surface.
@@ -59,7 +59,8 @@ Never use the old `3dp` or `4dp` card elevation on Home. Do not stack a border, 
 | Recent image area | `84 x 96dp` |
 | Recent card spacing | `8dp` |
 | Spending card | `102dp` high |
-| Spending card padding | horizontal `13dp`, vertical `7dp` |
+| Spending card padding | horizontal `13dp`, top `12dp`, bottom `7dp` |
+| Spending text gaps | title-to-month `9dp`, month-to-amount `4dp`, amount-to-change `4dp` |
 | Spending chart | `120 x 56dp` |
 | Spending bar | `7dp` wide, `7dp` gap |
 | Schedule thumbnail | `40dp`, `10dp` radius |
@@ -85,8 +86,9 @@ Do not move an entire scroll viewport with `Modifier.offset` to compensate for o
 - Summary metric number: `20sp / 24sp`, bold.
 - Recent goods series: `9sp / 11sp`.
 - Recent goods title: `10sp / 13sp`, bold.
-- Spending amount: `18sp / 20sp`, bold.
-- Spending metadata and change: `10sp / 12-13sp`.
+- Spending title: `12sp / 17sp`, bold; this is separate from other section titles.
+- Spending amount: `16sp / 20sp`, bold.
+- Spending month: `10sp / 13sp`; change: `11sp / 14sp`.
 - Schedule title: `11sp / 14sp`, bold.
 - Schedule date: `10sp / 13sp`, medium.
 - Badge: `9sp / 11sp`, bold.
@@ -106,3 +108,4 @@ Use `FontWeight.Bold` for normal hierarchy. `ExtraBold` is reserved for the bran
 - Summary, spending, recent activity, and schedule values come from domain state. Do not hardcode reference-only values into production UI.
 - Existing event handlers and navigation callbacks stay attached to the visible action component.
 - A screenshot is a visual comparison source only, never an app `Image` replacing the UI.
+- The quick-add plus is a rounded, native-drawn glyph with about `15dp` visible bounds inside an `18dp` canvas. It does not scale with text preferences; preserve its accessible action label and touch target.

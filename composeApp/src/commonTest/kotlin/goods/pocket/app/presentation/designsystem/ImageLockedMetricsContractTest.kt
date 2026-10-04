@@ -33,8 +33,7 @@ class ImageLockedMetricsContractTest {
     @Test
     fun `bottom navigation metrics keep the approved footprint`() {
         assertEquals(38.dp, ImageLockedNavigationMetrics.QuickAddDiameter)
-        assertEquals(4.dp, ImageLockedNavigationMetrics.QuickAddTopPadding)
-        assertEquals(0.5.dp, ImageLockedNavigationMetrics.QuickAddShadowElevation)
+        assertEquals(1.dp, ImageLockedNavigationMetrics.QuickAddShadowElevation)
         assertEquals(56.dp, ImageLockedNavigationMetrics.ContentMinHeight)
         assertEquals(9.sp, ImageLockedNavigationMetrics.LabelFontSize)
         assertEquals(24.dp, ImageLockedNavigationMetrics.IconSize)
