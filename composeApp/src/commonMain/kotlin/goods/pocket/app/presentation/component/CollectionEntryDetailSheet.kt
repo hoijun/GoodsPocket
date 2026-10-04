@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -43,13 +43,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import goods.pocket.app.domain.model.CollectionEntry
-import goods.pocket.app.domain.model.CollectionEntryStatus
+import goods.pocket.app.domain.collection.CollectionEntry
+import goods.pocket.app.domain.collection.CollectionEntryStatus
 import goods.pocket.app.presentation.i18n.formatCurrency
 import goods.pocket.app.presentation.i18n.formatDate
 import goods.pocket.app.presentation.i18n.localizedCategory
 import goods.pocket.app.presentation.i18n.localizedLabel
 import goods.pocket.app.presentation.i18n.tr
+import goods.pocket.app.presentation.state.CommandState
 import goodspocket.composeapp.generated.resources.Res
 import goodspocket.composeapp.generated.resources.action_close
 import goodspocket.composeapp.generated.resources.action_delete
@@ -78,6 +79,9 @@ private val DetailDanger = Color(0xFFFF5A52)
 @Composable
 fun CollectionEntryDetailSheet(
     entry: CollectionEntry,
+    commandState: CommandState = CommandState(),
+    actionsEnabled: Boolean = true,
+    onRetry: () -> Unit = {},
     onDismiss: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
@@ -106,6 +110,7 @@ fun CollectionEntryDetailSheet(
                 .navigationBarsPadding(),
         ) {
             CollectionDetailHeader(onDismiss = onDismiss)
+            FeatureFeedback(commandState.isRunning, commandState.hasFailure, onRetry)
             Box(modifier = Modifier.weight(1f)) {
                 CollectionDetailContent(
                     entry = entry,
@@ -113,18 +118,19 @@ fun CollectionEntryDetailSheet(
             }
             CollectionDetailFooter(
                 entry = entry,
-                onEdit = onEdit,
-                onDelete = onDelete,
-                onMarkReceived = onMarkReceived,
+                isEnabled = actionsEnabled && !commandState.isRunning,
+                onEdit = { if (!commandState.isRunning) onEdit() },
+                onDelete = { if (!commandState.isRunning) onDelete() },
+                onMarkReceived = onMarkReceived?.let { action ->
+                    { if (!commandState.isRunning) action() }
+                },
             )
         }
     }
 }
 
 @Composable
-private fun CollectionDetailHeader(
-    onDismiss: () -> Unit,
-) {
+private fun CollectionDetailHeader(onDismiss: () -> Unit) {
     val closeDescription = tr(Res.string.action_close)
     Box(
         modifier = Modifier
@@ -153,14 +159,23 @@ private fun CollectionDetailHeader(
                 drawLine(
                     color = DetailMutedInk,
                     start = androidx.compose.ui.geometry.Offset(2.dp.toPx(), 2.dp.toPx()),
-                    end = androidx.compose.ui.geometry.Offset(size.width - 2.dp.toPx(), size.height - 2.dp.toPx()),
+                    end = androidx.compose.ui.geometry.Offset(
+                        size.width - 2.dp.toPx(),
+                        size.height - 2.dp.toPx(),
+                    ),
                     strokeWidth = strokeWidth,
                     cap = StrokeCap.Round,
                 )
                 drawLine(
                     color = DetailMutedInk,
-                    start = androidx.compose.ui.geometry.Offset(size.width - 2.dp.toPx(), 2.dp.toPx()),
-                    end = androidx.compose.ui.geometry.Offset(2.dp.toPx(), size.height - 2.dp.toPx()),
+                    start = androidx.compose.ui.geometry.Offset(
+                        size.width - 2.dp.toPx(),
+                        2.dp.toPx(),
+                    ),
+                    end = androidx.compose.ui.geometry.Offset(
+                        2.dp.toPx(),
+                        size.height - 2.dp.toPx(),
+                    ),
                     strokeWidth = strokeWidth,
                     cap = StrokeCap.Round,
                 )
@@ -170,9 +185,7 @@ private fun CollectionDetailHeader(
 }
 
 @Composable
-private fun CollectionDetailContent(
-    entry: CollectionEntry,
-) {
+private fun CollectionDetailContent(entry: CollectionEntry) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -222,6 +235,7 @@ private fun CollectionDetailContent(
 @Composable
 private fun CollectionDetailFooter(
     entry: CollectionEntry,
+    isEnabled: Boolean,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     onMarkReceived: (() -> Unit)?,
@@ -235,6 +249,7 @@ private fun CollectionDetailFooter(
         if (entry.status == CollectionEntryStatus.RESERVED && onMarkReceived != null) {
             Button(
                 onClick = onMarkReceived,
+                enabled = isEnabled,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(CollectionDetailReferenceMetrics.ActionHeight),
@@ -250,6 +265,7 @@ private fun CollectionDetailFooter(
             Spacer(modifier = Modifier.height(6.dp))
         }
         CollectionDetailActions(
+            isEnabled = isEnabled,
             onEdit = onEdit,
             onDelete = onDelete,
         )
@@ -270,9 +286,7 @@ private fun collectionDetailSubtitle(entry: CollectionEntry): String {
 }
 
 @Composable
-private fun CollectionStatusBadge(
-    status: CollectionEntryStatus,
-) {
+private fun CollectionStatusBadge(status: CollectionEntryStatus) {
     val containerColor = when (status) {
         CollectionEntryStatus.OWNED -> MaterialTheme.colorScheme.secondaryContainer
         CollectionEntryStatus.RESERVED -> MaterialTheme.colorScheme.primaryContainer
@@ -314,7 +328,10 @@ private fun CollectionMetadata(entry: CollectionEntry) {
             )
             CollectionMetadataRow(
                 label = tr(Res.string.detail_reservation_amount),
-                value = entry.purchasePrice?.let { formatCurrency(it) } ?: tr(Res.string.common_not_set),
+                value =
+                entry.purchasePrice?.let {
+                    formatCurrency(it)
+                } ?: tr(Res.string.common_not_set),
             )
             CollectionMetadataRow(
                 label = tr(Res.string.detail_related_link),
@@ -335,7 +352,10 @@ private fun CollectionMetadata(entry: CollectionEntry) {
             )
             CollectionMetadataRow(
                 label = tr(Res.string.detail_collection_purchase_price),
-                value = entry.purchasePrice?.let { formatCurrency(it) } ?: tr(Res.string.common_not_set),
+                value =
+                entry.purchasePrice?.let {
+                    formatCurrency(it)
+                } ?: tr(Res.string.common_not_set),
             )
             CollectionMetadataRow(
                 label = tr(Res.string.detail_related_link),
@@ -350,10 +370,7 @@ private fun CollectionMetadata(entry: CollectionEntry) {
 }
 
 @Composable
-private fun CollectionMetadataRow(
-    label: String,
-    value: String,
-) {
+private fun CollectionMetadataRow(label: String, value: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -416,16 +433,14 @@ private fun CollectionNote(note: String) {
 }
 
 @Composable
-private fun CollectionDetailActions(
-    onEdit: () -> Unit,
-    onDelete: () -> Unit,
-) {
+private fun CollectionDetailActions(isEnabled: Boolean, onEdit: () -> Unit, onDelete: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Button(
             onClick = onEdit,
+            enabled = isEnabled,
             modifier = Modifier
                 .weight(1f)
                 .height(CollectionDetailReferenceMetrics.ActionHeight),
@@ -444,6 +459,7 @@ private fun CollectionDetailActions(
         }
         OutlinedButton(
             onClick = onDelete,
+            enabled = isEnabled,
             modifier = Modifier
                 .weight(1f)
                 .height(CollectionDetailReferenceMetrics.ActionHeight),

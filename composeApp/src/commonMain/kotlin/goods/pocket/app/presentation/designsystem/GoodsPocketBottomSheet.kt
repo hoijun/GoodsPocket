@@ -42,9 +42,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import kotlin.math.roundToInt
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,7 +82,8 @@ fun GoodsPocketModalBottomSheet(
     fun settleSheet(velocity: Float) {
         settleJob?.cancel()
         settleJob = scope.launch {
-            val shouldDismiss = sheetDragOffsetPx > dismissThresholdPx || velocity > dismissVelocityPx
+            val shouldDismiss =
+                sheetDragOffsetPx > dismissThresholdPx || velocity > dismissVelocityPx
             if (shouldDismiss && sheetHeightPx > 0) {
                 animate(
                     initialValue = sheetDragOffsetPx,

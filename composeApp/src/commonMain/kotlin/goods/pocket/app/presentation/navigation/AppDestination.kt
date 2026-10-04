@@ -1,8 +1,6 @@
 package goods.pocket.app.presentation.navigation
 
-sealed class AppDestination(
-    val route: String,
-) {
+sealed class AppDestination(val route: String) {
     data object Home : AppDestination("home")
     data object Collection : AppDestination("collection/list")
     data object My : AppDestination("my")

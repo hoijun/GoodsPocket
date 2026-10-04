@@ -35,13 +35,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import goods.pocket.app.presentation.i18n.localizedLabel
+import goods.pocket.app.presentation.i18n.tr
 import goods.pocket.app.presentation.navigation.AppDestination
+import goodspocket.composeapp.generated.resources.Res
+import goodspocket.composeapp.generated.resources.quick_add_title
 
 @Composable
 fun GoodsPocketImageLockedCard(
@@ -197,7 +202,7 @@ fun GoodsPocketImageLockedBottomBar(
                 .height(81.dp)
                 .align(Alignment.BottomCenter),
             shape = RoundedCornerShape(0.dp),
-            color = Color(GoodsPocketVisualTokens.Background),
+            color = Color(GoodsPocketVisualTokens.BACKGROUND),
             tonalElevation = 0.dp,
             shadowElevation = 0.dp,
             border = BorderStroke(1.dp, Color(0xFFF3F0EE)),
@@ -231,13 +236,12 @@ fun GoodsPocketImageLockedBottomBar(
 }
 
 @Composable
-fun GoodsPocketCenteredQuickAddButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+fun GoodsPocketCenteredQuickAddButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val description = tr(Res.string.quick_add_title)
     Surface(
         onClick = onClick,
         modifier = modifier
+            .semantics { contentDescription = description }
             .offset(x = (-1).dp)
             .size(ImageLockedNavigationMetrics.QuickAddDiameter),
         shape = CircleShape,
@@ -321,10 +325,7 @@ private fun AppDestination.referenceBottomNavIconOffset() = when (this) {
 }
 
 @Composable
-private fun GoodsPocketBottomNavIcon(
-    destination: AppDestination,
-    selected: Boolean,
-) {
+private fun GoodsPocketBottomNavIcon(destination: AppDestination, selected: Boolean) {
     val color = if (selected) {
         MaterialTheme.colorScheme.primary
     } else {
@@ -441,32 +442,27 @@ private fun GoodsPocketBottomNavIcon(
 }
 
 @Composable
-private fun GoodsPocketBadgeTone.colors(): BadgeColors {
-    return when (this) {
-        GoodsPocketBadgeTone.Neutral -> BadgeColors(
-            container = MaterialTheme.colorScheme.surfaceContainerLow,
-            content = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        GoodsPocketBadgeTone.Owned -> BadgeColors(
-            container = MaterialTheme.colorScheme.secondaryContainer,
-            content = MaterialTheme.colorScheme.onSecondaryContainer,
-        )
-        GoodsPocketBadgeTone.Reserved -> BadgeColors(
-            container = MaterialTheme.colorScheme.primaryContainer,
-            content = MaterialTheme.colorScheme.primary,
-        )
-        GoodsPocketBadgeTone.Event -> BadgeColors(
-            container = MaterialTheme.colorScheme.tertiaryContainer,
-            content = MaterialTheme.colorScheme.onTertiaryContainer,
-        )
-        GoodsPocketBadgeTone.Danger -> BadgeColors(
-            container = MaterialTheme.colorScheme.errorContainer,
-            content = MaterialTheme.colorScheme.error,
-        )
-    }
+private fun GoodsPocketBadgeTone.colors(): BadgeColors = when (this) {
+    GoodsPocketBadgeTone.Neutral -> BadgeColors(
+        container = MaterialTheme.colorScheme.surfaceContainerLow,
+        content = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    GoodsPocketBadgeTone.Owned -> BadgeColors(
+        container = MaterialTheme.colorScheme.secondaryContainer,
+        content = MaterialTheme.colorScheme.onSecondaryContainer,
+    )
+    GoodsPocketBadgeTone.Reserved -> BadgeColors(
+        container = MaterialTheme.colorScheme.primaryContainer,
+        content = MaterialTheme.colorScheme.primary,
+    )
+    GoodsPocketBadgeTone.Event -> BadgeColors(
+        container = MaterialTheme.colorScheme.tertiaryContainer,
+        content = MaterialTheme.colorScheme.onTertiaryContainer,
+    )
+    GoodsPocketBadgeTone.Danger -> BadgeColors(
+        container = MaterialTheme.colorScheme.errorContainer,
+        content = MaterialTheme.colorScheme.error,
+    )
 }
 
-private data class BadgeColors(
-    val container: Color,
-    val content: Color,
-)
+private data class BadgeColors(val container: Color, val content: Color)

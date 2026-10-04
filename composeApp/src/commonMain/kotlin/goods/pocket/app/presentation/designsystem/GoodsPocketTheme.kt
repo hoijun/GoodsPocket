@@ -86,9 +86,7 @@ private val GoodsPocketTypography = Typography(
 )
 
 @Composable
-fun GoodsPocketTheme(
-    content: @Composable () -> Unit,
-) {
+fun GoodsPocketTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = LightColors,
         shapes = GoodsPocketShapes,
@@ -97,37 +95,35 @@ fun GoodsPocketTheme(
     )
 }
 
-private fun buildGoodsPocketLightScheme(): ColorScheme {
-    return lightColorScheme(
-        primary = colorOf(GoodsPocketVisualTokens.Primary),
-        onPrimary = colorOf(0xFFFFFFFFL),
-        primaryContainer = colorOf(GoodsPocketVisualTokens.PrimaryContainer),
-        onPrimaryContainer = colorOf(GoodsPocketVisualTokens.Ink),
-        background = colorOf(GoodsPocketVisualTokens.Background),
-        onBackground = colorOf(GoodsPocketVisualTokens.Ink),
-        surface = colorOf(GoodsPocketVisualTokens.Surface),
-        onSurface = colorOf(GoodsPocketVisualTokens.Ink),
-        surfaceContainer = colorOf(GoodsPocketVisualTokens.SurfaceLow),
-        surfaceContainerLow = colorOf(GoodsPocketVisualTokens.SurfaceLow),
-        surfaceContainerHigh = colorOf(GoodsPocketVisualTokens.SurfaceHigh),
-        surfaceContainerHighest = colorOf(GoodsPocketVisualTokens.SurfaceTint),
-        surfaceVariant = colorOf(GoodsPocketVisualTokens.SurfaceTint),
-        onSurfaceVariant = colorOf(GoodsPocketVisualTokens.MutedInk),
-        outline = colorOf(GoodsPocketVisualTokens.Outline),
-        outlineVariant = colorOf(GoodsPocketVisualTokens.Outline),
-        secondary = colorOf(GoodsPocketVisualTokens.Secondary),
-        onSecondary = colorOf(0xFF0F3B2AL),
-        secondaryContainer = colorOf(GoodsPocketVisualTokens.SecondaryContainer),
-        onSecondaryContainer = colorOf(0xFF0F3B2AL),
-        tertiary = colorOf(GoodsPocketVisualTokens.Tertiary),
-        onTertiary = colorOf(0xFFFFFFFFL),
-        tertiaryContainer = colorOf(GoodsPocketVisualTokens.TertiaryContainer),
-        onTertiaryContainer = colorOf(0xFF352260L),
-        error = colorOf(GoodsPocketVisualTokens.Danger),
-        onError = colorOf(0xFFFFFFFFL),
-        errorContainer = colorOf(GoodsPocketVisualTokens.PrimaryContainer),
-        onErrorContainer = colorOf(GoodsPocketVisualTokens.Ink),
-    )
-}
+private fun buildGoodsPocketLightScheme(): ColorScheme = lightColorScheme(
+    primary = colorOf(GoodsPocketVisualTokens.PRIMARY),
+    onPrimary = colorOf(0xFFFFFFFFL),
+    primaryContainer = colorOf(GoodsPocketVisualTokens.PRIMARY_CONTAINER),
+    onPrimaryContainer = colorOf(GoodsPocketVisualTokens.INK),
+    background = colorOf(GoodsPocketVisualTokens.BACKGROUND),
+    onBackground = colorOf(GoodsPocketVisualTokens.INK),
+    surface = colorOf(GoodsPocketVisualTokens.SURFACE),
+    onSurface = colorOf(GoodsPocketVisualTokens.INK),
+    surfaceContainer = colorOf(GoodsPocketVisualTokens.SURFACE_LOW),
+    surfaceContainerLow = colorOf(GoodsPocketVisualTokens.SURFACE_LOW),
+    surfaceContainerHigh = colorOf(GoodsPocketVisualTokens.SURFACE_HIGH),
+    surfaceContainerHighest = colorOf(GoodsPocketVisualTokens.SURFACE_TINT),
+    surfaceVariant = colorOf(GoodsPocketVisualTokens.SURFACE_TINT),
+    onSurfaceVariant = colorOf(GoodsPocketVisualTokens.MUTED_INK),
+    outline = colorOf(GoodsPocketVisualTokens.OUTLINE),
+    outlineVariant = colorOf(GoodsPocketVisualTokens.OUTLINE),
+    secondary = colorOf(GoodsPocketVisualTokens.SECONDARY),
+    onSecondary = colorOf(0xFF0F3B2AL),
+    secondaryContainer = colorOf(GoodsPocketVisualTokens.SECONDARY_CONTAINER),
+    onSecondaryContainer = colorOf(0xFF0F3B2AL),
+    tertiary = colorOf(GoodsPocketVisualTokens.TERTIARY),
+    onTertiary = colorOf(0xFFFFFFFFL),
+    tertiaryContainer = colorOf(GoodsPocketVisualTokens.TERTIARY_CONTAINER),
+    onTertiaryContainer = colorOf(0xFF352260L),
+    error = colorOf(GoodsPocketVisualTokens.DANGER),
+    onError = colorOf(0xFFFFFFFFL),
+    errorContainer = colorOf(GoodsPocketVisualTokens.PRIMARY_CONTAINER),
+    onErrorContainer = colorOf(GoodsPocketVisualTokens.INK),
+)
 
 private fun colorOf(value: Long): Color = Color(value)

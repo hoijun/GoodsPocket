@@ -1,4 +1,4 @@
-package goods.pocket.app.presentation.screen
+package goods.pocket.app.presentation.collection
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -19,8 +19,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import goods.pocket.app.domain.model.CollectionEntry
-import goods.pocket.app.domain.model.CollectionEntryStatus
+import goods.pocket.app.domain.collection.CollectionEntry
+import goods.pocket.app.domain.collection.CollectionEntryStatus
 import goods.pocket.app.presentation.designsystem.GoodsPocketVisualTokens
 import goods.pocket.app.presentation.i18n.formatCurrency
 import goods.pocket.app.presentation.i18n.formatDate
@@ -58,7 +58,7 @@ fun CollectionScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(GoodsPocketVisualTokens.Background)),
+            .background(Color(GoodsPocketVisualTokens.BACKGROUND)),
     ) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
@@ -147,19 +147,13 @@ fun CollectionScreen(
 }
 
 internal sealed interface CollectionCardMetadata {
-    data class Catalog(
-        val seriesName: String?,
-        val category: String,
-    ) : CollectionCardMetadata
+    data class Catalog(val seriesName: String?, val category: String) : CollectionCardMetadata
 
-    data class Reservation(
-        val store: String?,
-        val releaseDate: String?,
-    ) : CollectionCardMetadata
+    data class Reservation(val store: String?, val releaseDate: String?) : CollectionCardMetadata
 }
 
-internal fun CollectionEntry.collectionCardMetadata(): CollectionCardMetadata {
-    return if (status == CollectionEntryStatus.RESERVED) {
+internal fun CollectionEntry.collectionCardMetadata(): CollectionCardMetadata =
+    if (status == CollectionEntryStatus.RESERVED) {
         CollectionCardMetadata.Reservation(
             store = reservationStore,
             releaseDate = releaseDate,
@@ -170,7 +164,6 @@ internal fun CollectionEntry.collectionCardMetadata(): CollectionCardMetadata {
             category = category,
         )
     }
-}
 
 internal data class CollectionSummary(
     val ownedCount: Int,
@@ -179,11 +172,12 @@ internal data class CollectionSummary(
 )
 
 internal fun collectionSummary(entries: List<CollectionEntry>): CollectionSummary {
-    val ownedEntries = entries.filter { it.status != CollectionEntryStatus.RESERVED }
+    val ownedEntries = entries.filter { it.status == CollectionEntryStatus.OWNED }
     return CollectionSummary(
         ownedCount = ownedEntries.size,
         reservedCount = entries.count { it.status == CollectionEntryStatus.RESERVED },
-        totalPurchaseAmount = ownedEntries.sumOf { it.purchasePrice ?: 0L },
+        totalPurchaseAmount = entries.filter { it.status != CollectionEntryStatus.RESERVED }
+            .sumOf { it.purchasePrice ?: 0L },
     )
 }
 
@@ -191,17 +185,15 @@ internal fun visibleCollectionEntries(
     entries: List<CollectionEntry>,
     query: String,
     selectedSegment: CollectionSegment,
-): List<CollectionEntry> {
-    return entries.filter { entry ->
-        val matchesQuery = query.isBlank() ||
-            entry.name.contains(query, ignoreCase = true) ||
-            entry.seriesName?.contains(query, ignoreCase = true) == true ||
-            entry.characterName?.contains(query, ignoreCase = true) == true
-        val matchesSegment = when (selectedSegment) {
-            CollectionSegment.OWNED -> entry.status != CollectionEntryStatus.RESERVED
-            CollectionSegment.RESERVED -> entry.status == CollectionEntryStatus.RESERVED
-            CollectionSegment.ALL -> true
-        }
-        matchesQuery && matchesSegment
+): List<CollectionEntry> = entries.filter { entry ->
+    val matchesQuery = query.isBlank() ||
+        entry.name.contains(query, ignoreCase = true) ||
+        entry.seriesName?.contains(query, ignoreCase = true) == true ||
+        entry.characterName?.contains(query, ignoreCase = true) == true
+    val matchesSegment = when (selectedSegment) {
+        CollectionSegment.OWNED -> entry.status != CollectionEntryStatus.RESERVED
+        CollectionSegment.RESERVED -> entry.status == CollectionEntryStatus.RESERVED
+        CollectionSegment.ALL -> true
     }
+    matchesQuery && matchesSegment
 }

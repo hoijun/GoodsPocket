@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import goods.pocket.app.presentation.i18n.tr
+import goods.pocket.app.presentation.state.CommandState
 import goodspocket.composeapp.generated.resources.Res
 import goodspocket.composeapp.generated.resources.action_cancel
 
@@ -32,6 +33,8 @@ internal fun DeleteConfirmationDialog(
     title: String,
     body: String,
     confirmLabel: String,
+    commandState: CommandState = CommandState(),
+    onRetry: () -> Unit = {},
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
 ) {
@@ -45,25 +48,53 @@ internal fun DeleteConfirmationDialog(
             shadowElevation = 0.5.dp,
         ) {
             Column(
-                modifier = Modifier.padding(start = 16.dp, top = 23.dp, end = 16.dp, bottom = 16.dp),
+                modifier = Modifier.padding(
+                    start = 16.dp,
+                    top = 23.dp,
+                    end = 16.dp,
+                    bottom = 16.dp,
+                ),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(5.dp),
             ) {
-                Text(title, color = Color(0xFF202838), fontSize = 18.sp, lineHeight = 24.sp,
-                    fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-                Text(body, modifier = Modifier.width(168.dp), color = Color(0xFF8A8F9B),
-                    fontSize = 13.sp, lineHeight = 17.sp, minLines = 2, textAlign = TextAlign.Center)
-                Row(Modifier.fillMaxWidth().padding(top = 13.dp), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+                FeatureFeedback(commandState.isRunning, commandState.hasFailure, onRetry)
+                Text(
+                    title,
+                    color = Color(0xFF202838),
+                    fontSize = 18.sp,
+                    lineHeight = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                )
+                Text(
+                    body,
+                    modifier = Modifier.width(168.dp),
+                    color = Color(0xFF8A8F9B),
+                    fontSize = 13.sp,
+                    lineHeight = 17.sp,
+                    minLines = 2,
+                    textAlign = TextAlign.Center,
+                )
+                Row(
+                    Modifier.fillMaxWidth().padding(top = 13.dp),
+                    horizontalArrangement = Arrangement.spacedBy(9.dp),
+                ) {
                     OutlinedButton(
                         onClick = onDismiss,
                         modifier = Modifier.weight(1f).height(40.dp),
                         shape = RoundedCornerShape(8.dp),
                         border = BorderStroke(1.dp, Color(0xFFC8CDD6)),
                     ) {
-                        Text(tr(Res.string.action_cancel), color = Color(0xFF8A8F9B), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                        Text(
+                            tr(Res.string.action_cancel),
+                            color = Color(0xFF8A8F9B),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold,
+                        )
                     }
                     Button(
                         onClick = onConfirm,
+                        enabled = !commandState.isRunning,
                         modifier = Modifier.weight(1f).height(40.dp),
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = orange),

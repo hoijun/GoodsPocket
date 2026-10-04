@@ -1,7 +1,7 @@
 package goods.pocket.app.presentation.component
 
-import goods.pocket.app.domain.model.CollectionEntryStatus
-import goods.pocket.app.domain.model.EventType
+import goods.pocket.app.domain.collection.CollectionEntryStatus
+import goods.pocket.app.domain.event.EventType
 
 data class CollectionDraft(
     val name: String = "",
@@ -18,7 +18,8 @@ data class CollectionDraft(
         get() = status == CollectionEntryStatus.RESERVED
 
     val canSubmit: Boolean
-        get() = name.isNotBlank() && category.isNotBlank() &&
+        get() = name.isNotBlank() &&
+            category.isNotBlank() &&
             (!isReserved || (reservationStore.isNotBlank() && releaseDate.isNotBlank()))
 }
 

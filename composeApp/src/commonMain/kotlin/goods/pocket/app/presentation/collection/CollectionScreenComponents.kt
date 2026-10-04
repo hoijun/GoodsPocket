@@ -1,4 +1,4 @@
-package goods.pocket.app.presentation.screen
+package goods.pocket.app.presentation.collection
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,9 +36,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import goods.pocket.app.domain.model.CollectionEntry
-import goods.pocket.app.domain.model.CollectionEntryStatus
+import goods.pocket.app.domain.collection.CollectionEntry
+import goods.pocket.app.domain.collection.CollectionEntryStatus
 import goods.pocket.app.presentation.designsystem.GoodsPocketVisualTokens
 
 @Composable
@@ -57,14 +55,14 @@ internal fun CollectionHeader(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(Color(GoodsPocketVisualTokens.Background))
+            .background(Color(GoodsPocketVisualTokens.BACKGROUND))
             .padding(horizontal = CollectionReferenceMetrics.ScreenHorizontalPadding),
     ) {
         Spacer(modifier = Modifier.height(CollectionReferenceMetrics.TitleTopPadding))
         Text(
             text = title,
             modifier = Modifier.fillMaxWidth(),
-            color = Color(GoodsPocketVisualTokens.Ink),
+            color = Color(GoodsPocketVisualTokens.INK),
             fontSize = CollectionReferenceMetrics.TitleFontSize,
             lineHeight = CollectionReferenceMetrics.TitleLineHeight,
             fontWeight = FontWeight.Bold,
@@ -85,7 +83,7 @@ internal fun CollectionHeader(
         Spacer(modifier = Modifier.height(CollectionReferenceMetrics.SearchToCountSpacing))
         Text(
             text = resultCount,
-            color = Color(GoodsPocketVisualTokens.Ink),
+            color = Color(GoodsPocketVisualTokens.INK),
             fontSize = CollectionReferenceMetrics.ResultCountFontSize,
             lineHeight = CollectionReferenceMetrics.ResultCountLineHeight,
             fontWeight = FontWeight.SemiBold,
@@ -122,7 +120,13 @@ private fun CollectionSegmentedControl(
                         .fillMaxHeight()
                         .clip(RoundedCornerShape(CollectionReferenceMetrics.SelectedSegmentRadius))
                         .background(
-                            if (selected) Color(GoodsPocketVisualTokens.Primary) else Color.Transparent,
+                            if (selected) {
+                                Color(
+                                    GoodsPocketVisualTokens.PRIMARY,
+                                )
+                            } else {
+                                Color.Transparent
+                            },
                         )
                         .selectable(
                             selected = selected,
@@ -135,7 +139,7 @@ private fun CollectionSegmentedControl(
                 ) {
                     Text(
                         text = option,
-                        color = if (selected) Color.White else Color(GoodsPocketVisualTokens.Ink),
+                        color = if (selected) Color.White else Color(GoodsPocketVisualTokens.INK),
                         fontSize = CollectionReferenceMetrics.SegmentFontSize,
                         lineHeight = CollectionReferenceMetrics.SegmentLineHeight,
                         fontWeight = FontWeight.Bold,
@@ -176,18 +180,18 @@ private fun CollectionSearchField(
                 modifier = Modifier.weight(1f),
                 singleLine = true,
                 textStyle = TextStyle(
-                    color = Color(GoodsPocketVisualTokens.Ink),
+                    color = Color(GoodsPocketVisualTokens.INK),
                     fontSize = CollectionReferenceMetrics.SearchFontSize,
                     lineHeight = CollectionReferenceMetrics.SearchLineHeight,
                     fontWeight = FontWeight.Normal,
                 ),
-                cursorBrush = SolidColor(Color(GoodsPocketVisualTokens.Primary)),
+                cursorBrush = SolidColor(Color(GoodsPocketVisualTokens.PRIMARY)),
                 decorationBox = { innerTextField ->
                     Box(contentAlignment = Alignment.CenterStart) {
                         if (value.isEmpty()) {
                             Text(
                                 text = placeholder,
-                                color = Color(GoodsPocketVisualTokens.MutedInk),
+                                color = Color(GoodsPocketVisualTokens.MUTED_INK),
                                 fontSize = CollectionReferenceMetrics.SearchFontSize,
                                 lineHeight = CollectionReferenceMetrics.SearchLineHeight,
                             )
@@ -203,7 +207,7 @@ private fun CollectionSearchField(
 @Composable
 private fun CollectionSearchIcon() {
     Canvas(modifier = Modifier.size(17.dp)) {
-        val color = Color(GoodsPocketVisualTokens.MutedInk)
+        val color = Color(GoodsPocketVisualTokens.MUTED_INK)
         drawCircle(
             color = color,
             radius = size.minDimension * 0.31f,
@@ -233,7 +237,7 @@ internal fun CollectionGoodsCard(
             .height(CollectionReferenceMetrics.GoodsCardHeight),
         shape = RoundedCornerShape(CollectionReferenceMetrics.GoodsCardRadius),
         color = CollectionColors.Card,
-        contentColor = Color(GoodsPocketVisualTokens.Ink),
+        contentColor = Color(GoodsPocketVisualTokens.INK),
         border = BorderStroke(1.dp, CollectionColors.Outline),
         shadowElevation = CollectionReferenceMetrics.CardShadowElevation,
     ) {
@@ -258,7 +262,7 @@ internal fun CollectionGoodsCard(
             ) {
                 Text(
                     text = entry.name,
-                    color = Color(GoodsPocketVisualTokens.Ink),
+                    color = Color(GoodsPocketVisualTokens.INK),
                     fontSize = CollectionReferenceMetrics.GoodsNameFontSize,
                     lineHeight = CollectionReferenceMetrics.GoodsNameLineHeight,
                     fontWeight = FontWeight.Bold,
@@ -268,7 +272,7 @@ internal fun CollectionGoodsCard(
                 Spacer(modifier = Modifier.height(3.dp))
                 Text(
                     text = metadata,
-                    color = Color(GoodsPocketVisualTokens.MutedInk),
+                    color = Color(GoodsPocketVisualTokens.MUTED_INK),
                     fontSize = CollectionReferenceMetrics.GoodsMetadataFontSize,
                     lineHeight = CollectionReferenceMetrics.GoodsMetadataLineHeight,
                     maxLines = 1,
@@ -285,22 +289,19 @@ internal fun CollectionGoodsCard(
 }
 
 @Composable
-private fun CollectionStatusBadge(
-    text: String,
-    status: CollectionEntryStatus,
-) {
+private fun CollectionStatusBadge(text: String, status: CollectionEntryStatus) {
     val colors = when (status) {
         CollectionEntryStatus.OWNED -> CollectionStatusColors(
             container = CollectionColors.OwnedContainer,
-            content = Color(GoodsPocketVisualTokens.Secondary),
+            content = Color(GoodsPocketVisualTokens.SECONDARY),
         )
         CollectionEntryStatus.RESERVED -> CollectionStatusColors(
             container = CollectionColors.ReservedContainer,
-            content = Color(GoodsPocketVisualTokens.Primary),
+            content = Color(GoodsPocketVisualTokens.PRIMARY),
         )
         CollectionEntryStatus.PLANNED_CLEANUP -> CollectionStatusColors(
             container = CollectionColors.PlannedContainer,
-            content = Color(GoodsPocketVisualTokens.Tertiary),
+            content = Color(GoodsPocketVisualTokens.TERTIARY),
         )
     }
     Surface(
@@ -335,7 +336,7 @@ internal fun CollectionSummaryBand(
             .height(CollectionReferenceMetrics.SummaryHeight),
         shape = RoundedCornerShape(CollectionReferenceMetrics.SummaryRadius),
         color = CollectionColors.Card,
-        contentColor = Color(GoodsPocketVisualTokens.Ink),
+        contentColor = Color(GoodsPocketVisualTokens.INK),
         border = BorderStroke(1.dp, CollectionColors.Outline),
         shadowElevation = CollectionReferenceMetrics.CardShadowElevation,
     ) {
@@ -346,21 +347,21 @@ internal fun CollectionSummaryBand(
             CollectionSummaryMetric(
                 label = ownedLabel,
                 value = ownedValue,
-                valueColor = Color(GoodsPocketVisualTokens.Secondary),
+                valueColor = Color(GoodsPocketVisualTokens.SECONDARY),
                 modifier = Modifier.weight(1.05f),
             )
             CollectionSummaryDivider()
             CollectionSummaryMetric(
                 label = reservedLabel,
                 value = reservedValue,
-                valueColor = Color(GoodsPocketVisualTokens.Warning),
+                valueColor = Color(GoodsPocketVisualTokens.WARNING),
                 modifier = Modifier.weight(1f),
             )
             CollectionSummaryDivider()
             CollectionSummaryMetric(
                 label = amountLabel,
                 value = amountValue,
-                valueColor = Color(GoodsPocketVisualTokens.Ink),
+                valueColor = Color(GoodsPocketVisualTokens.INK),
                 modifier = Modifier.weight(1.5f),
             )
         }
@@ -381,7 +382,7 @@ private fun CollectionSummaryMetric(
     ) {
         Text(
             text = label,
-            color = Color(GoodsPocketVisualTokens.MutedInk),
+            color = Color(GoodsPocketVisualTokens.MUTED_INK),
             fontSize = CollectionReferenceMetrics.SummaryLabelFontSize,
             lineHeight = CollectionReferenceMetrics.SummaryLabelLineHeight,
             maxLines = 1,
@@ -417,7 +418,4 @@ private object CollectionColors {
     val PlannedContainer = Color(0xFFEDE8FF)
 }
 
-private data class CollectionStatusColors(
-    val container: Color,
-    val content: Color,
-)
+private data class CollectionStatusColors(val container: Color, val content: Color)

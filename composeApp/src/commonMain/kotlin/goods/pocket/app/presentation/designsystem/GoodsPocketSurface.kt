@@ -104,10 +104,7 @@ fun GoodsPocketHeroCard(
 }
 
 @Composable
-fun GoodsPocketSectionHeader(
-    title: String,
-    subtitle: String? = null,
-) {
+fun GoodsPocketSectionHeader(title: String, subtitle: String? = null) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(
             text = title,
@@ -125,10 +122,7 @@ fun GoodsPocketSectionHeader(
 }
 
 @Composable
-fun GoodsPocketBottomSheetHandle(
-    modifier: Modifier = Modifier,
-    onClick: (() -> Unit)? = null,
-) {
+fun GoodsPocketBottomSheetHandle(modifier: Modifier = Modifier, onClick: (() -> Unit)? = null) {
     val interactionSource = remember { MutableInteractionSource() }
     Box(
         modifier = modifier
@@ -184,7 +178,7 @@ fun GoodsPocketBottomSheetHeader(
             )
             TextButton(
                 onClick = onDismiss,
-                modifier = Modifier.padding(end = 5.dp)
+                modifier = Modifier.padding(end = 5.dp),
             ) {
                 Text(tr(Res.string.action_close))
             }
@@ -305,8 +299,16 @@ fun GoodsPocketFilterChip(
 ) {
     val shape = MaterialTheme.shapes.small
     val containerColor = if (selected) selectedContainerColor else MaterialTheme.colorScheme.surface
-    val contentColor = if (selected) selectedContentColor else MaterialTheme.colorScheme.onSurfaceVariant
-    val borderColor = if (selected) selectedBorderColor else MaterialTheme.colorScheme.outlineVariant
+    val contentColor = if (selected) {
+        selectedContentColor
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    }
+    val borderColor = if (selected) {
+        selectedBorderColor
+    } else {
+        MaterialTheme.colorScheme.outlineVariant
+    }
 
     Surface(
         onClick = onClick,

@@ -1,4 +1,4 @@
-package goods.pocket.app.presentation.screen
+package goods.pocket.app.presentation.collection
 
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
