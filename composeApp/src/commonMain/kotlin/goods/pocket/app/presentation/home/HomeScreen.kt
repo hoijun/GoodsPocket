@@ -36,7 +36,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import goods.pocket.app.domain.dashboard.HomeSummary
-import goods.pocket.app.domain.event.Event
 import goods.pocket.app.presentation.designsystem.GoodsPocketVisualTokens
 import goods.pocket.app.presentation.designsystem.goodsPocketScreenModifier
 import goods.pocket.app.presentation.i18n.tr
@@ -60,11 +59,13 @@ internal val HomeCardBorder = Color(0xFFEFEDEC)
 
 @Composable
 fun HomeScreen(
-    dashboardSummary: HomeSummary,
-    upcomingEvents: List<Event>,
-    currentDate: String,
+    state: HomeUiState,
     onAction: (HomeAction) -> Unit,
+    onRetry: () -> Unit,
 ) {
+    val dashboardSummary = state.summary
+    val upcomingEvents = state.upcomingEvents
+    val currentDate = state.currentDate
     LazyColumn(
         modifier = goodsPocketScreenModifier(),
         contentPadding = PaddingValues(top = 2.dp, bottom = 16.dp),
@@ -76,7 +77,15 @@ fun HomeScreen(
                 onNotificationsClick = { onAction(HomeAction.OpenScheduleOverview) },
             )
         }
-        item { HomeHeroCard(onClick = { onAction(HomeAction.OpenQuickAdd) }) }
+        item(key = "hero") {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                HomeHeroCard(onClick = { onAction(HomeAction.OpenQuickAdd) })
+                if (state.isLoading || state.hasLoadFailure) {
+                    HomeLoadFeedback(isLoading = state.isLoading, onRetry = onRetry)
+                }
+            }
+        }
+        if (!state.hasLoaded) return@LazyColumn
         item {
             HomeTodaySummaryCard(
                 dashboardSummary = dashboardSummary,

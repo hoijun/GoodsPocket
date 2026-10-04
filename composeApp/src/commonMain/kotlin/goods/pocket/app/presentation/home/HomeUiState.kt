@@ -9,4 +9,5 @@ data class HomeUiState(
     val currentDate: String = "",
     val isLoading: Boolean = true,
     val hasLoadFailure: Boolean = false,
+    val hasLoaded: Boolean = false,
 )

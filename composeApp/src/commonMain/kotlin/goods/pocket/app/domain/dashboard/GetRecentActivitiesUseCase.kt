@@ -27,6 +27,7 @@ class GetRecentActivitiesUseCase(private val collectionRepository: CollectionRep
                     },
                     happenedAt = entry.updatedAt,
                     storeName = entry.reservationStore,
+                    seriesName = entry.seriesName,
                 )
             }
         }

@@ -236,7 +236,6 @@ private fun CollectionDetailContent(entry: CollectionEntry) {
         Spacer(modifier = Modifier.height(CollectionDetailReferenceMetrics.TitleMetadataGap))
         HorizontalDivider(color = DetailDivider)
         CollectionMetadata(entry = entry)
-        HorizontalDivider(color = DetailDivider)
         CollectionNote(note = entry.note ?: tr(Res.string.common_not_set))
     }
 }
@@ -338,7 +337,7 @@ private fun CollectionMetadata(entry: CollectionEntry) {
             CollectionMetadataRow(
                 label = tr(Res.string.detail_reservation_amount),
                 value =
-                entry.purchasePrice?.let {
+                (if (entry.reservation != null) entry.reservation.totalPrice else entry.purchasePrice)?.let {
                     formatCurrency(it)
                 } ?: tr(Res.string.common_not_set),
             )
@@ -380,30 +379,33 @@ private fun CollectionMetadata(entry: CollectionEntry) {
 
 @Composable
 private fun CollectionMetadataRow(label: String, value: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = CollectionDetailReferenceMetrics.MetadataRowHeight),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = label,
-            modifier = Modifier.weight(0.48f),
-            style = MaterialTheme.typography.bodySmall.copy(
-                fontSize = CollectionDetailReferenceMetrics.MetadataFontSize,
-                lineHeight = 15.sp,
-            ),
-            color = DetailInk,
-        )
-        Text(
-            text = value,
-            modifier = Modifier.weight(0.52f),
-            style = MaterialTheme.typography.bodySmall.copy(
-                fontSize = CollectionDetailReferenceMetrics.MetadataFontSize,
-                lineHeight = 15.sp,
-            ),
-            color = DetailInk,
-        )
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = CollectionDetailReferenceMetrics.MetadataRowHeight),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = label,
+                modifier = Modifier.weight(0.48f),
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontSize = CollectionDetailReferenceMetrics.MetadataFontSize,
+                    lineHeight = 15.sp,
+                ),
+                color = DetailInk,
+            )
+            Text(
+                text = value,
+                modifier = Modifier.weight(0.52f),
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontSize = CollectionDetailReferenceMetrics.MetadataFontSize,
+                    lineHeight = 15.sp,
+                ),
+                color = DetailInk,
+            )
+        }
+        HorizontalDivider(modifier = Modifier.align(Alignment.BottomCenter), color = DetailDivider)
     }
 }
 

@@ -36,6 +36,7 @@ import goods.pocket.app.presentation.i18n.tr
 import goods.pocket.app.presentation.state.CollectionSegment
 import goodspocket.composeapp.generated.resources.Res
 import goodspocket.composeapp.generated.resources.collection_empty_search
+import goodspocket.composeapp.generated.resources.collection_empty
 import goodspocket.composeapp.generated.resources.collection_metric_monthly_spend
 import goodspocket.composeapp.generated.resources.collection_result_count
 import goodspocket.composeapp.generated.resources.collection_search_placeholder
@@ -45,7 +46,7 @@ import goodspocket.composeapp.generated.resources.collection_series_category
 import goodspocket.composeapp.generated.resources.common_not_set
 import goodspocket.composeapp.generated.resources.common_unknown
 import goodspocket.composeapp.generated.resources.nav_collection
-import goodspocket.composeapp.generated.resources.preorders_store_release
+import goodspocket.composeapp.generated.resources.collection_reservation_store
 
 @Composable
 fun CollectionScreen(
@@ -113,7 +114,13 @@ fun CollectionScreen(
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
-                            text = tr(Res.string.collection_empty_search),
+                            text = tr(
+                                if (entries.isEmpty() && query.isBlank()) {
+                                    Res.string.collection_empty
+                                } else {
+                                    Res.string.collection_empty_search
+                                },
+                            ),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center,
@@ -135,11 +142,13 @@ fun CollectionScreen(
                             entry.localizedCategory(),
                         )
                         is CollectionCardMetadata.Reservation -> tr(
-                            Res.string.preorders_store_release,
+                            Res.string.collection_reservation_store,
                             metadata.store ?: tr(Res.string.common_unknown),
-                            metadata.releaseDate?.let { formatDate(it) }
-                                ?: tr(Res.string.common_not_set),
                         )
+                    },
+                    secondaryMetadata = (metadata as? CollectionCardMetadata.Reservation)?.let {
+                        it.releaseDate?.let { date -> formatDate(date) }
+                            ?: tr(Res.string.common_not_set)
                     },
                     statusLabel = entry.status.localizedLabel(),
                     onClick = { onEntryClick(entry.id) },

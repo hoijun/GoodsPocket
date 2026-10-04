@@ -27,6 +27,10 @@ fun EventsScreen(
     events: List<Event>,
     selectedType: EventType?,
     currentDate: String,
+    isLoading: Boolean,
+    hasLoadFailure: Boolean,
+    hasLoaded: Boolean,
+    onRetry: () -> Unit,
     onTypeChange: (EventType?) -> Unit,
     onEventClick: (String) -> Unit,
 ) {
@@ -58,12 +62,19 @@ fun EventsScreen(
                 pageTitle = tr(Res.string.nav_events),
                 monthLabel = overview.headlineMonth,
                 overviewTitle = tr(Res.string.events_highlight),
-                count = visibleCount.toString(),
+                count = visibleCount.toString().takeIf { hasLoaded },
                 filterLabels = filterLabels,
                 selectedFilterIndex = filters.indexOf(selectedType),
                 onFilterSelected = { index -> onTypeChange(filters[index]) },
             )
         }
+
+        if (isLoading || hasLoadFailure) {
+            item {
+                EventsLoadFeedback(isLoading = isLoading, onRetry = onRetry)
+            }
+        }
+        if (!hasLoaded) return@LazyColumn
 
         val featuredEvent = overview.featuredEvent
         if (featuredEvent == null) {

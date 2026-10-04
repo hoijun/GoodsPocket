@@ -48,6 +48,7 @@ class EventsStateHolder(
             data.hasFailure,
             command,
             saved?.value,
+            hasLoaded = data.hasLoaded,
         )
     }.stateIn(scope, SharingStarted.Eagerly, EventsUiState(currentDate = clock.currentDate()))
     private var newEventId: String? = null

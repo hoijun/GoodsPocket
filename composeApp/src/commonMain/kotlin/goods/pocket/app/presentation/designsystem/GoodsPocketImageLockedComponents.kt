@@ -386,27 +386,40 @@ private fun GoodsPocketBottomNavIcon(destination: AppDestination, selected: Bool
                     lineTo(size.width * 0.18f, size.height * 0.30f)
                     close()
                 }
-                drawPath(path = cube, color = color, style = stroke)
+                if (selected) {
+                    drawPath(path = cube, color = color)
+                } else {
+                    drawPath(path = cube, color = color, style = stroke)
+                }
+                val edgeColor = if (selected) Color.White else color
                 drawLine(
-                    color = color,
+                    color = edgeColor,
                     start = Offset(size.width * 0.18f, size.height * 0.30f),
                     end = Offset(size.width * 0.50f, size.height * 0.47f),
                     strokeWidth = strokeWidth,
                 )
                 drawLine(
-                    color = color,
+                    color = edgeColor,
                     start = Offset(size.width * 0.82f, size.height * 0.30f),
                     end = Offset(size.width * 0.50f, size.height * 0.47f),
                     strokeWidth = strokeWidth,
                 )
                 drawLine(
-                    color = color,
+                    color = edgeColor,
                     start = Offset(size.width * 0.50f, size.height * 0.47f),
                     end = Offset(size.width * 0.50f, size.height * 0.86f),
                     strokeWidth = strokeWidth,
                 )
             }
             AppDestination.Events -> {
+                if (selected) {
+                    drawRoundRect(
+                        color = color,
+                        topLeft = Offset(size.width * 0.18f, size.height * 0.24f),
+                        size = Size(size.width * 0.64f, size.height * 0.58f),
+                        cornerRadius = CornerRadius(NavigationIconDrawingMetrics.CornerRadius.toPx()),
+                    )
+                }
                 drawRoundRect(
                     color = color,
                     topLeft = Offset(size.width * 0.18f, size.height * 0.24f),
@@ -415,7 +428,7 @@ private fun GoodsPocketBottomNavIcon(destination: AppDestination, selected: Bool
                     style = stroke,
                 )
                 drawLine(
-                    color = color,
+                    color = if (selected) Color.White else color,
                     start = Offset(size.width * 0.18f, size.height * 0.42f),
                     end = Offset(size.width * 0.82f, size.height * 0.42f),
                     strokeWidth = strokeWidth,

@@ -68,7 +68,7 @@
     <string name="collection_search_label">Search collection</string>
     <string name="collection_search_placeholder">Name or series</string>
     <string name="collection_result_count">%1$s total</string>
-    <string name="collection_empty_search">No items match the current collection filters.</string>
+    <string name="collection_empty_search">No matching goods. Try a different search or status.</string>
     <string name="collection_status_section">Item status</string>
     <string name="collection_status_section_subtitle">Switch between owned and planned cleanup items and review purchase scale together.</string>
     <string name="collection_series_category">%1$s · %2$s</string>
@@ -226,4 +226,14 @@
     <string name="collection_loading">Loading your collection</string>
     <string name="collection_loading_hint">Please wait a moment.</string>
     <string name="collection_retry_hint">Please try again in a moment.</string>
+    <string name="home_load_failed">Couldn’t load Home</string>
+    <string name="home_loading">Loading Home</string>
+    <string name="home_loading_hint">Please wait a moment.</string>
+    <string name="home_retry_hint">Please try again in a moment.</string>
+    <string name="collection_empty">No goods yet. Tap + to add your first item.</string>
+    <string name="collection_reservation_store">%1$s · release</string>
+    <string name="events_load_failed">Couldn’t load your events</string>
+    <string name="events_retry_hint">Please try again in a moment.</string>
+    <string name="events_loading">Loading your events</string>
+    <string name="events_loading_hint">Please wait a moment.</string>
 </resources>

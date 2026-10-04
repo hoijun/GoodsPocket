@@ -64,7 +64,7 @@ Additional domain rows scroll above the fixed bottom navigation.
 - Featured card and rows call `onEventClick(event.id)`.
 - Month, count, labels, titles, locations, and dates remain domain-derived and localized.
 - Empty states keep the title, overview, filters, and navigation geometry.
-- Events remains a primary destination with Events selected in bottom navigation.
+- Events remains a primary destination with Events selected in bottom navigation. The selected calendar has a filled orange body and white horizontal separator; inactive calendars remain outlined.
 
 ## Exclusions
 
@@ -90,3 +90,11 @@ The final implementation was captured from the fixed iPhone 16 simulator and nor
 - GPT Web secondary review was used to identify candidate spacing differences. Pixel-boundary measurement retained only reproducible geometry corrections; subjective suggestions that contradicted the normalized measurements were not applied.
 - The current date separator follows the existing user date-format preference. The generated reference uses dots, so punctuation remains an explicitly excluded dynamic formatting difference.
 - The generated reference navigation begins above the shared locked position. The implementation keeps the approved Home/Collection border at `y=770`.
+
+## Read Feedback States
+
+- `design/references/events/load-failure.png` and `design/prompts/events-load-failure.md` define the support card, pending user approval. Existing header/filter geometry remains the default reference contract.
+- Render read feedback below filters inside the scrolling body, never over the title.
+- Unknown initial data hides the count pill and empty-result message. After successful observation, empty results and zero counts are valid.
+- Preserve last successful events and selected filter through read failure and retry. A retry restarts only the event observation.
+- Loading uses the same support card with localized loading copy and progress in place of retry. Error offers one retry action. Text and action minimum height may grow for accessibility.

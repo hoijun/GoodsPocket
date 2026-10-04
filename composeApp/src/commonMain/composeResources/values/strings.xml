@@ -68,7 +68,7 @@
     <string name="collection_search_label">컬렉션 검색</string>
     <string name="collection_search_placeholder">이름 또는 시리즈</string>
     <string name="collection_result_count">총 %1$s개</string>
-    <string name="collection_empty_search">현재 조건과 일치하는 굿즈가 없어요.</string>
+    <string name="collection_empty_search">일치하는 굿즈가 없어요. 검색어나 상태를 바꿔 보세요.</string>
     <string name="collection_status_section">굿즈 상태</string>
     <string name="collection_status_section_subtitle">보유 중과 정리 예정 굿즈를 나누고 구매 규모를 함께 확인해요.</string>
     <string name="collection_series_category">%1$s · %2$s</string>
@@ -226,4 +226,14 @@
     <string name="collection_loading">컬렉션을 불러오고 있어요</string>
     <string name="collection_loading_hint">잠시만 기다려 주세요.</string>
     <string name="collection_retry_hint">잠시 후 다시 시도해 주세요.</string>
+    <string name="home_load_failed">홈 정보를 불러오지 못했어요</string>
+    <string name="home_loading">홈 정보를 불러오고 있어요</string>
+    <string name="home_loading_hint">잠시만 기다려 주세요.</string>
+    <string name="home_retry_hint">잠시 후 다시 시도해 주세요.</string>
+    <string name="collection_empty">아직 등록한 굿즈가 없어요. + 버튼으로 첫 굿즈를 추가해 보세요.</string>
+    <string name="collection_reservation_store">%1$s · 발매</string>
+    <string name="events_load_failed">이벤트를 불러오지 못했어요</string>
+    <string name="events_retry_hint">잠시 후 다시 시도해 주세요.</string>
+    <string name="events_loading">이벤트를 불러오는 중이에요</string>
+    <string name="events_loading_hint">잠시만 기다려 주세요.</string>
 </resources>

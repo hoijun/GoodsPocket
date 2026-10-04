@@ -99,6 +99,10 @@ Use `FontWeight.Bold` for normal hierarchy. `ExtraBold` is reserved for the bran
 
 ## Behavior
 
+- Loading and failure feedback belongs in the scroll content below the hero, never over the brand header. Initial loading/failure must not render the default zero summary or empty activity/schedule content as loaded data. A later read failure retains the last successful content and exposes a read-only retry.
+- Initial failure reference: `design/references/home/load-failure.png`. Loading reuses its feedback region with progress in place of retry.
+- Recent-goods subtitles display the entry's series name; missing/blank series uses localized unknown copy, not generic activity-kind text. Activity identity and click navigation remain unchanged.
+
 - `View all` is text plus a separate thin chevron glyph, never a typed `>` character.
 - Bell, navigation, chart, placeholder, and chevron visuals are native Compose components or drawing, never cropped screenshot assets.
 - Recent goods cards have no favorite affordance because the current domain and event contract does not support favorites.

@@ -32,7 +32,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import goods.pocket.app.domain.dashboard.ActivityKind
 import goods.pocket.app.domain.dashboard.ActivityRecord
 import goods.pocket.app.domain.dashboard.HomeSummary
 import goods.pocket.app.domain.event.Event
@@ -42,9 +41,7 @@ import goods.pocket.app.presentation.i18n.formatCurrency
 import goods.pocket.app.presentation.i18n.localizedLabel
 import goods.pocket.app.presentation.i18n.tr
 import goodspocket.composeapp.generated.resources.Res
-import goodspocket.composeapp.generated.resources.activity_added
-import goodspocket.composeapp.generated.resources.activity_received
-import goodspocket.composeapp.generated.resources.activity_reserved
+import goodspocket.composeapp.generated.resources.common_unknown
 import goodspocket.composeapp.generated.resources.home_monthly_spend_basis
 import goodspocket.composeapp.generated.resources.home_monthly_spend_change
 import goodspocket.composeapp.generated.resources.home_monthly_spend_title
@@ -450,11 +447,7 @@ private data class HomeScheduleRowModel(
 private fun ActivityRecord.toRecentGoodsCardModel(): RecentGoodsCardModel = RecentGoodsCardModel(
     id = id,
     title = title,
-    subtitle = when (kind) {
-        ActivityKind.ADDED -> tr(Res.string.activity_added)
-        ActivityKind.RESERVED -> tr(Res.string.activity_reserved, storeName.orEmpty())
-        ActivityKind.RECEIVED -> tr(Res.string.activity_received)
-    },
+    subtitle = seriesName?.takeIf { it.isNotBlank() } ?: tr(Res.string.common_unknown),
 )
 
 @Composable

@@ -65,6 +65,7 @@ The grid occupies the flexible content region between the result count and summa
 - Card and summary surface: `#FEFBF8`.
 - Outline: `1px #EFEDEC`.
 - Goods-card radius: `8px`.
+- The media placeholder has all four corners rounded at `8px`, including the lower corners inside the card.
 - Standard shadow: at most `0.5dp`; keep the reference's visual separation without a visible halo.
 - Selected segment and selected navigation: `#FF7445` with white content.
 - Owned badge: pale green container with `#36C781` content.
@@ -95,11 +96,14 @@ Letter spacing is `0` for every Collection text style.
 - Goods cards keep stable entry IDs and call `onEntryClick(entry.id)`.
 - Owned cards show localized series and category metadata.
 - Reserved cards show localized reservation store and release-date metadata.
+- Reserved cards use 5dp vertical body padding without the owned card’s extra 3dp top inset, leaving room for a two-line name, both metadata rows, and the full status badge within the shared 222dp card height.
+- Reserved metadata uses separate single-line store/release-label and date rows so a long store name cannot truncate the date. Owned metadata stays on one line.
 - Reserved badges use the pale peach container and primary-orange content shown in the reserved reference.
 - Counts, prices, names, categories, status labels, and metadata remain domain-derived.
 - The fixed summary presents owned count, reserved count, and total purchase amount.
 - Missing media contains no initials, text, generated artwork, or screenshot crop.
 - Empty and no-result states preserve the same header, controls, summary, and navigation geometry.
+- A truly empty collection with no query suggests adding the first item with the existing + action. A nonmatching query or segment suggests changing the search or status.
 
 ### Detail Sheet States
 
@@ -109,6 +113,8 @@ Letter spacing is `0` for every Collection text style.
 - Reserved detail keeps the real reservation transition callback; it never changes status directly in UI code.
 - Owned metadata shows purchase date, purchase store, purchase amount, related link, storage location, and memo.
 - Reserved metadata shows expected release date, reservation store, total preorder amount, related link, and memo.
+- Total preorder amount uses `reservation.totalPrice` when reservation details exist, including an unknown or zero total. Only older entries without reservation details use their existing purchase amount fallback. Do not replace an unknown reservation total with a different purchase amount.
+- Metadata rows have inset bottom dividers drawn within the existing minimum row height; dividers must not accumulate extra vertical spacing.
 - The edit action remains present, but its future redesign is outside the current detail-field task.
 - Keep actions in a fixed footer above the system inset; scroll media and metadata within the remaining sheet height.
 - Capture the real reserved card state and obtain user approval before locking its visible metadata fields and copy.

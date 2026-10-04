@@ -171,22 +171,22 @@ private fun EventDetailHandle(onDismiss: () -> Unit) {
         )
         IconButton(
             onClick = onDismiss,
-            modifier = Modifier.align(Alignment.TopEnd).padding(end = 8.dp, top = 6.dp)
+            modifier = Modifier.align(Alignment.TopEnd).padding(end = 6.dp, top = 4.dp)
                 .semantics { contentDescription = closeLabel },
         ) {
-            Canvas(Modifier.size(20.dp)) {
+            Canvas(Modifier.size(14.dp)) {
                 drawLine(
                     EventDetailMuted,
                     Offset.Zero,
                     Offset(size.width, size.height),
-                    1.5.dp.toPx(),
+                    1.7.dp.toPx(),
                     StrokeCap.Round,
                 )
                 drawLine(
                     EventDetailMuted,
                     Offset(size.width, 0f),
                     Offset(0f, size.height),
-                    1.5.dp.toPx(),
+                    1.7.dp.toPx(),
                     StrokeCap.Round,
                 )
             }

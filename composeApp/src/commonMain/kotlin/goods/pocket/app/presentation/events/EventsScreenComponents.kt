@@ -36,7 +36,7 @@ internal fun EventsHeader(
     pageTitle: String,
     monthLabel: String,
     overviewTitle: String,
-    count: String,
+    count: String?,
     filterLabels: List<String>,
     selectedFilterIndex: Int,
     onFilterSelected: (Int) -> Unit,
@@ -69,7 +69,7 @@ internal fun EventsHeader(
 }
 
 @Composable
-private fun EventsOverview(monthLabel: String, overviewTitle: String, count: String) {
+private fun EventsOverview(monthLabel: String, overviewTitle: String, count: String?) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -96,7 +96,7 @@ private fun EventsOverview(monthLabel: String, overviewTitle: String, count: Str
                 maxLines = 1,
             )
         }
-        Surface(
+        if (count != null) Surface(
             modifier = Modifier
                 .width(EventsReferenceMetrics.CountPillWidth)
                 .height(EventsReferenceMetrics.CountPillHeight)

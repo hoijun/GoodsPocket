@@ -235,6 +235,7 @@ private fun CollectionSearchIcon() {
 internal fun CollectionGoodsCard(
     entry: CollectionEntry,
     metadata: String,
+    secondaryMetadata: String?,
     statusLabel: String,
     onClick: () -> Unit,
 ) {
@@ -255,18 +256,15 @@ internal fun CollectionGoodsCard(
                     .fillMaxWidth()
                     .height(CollectionReferenceMetrics.GoodsMediaHeight)
                     .clip(
-                        RoundedCornerShape(
-                            topStart = CollectionReferenceMetrics.GoodsCardRadius,
-                            topEnd = CollectionReferenceMetrics.GoodsCardRadius,
-                        ),
+                        RoundedCornerShape(CollectionReferenceMetrics.GoodsCardRadius),
                     )
                     .background(CollectionColors.MediaPlaceholder),
             )
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 8.dp, vertical = 7.dp)
-                    .padding(top = 3.dp),
+                    .padding(horizontal = 8.dp, vertical = if (secondaryMetadata == null) 7.dp else 5.dp)
+                    .padding(top = if (secondaryMetadata == null) 3.dp else 0.dp),
             ) {
                 Text(
                     text = entry.name,
@@ -286,6 +284,16 @@ internal fun CollectionGoodsCard(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
+                if (secondaryMetadata != null) {
+                    Text(
+                        text = secondaryMetadata,
+                        color = Color(GoodsPocketVisualTokens.MUTED_INK),
+                        fontSize = CollectionReferenceMetrics.GoodsMetadataFontSize,
+                        lineHeight = CollectionReferenceMetrics.GoodsMetadataLineHeight,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
                 Spacer(modifier = Modifier.weight(1f))
                 CollectionStatusBadge(
                     text = statusLabel,

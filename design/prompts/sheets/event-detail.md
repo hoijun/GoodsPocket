@@ -7,3 +7,5 @@ Generate one 393:852 portrait event-detail bottom sheet over the approved Events
 The returned image defines geometry rather than the requested approximate top coordinate. Normalized sheet top is around 424px (428px height). Runtime copy is domain-derived and absent optional rows are omitted. Linked records use names when available, retaining the ID only as a missing-record fallback.
 
 Generated under delegated implementation authority, not separately user-approved. Device comparison is pending; do not label this pixel-verified.
+
+Implementation comparison: the close glyph uses a 14dp canvas with 1.7dp rounded strokes inside the existing IconButton target. End/top padding is 6dp/4dp; this aligns the glyph near normalized x=363, y=452 without shrinking the button.

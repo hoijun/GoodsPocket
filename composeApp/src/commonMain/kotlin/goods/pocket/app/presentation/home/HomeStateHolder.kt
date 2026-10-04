@@ -48,7 +48,11 @@ class HomeStateHolder(
             }
         }
     val state: kotlinx.coroutines.flow.StateFlow<HomeUiState> = content.state.map { data ->
-        data.value.copy(isLoading = data.isLoading, hasLoadFailure = data.hasFailure)
+        data.value.copy(
+            isLoading = data.isLoading,
+            hasLoadFailure = data.hasFailure,
+            hasLoaded = data.hasLoaded,
+        )
     }.stateIn(scope, SharingStarted.Eagerly, HomeUiState(currentDate = clock.currentDate()))
 
     fun retryLoad() = content.retry()

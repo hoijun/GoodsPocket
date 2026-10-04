@@ -12,6 +12,7 @@ data class EventsUiState(
     val hasLoadFailure: Boolean = false,
     val command: CommandState = CommandState(),
     val savedEvent: Event? = null,
+    val hasLoaded: Boolean = false,
 ) {
     fun event(id: String): Event? {
         val observed = events.firstOrNull { it.id == id }

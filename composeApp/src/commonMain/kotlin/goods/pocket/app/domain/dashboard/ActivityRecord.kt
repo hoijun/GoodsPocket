@@ -6,6 +6,7 @@ data class ActivityRecord(
     val kind: ActivityKind,
     val happenedAt: String,
     val storeName: String? = null,
+    val seriesName: String? = null,
 )
 
 enum class ActivityKind {
