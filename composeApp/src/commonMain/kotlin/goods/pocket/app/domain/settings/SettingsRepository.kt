@@ -1,8 +1,9 @@
-package goods.pocket.app.domain.repository
+package goods.pocket.app.domain.settings
 
-import goods.pocket.app.domain.model.AppPreference
+import kotlinx.coroutines.flow.Flow
 
 interface SettingsRepository {
+    fun observePreferences(): Flow<AppPreference>
     suspend fun getAppPreferences(): AppPreference
     suspend fun updateAppPreferences(preferences: AppPreference)
 }

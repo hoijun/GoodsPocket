@@ -1,15 +1,19 @@
 package goods.pocket.app.di
 
 import goods.pocket.app.data.di.GoodsPocketDataModule
-import goods.pocket.app.data.di.PlatformDataModule
 import goods.pocket.app.data.di.GoodsPocketUseCaseModule
-import goods.pocket.app.presentation.state.GoodsPocketAppStateHolder
-import goods.pocket.app.presentation.state.GoodsPocketContentLoader
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import goods.pocket.app.data.di.PlatformDataModule
+import goods.pocket.app.domain.collection.CollectionRepository
+import goods.pocket.app.domain.collection.MarkPreorderReceivedUseCase
+import goods.pocket.app.domain.dashboard.GetDashboardSummaryUseCase
+import goods.pocket.app.domain.dashboard.GetRecentActivitiesUseCase
+import goods.pocket.app.domain.event.EventRepository
+import goods.pocket.app.domain.service.AppClock
+import goods.pocket.app.domain.service.IdGenerator
+import goods.pocket.app.domain.settings.SettingsRepository
+import goods.pocket.app.presentation.PresentationSessionFactory
+import org.koin.core.annotation.Factory
 import org.koin.core.annotation.Module
-import org.koin.core.annotation.Single
 
 @Module(
     includes = [
@@ -23,46 +27,24 @@ class GoodsPocketAppModule
 
 @Module
 class GoodsPocketPresentationModule {
-    @Single
-    fun applicationScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-
-    @Single
-    fun goodsPocketContentLoader(
-        collectionRepository: goods.pocket.app.domain.repository.CollectionRepository,
-        eventRepository: goods.pocket.app.domain.repository.EventRepository,
-        settingsRepository: goods.pocket.app.domain.repository.SettingsRepository,
-        getDashboardSummaryUseCase: goods.pocket.app.domain.usecase.GetDashboardSummaryUseCase,
-        getRecentActivitiesUseCase: goods.pocket.app.domain.usecase.GetRecentActivitiesUseCase,
-        clock: goods.pocket.app.domain.service.AppClock,
-    ) = GoodsPocketContentLoader(
-        collectionRepository = collectionRepository,
-        eventRepository = eventRepository,
-        settingsRepository = settingsRepository,
-        getDashboardSummaryUseCase = getDashboardSummaryUseCase,
-        getRecentActivitiesUseCase = getRecentActivitiesUseCase,
-        clock = clock,
-    )
-
-    @Single
-    fun goodsPocketAppStateHolder(
-        collectionRepository: goods.pocket.app.domain.repository.CollectionRepository,
-        preorderRepository: goods.pocket.app.domain.repository.PreorderRepository,
-        eventRepository: goods.pocket.app.domain.repository.EventRepository,
-        settingsRepository: goods.pocket.app.domain.repository.SettingsRepository,
-        contentLoader: GoodsPocketContentLoader,
-        markPreorderReceivedUseCase: goods.pocket.app.domain.usecase.MarkPreorderReceivedUseCase,
-        clock: goods.pocket.app.domain.service.AppClock,
-        idGenerator: goods.pocket.app.domain.service.IdGenerator,
-        coroutineScope: CoroutineScope,
-    ) = GoodsPocketAppStateHolder(
-        collectionRepository = collectionRepository,
-        preorderRepository = preorderRepository,
-        eventRepository = eventRepository,
-        settingsRepository = settingsRepository,
-        contentLoader = contentLoader,
-        markPreorderReceivedUseCase = markPreorderReceivedUseCase,
-        clock = clock,
-        idGenerator = idGenerator,
-        coroutineScope = coroutineScope,
+    @Factory
+    fun presentationSessionFactory(
+        collectionRepository: CollectionRepository,
+        eventRepository: EventRepository,
+        settingsRepository: SettingsRepository,
+        clock: AppClock,
+        idGenerator: IdGenerator,
+        receive: MarkPreorderReceivedUseCase,
+        dashboard: GetDashboardSummaryUseCase,
+        activities: GetRecentActivitiesUseCase,
+    ): PresentationSessionFactory = PresentationSessionFactory(
+        collectionRepository,
+        eventRepository,
+        settingsRepository,
+        clock,
+        idGenerator,
+        receive,
+        dashboard,
+        activities,
     )
 }

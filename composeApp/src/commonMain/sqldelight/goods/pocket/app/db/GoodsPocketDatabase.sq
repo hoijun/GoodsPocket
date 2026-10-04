@@ -1,194 +1,118 @@
-CREATE TABLE items (
-  id TEXT NOT NULL PRIMARY KEY,
-  name TEXT NOT NULL,
-  category TEXT NOT NULL,
-  status TEXT NOT NULL,
-  series_name TEXT,
-  character_name TEXT,
-  quantity INTEGER NOT NULL DEFAULT 1,
-  purchase_price INTEGER,
-  purchase_date TEXT,
-  purchase_store TEXT,
-  storage_location_id TEXT,
-  linked_preorder_id TEXT,
-  related_link TEXT,
-  note TEXT,
-  created_at TEXT NOT NULL,
-  updated_at TEXT NOT NULL
+CREATE TABLE collection_entry (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    category TEXT NOT NULL,
+    status TEXT NOT NULL CHECK (status IN ('RESERVED', 'OWNED', 'PLANNED_CLEANUP')),
+    series_name TEXT,
+    character_name TEXT,
+    quantity INTEGER NOT NULL DEFAULT 1 CHECK (quantity > 0),
+    purchase_price INTEGER,
+    purchase_date TEXT,
+    purchase_store TEXT,
+    storage_location_id TEXT,
+    release_date TEXT,
+    reservation_store TEXT,
+    related_link TEXT,
+    note TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    currency_code TEXT NOT NULL DEFAULT 'KRW',
+    canceled_at TEXT,
+    has_reservation INTEGER NOT NULL DEFAULT 0,
+    order_date TEXT,
+    total_price INTEGER,
+    deposit_price INTEGER,
+    remaining_price INTEGER,
+    shipping_fee INTEGER,
+    reservation_number TEXT,
+    received_at TEXT
 );
 
-CREATE TABLE preorders (
-  id TEXT NOT NULL PRIMARY KEY,
-  name TEXT NOT NULL,
-  category TEXT,
-  store_name TEXT NOT NULL,
-  release_date TEXT NOT NULL,
-  status TEXT NOT NULL,
-  series_name TEXT,
-  character_name TEXT,
-  total_price INTEGER,
-  deposit_price INTEGER,
-  remaining_price INTEGER,
-  shipping_fee INTEGER,
-  order_date TEXT,
-  payment_due_date TEXT,
-  receive_date TEXT,
-  reservation_number TEXT,
-  related_link TEXT,
-  note TEXT,
-  created_at TEXT NOT NULL,
-  updated_at TEXT NOT NULL
+CREATE INDEX collection_status_updated ON collection_entry(status, updated_at);
+
+CREATE TABLE event (
+    id TEXT NOT NULL PRIMARY KEY,
+    title TEXT NOT NULL,
+    event_type TEXT NOT NULL,
+    target_date TEXT NOT NULL,
+    related_entry_id TEXT REFERENCES collection_entry(id) ON DELETE SET NULL,
+    location_or_store TEXT,
+    memo TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
 );
 
-CREATE TABLE events (
-  id TEXT NOT NULL PRIMARY KEY,
-  title TEXT NOT NULL,
-  event_type TEXT NOT NULL,
-  target_date TEXT NOT NULL,
-  related_item_id TEXT,
-  related_preorder_id TEXT,
-  location_or_store TEXT,
-  memo TEXT,
-  created_at TEXT NOT NULL,
-  updated_at TEXT NOT NULL
+CREATE INDEX event_date ON event(target_date);
+CREATE INDEX event_entry ON event(related_entry_id);
+
+CREATE TABLE app_preference (
+    id INTEGER NOT NULL PRIMARY KEY CHECK (id = 1),
+    currency_code TEXT NOT NULL,
+    date_format TEXT NOT NULL,
+    language_code TEXT NOT NULL
 );
 
-CREATE TABLE storage_locations (
-  id TEXT NOT NULL PRIMARY KEY,
-  name TEXT NOT NULL,
-  parent_id TEXT,
-  memo TEXT,
-  created_at TEXT NOT NULL
-);
+selectEntries:
+SELECT * FROM collection_entry WHERE canceled_at IS NULL ORDER BY updated_at DESC, id;
 
-CREATE TABLE app_preferences (
-  id TEXT NOT NULL PRIMARY KEY,
-  currency_code TEXT NOT NULL,
-  date_format TEXT NOT NULL,
-  start_tab_route TEXT NOT NULL,
-  language_code TEXT NOT NULL
-);
+selectAllEntries:
+SELECT * FROM collection_entry ORDER BY updated_at DESC, id;
 
-selectAllItems:
-SELECT * FROM items
-ORDER BY updated_at DESC, created_at DESC;
+selectEntry:
+SELECT * FROM collection_entry WHERE id = ?;
 
-selectItemsByFilter:
-SELECT * FROM items
-WHERE :filter IS NULL
-   OR :filter = ''
-   OR LOWER(name) LIKE '%' || LOWER(:filter) || '%'
-   OR LOWER(COALESCE(series_name, '')) LIKE '%' || LOWER(:filter) || '%'
-ORDER BY updated_at DESC, created_at DESC;
+upsertEntry:
+INSERT INTO collection_entry VALUES ?;
 
-selectItemById:
-SELECT * FROM items
-WHERE id = ?;
+updateEntry:
+UPDATE collection_entry SET
+    name = :name, category = :category, status = :status,
+    series_name = :series_name, character_name = :character_name,
+    quantity = :quantity, purchase_price = :purchase_price,
+    purchase_date = :purchase_date, purchase_store = :purchase_store,
+    storage_location_id = :storage_location_id, release_date = :release_date,
+    reservation_store = :reservation_store, related_link = :related_link,
+    note = :note, updated_at = :updated_at, currency_code = :currency_code,
+    canceled_at = :canceled_at, has_reservation = :has_reservation,
+    order_date = :order_date, total_price = :total_price,
+    deposit_price = :deposit_price, remaining_price = :remaining_price,
+    shipping_fee = :shipping_fee, reservation_number = :reservation_number,
+    received_at = :received_at WHERE id = :id;
 
-upsertItem:
-INSERT OR REPLACE INTO items (
-  id, name, category, status, series_name, character_name, quantity, purchase_price,
-  purchase_date, purchase_store, storage_location_id, linked_preorder_id, related_link, note, created_at, updated_at
-) VALUES (
-  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-);
+receiveEntry:
+UPDATE collection_entry SET status = 'OWNED', received_at = :receivedAt, updated_at = :receivedAt,
+    has_reservation = 1, purchase_date = coalesce(purchase_date, :receivedDate)
+WHERE id = :id AND status = 'RESERVED' AND canceled_at IS NULL;
 
-deleteItemById:
-DELETE FROM items
-WHERE id = ?;
+cancelEntry:
+UPDATE collection_entry SET canceled_at = :canceledAt, updated_at = :canceledAt
+WHERE id = :id AND status = 'RESERVED' AND canceled_at IS NULL;
 
-countOwnedItems:
-SELECT COUNT(*) FROM items
-WHERE status = 'OWNED';
+deleteEntry:
+DELETE FROM collection_entry WHERE id = ?;
 
-selectAllPreorders:
-SELECT * FROM preorders
-ORDER BY release_date ASC, updated_at DESC;
+clearEventLinks:
+UPDATE event SET related_entry_id = NULL WHERE related_entry_id = ?;
 
-selectPreordersByStatus:
-SELECT * FROM preorders
-WHERE status = ?
-ORDER BY release_date ASC, updated_at DESC;
-
-selectPreorderById:
-SELECT * FROM preorders
-WHERE id = ?;
-
-upsertPreorder:
-INSERT OR REPLACE INTO preorders (
-  id, name, category, store_name, release_date, status, series_name, character_name, total_price,
-  deposit_price, remaining_price, shipping_fee, order_date, payment_due_date, receive_date,
-  reservation_number, related_link, note, created_at, updated_at
-) VALUES (
-  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-);
-
-markPreorderReceived:
-UPDATE preorders
-SET status = 'RECEIVED',
-    receive_date = ?,
-    updated_at = ?
-WHERE id = ?;
-
-cancelPreorder:
-UPDATE preorders
-SET status = 'CANCELED',
-    updated_at = ?
-WHERE id = ?;
-
-countActivePreorders:
-SELECT COUNT(*) FROM preorders
-WHERE status IN ('ACTIVE', 'PAYMENT_PENDING');
-
-selectAllEvents:
-SELECT * FROM events
-ORDER BY target_date ASC, updated_at DESC;
-
-selectEventsByType:
-SELECT * FROM events
-WHERE event_type = ?
-ORDER BY target_date ASC, updated_at DESC;
-
-selectUpcomingEvents:
-SELECT * FROM events
-WHERE target_date >= ?
-ORDER BY target_date ASC, updated_at DESC
-LIMIT ?;
+selectEvents:
+SELECT * FROM event ORDER BY target_date, id;
 
 upsertEvent:
-INSERT OR REPLACE INTO events (
-  id, title, event_type, target_date, related_item_id, related_preorder_id,
-  location_or_store, memo, created_at, updated_at
-) VALUES (
-  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-);
+INSERT INTO event VALUES ?;
 
-deleteEventById:
-DELETE FROM events
-WHERE id = ?;
+selectEvent:
+SELECT * FROM event WHERE id = ?;
 
-selectAllStorageLocations:
-SELECT * FROM storage_locations
-ORDER BY name ASC;
+updateEvent:
+UPDATE event SET title = :title, event_type = :event_type, target_date = :target_date,
+    related_entry_id = :related_entry_id, location_or_store = :location_or_store,
+    memo = :memo, updated_at = :updated_at WHERE id = :id;
 
-upsertStorageLocation:
-INSERT OR REPLACE INTO storage_locations (
-  id, name, parent_id, memo, created_at
-) VALUES (
-  ?, ?, ?, ?, ?
-);
+deleteEvent:
+DELETE FROM event WHERE id = ?;
 
-deleteStorageLocationById:
-DELETE FROM storage_locations
-WHERE id = ?;
+selectPreferences:
+SELECT * FROM app_preference WHERE id = 1;
 
-selectAppPreferences:
-SELECT currency_code, date_format, language_code FROM app_preferences
-WHERE id = 'default';
-
-upsertAppPreferences:
-INSERT OR REPLACE INTO app_preferences (id, currency_code, date_format, start_tab_route, language_code)
-VALUES ('default', ?, ?, 'home', ?);
-
-deleteAllAppPreferences:
-DELETE FROM app_preferences;
+upsertPreferences:
+INSERT OR REPLACE INTO app_preference VALUES (1, ?, ?, ?);

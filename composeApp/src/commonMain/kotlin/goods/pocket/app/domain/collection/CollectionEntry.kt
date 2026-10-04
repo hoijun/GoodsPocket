@@ -1,4 +1,4 @@
-package goods.pocket.app.domain.model
+package goods.pocket.app.domain.collection
 
 data class CollectionEntry(
     val id: String,
@@ -18,6 +18,19 @@ data class CollectionEntry(
     val note: String? = null,
     val createdAt: String,
     val updatedAt: String,
+    val reservation: ReservationDetails? = null,
+    val canceledAt: String? = null,
+    val currencyCode: String = "KRW",
+)
+
+data class ReservationDetails(
+    val orderDate: String? = null,
+    val totalPrice: Long? = null,
+    val depositPrice: Long? = null,
+    val remainingPrice: Long? = null,
+    val shippingFee: Long? = null,
+    val reservationNumber: String? = null,
+    val receivedAt: String? = null,
 )
 
 enum class CollectionEntryStatus {
@@ -26,5 +39,5 @@ enum class CollectionEntryStatus {
     PLANNED_CLEANUP,
 }
 
-const val RESERVED_COLLECTION_CATEGORY_CODE = "reserved"
-const val GOODS_COLLECTION_CATEGORY_CODE = "goods"
+const val RESERVED_COLLECTION_CATEGORY_CODE: String = "reserved"
+const val GOODS_COLLECTION_CATEGORY_CODE: String = "goods"

@@ -1,12 +1,11 @@
-package goods.pocket.app.domain.model
+package goods.pocket.app.domain.event
 
 data class Event(
     val id: String,
     val title: String,
     val eventType: EventType,
     val targetDate: String,
-    val relatedItemId: String? = null,
-    val relatedPreorderId: String? = null,
+    val relatedEntryId: String? = null,
     val locationOrStore: String? = null,
     val memo: String? = null,
     val createdAt: String,

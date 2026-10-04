@@ -1,5 +1,6 @@
 package goods.pocket.app.data
 
+import androidx.sqlite.db.SupportSQLiteDatabase
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import goods.pocket.app.db.GoodsPocketDatabase
@@ -11,11 +12,14 @@ internal fun initializeAndroidDatabaseContext(context: android.content.Context) 
 }
 
 actual class DatabaseDriverFactory {
-    actual fun createDriver(): SqlDriver {
-        return AndroidSqliteDriver(
-            schema = GoodsPocketDatabase.Schema,
-            context = androidDatabaseContext,
-            name = "GoodsPocket.db",
-        )
-    }
+    actual fun createDriver(): SqlDriver = AndroidSqliteDriver(
+        schema = GoodsPocketDatabase.Schema,
+        context = androidDatabaseContext,
+        name = "GoodsPocket-v2.db",
+        callback = object : AndroidSqliteDriver.Callback(GoodsPocketDatabase.Schema) {
+            override fun onConfigure(db: SupportSQLiteDatabase) {
+                db.setForeignKeyConstraintsEnabled(true)
+            }
+        },
+    )
 }

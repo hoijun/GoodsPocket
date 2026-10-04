@@ -1,4 +1,4 @@
-package goods.pocket.app.domain.model
+package goods.pocket.app.domain.settings
 
 data class AppPreference(
     val currencyCode: String = "KRW",

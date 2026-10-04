@@ -1,4 +1,4 @@
-package goods.pocket.app.domain.model
+package goods.pocket.app.domain.dashboard
 
 data class HomeSummary(
     val monthlySpend: Long,
