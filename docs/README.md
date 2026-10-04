@@ -1,29 +1,19 @@
-# GoodsPocket Docs
+# GoodsPocket Documentation
 
-This folder contains the planning and architecture documents currently relevant to implementation.
+These documents describe the approved rebuild contract. They are not a claim that every feature has been implemented or validated.
 
-## Recommended reading order
+## Reading Order
 
-1. `doc01_service_plan.md`
-2. `doc06_kmp_structure.md`
-3. `doc07_compose_code_structure.md`
-4. `doc02_ui_structure.md`
-5. `doc12_navigation_design.md`
-6. `doc08_viewmodel_design.md`
-7. `doc11_repository_usecase.md`
-8. `doc09_db_schema.md`
-9. `doc10_sqldelight_spec.md`
+1. [Product scope and deferred goals](doc01_service_plan.md)
+2. [KMP structure](doc06_kmp_structure.md)
+3. [Compose code structure](doc07_compose_code_structure.md)
+4. [Screen scope](doc02_ui_structure.md)
+5. [Navigation](doc12_navigation_design.md)
+6. [Feature state](doc08_viewmodel_design.md)
+7. [Repository and aggregation semantics](doc11_repository_usecase.md)
+8. [Database contract](doc09_db_schema.md)
+9. [SQLDelight](doc10_sqldelight_spec.md)
 
-## Document guide
+[AGENTS.md](../AGENTS.md) and its linked rules govern implementation. [DESIGN.md](../DESIGN.md) routes to the screen-specific visual contracts; those override old exploratory references. Original ledger, automatic-event, photo and cloud goals remain explicitly deferred in the product scope, not implicitly removed or implemented.
 
-- `doc01_service_plan.md`: product scope and core feature direction
-- `doc02_ui_structure.md`: screen structure and top-level UI organization
-- `doc06_kmp_structure.md`: Kotlin Multiplatform module and source-set structure
-- `doc07_compose_code_structure.md`: Compose code organization and package boundaries
-- `doc08_viewmodel_design.md`: presentation state and ViewModel design
-- `doc09_db_schema.md`: database entities and schema rules
-- `doc10_sqldelight_spec.md`: SQLDelight usage and persistence conventions
-- `doc11_repository_usecase.md`: repository and use case responsibilities
-- `doc12_navigation_design.md`: app navigation flow and route structure
-
-Files not copied here were excluded because they are either more design-asset-oriented or better managed as task tracking rather than repository documentation.
+When code and this contract differ, report the discrepancy. Keep completion evidence separate from design intent and historical verification.

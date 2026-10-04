@@ -2,7 +2,7 @@
 
 ## Test Design
 
-- Use `InMemoryGoodsPocketRepository` for common behavior tests unless the test explicitly targets SQLDelight behavior.
+- Use focused fake implementations of domain repository contracts for common behavior tests; use a real driver for SQLDelight behavior.
 - Name tests by observable behavior rather than implementation details.
 - Structure tests clearly as arrange, act, and assert.
 - Keep test data deterministic.
@@ -13,6 +13,9 @@
 - State-transition tests must assert every affected record and final status.
 - Repository contract tests should verify behavior through domain repository interfaces.
 - Use SQLDelight-specific tests for queries, persistence mapping, migrations, and transaction behavior.
+- Verify nullable fields, links, money and dates through real save/read round trips, reopening persistence, observation emissions, and rollback. Source-text field checks do not replace these tests.
+- Verify same-ID receipt, preserved reservation metadata, hidden canceled entries, retained event rows after collection deletion, and month/year aggregation boundaries.
+- Test feature independence, draft retention, retry ID stability, cancellation, and command-success/observation-failure separation.
 
 ## Validation Selection
 

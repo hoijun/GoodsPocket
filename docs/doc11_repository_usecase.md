@@ -1,65 +1,43 @@
+# Repository and Use Cases
 
-Repository and UseCase Design
-Repository Interfaces
-CollectionRepository
-- getItems(filter)
-- getItem(id)
-- saveItem(item)
-- deleteItem(id)
-- getItemTransactions(itemId)
-- countOwnedItems()
-PreorderRepository
-- getPreorders(status)
-- getPreorder(id)
-- savePreorder(preorder)
-- markAsReceived(preorderId, receiveDate)
-- cancelPreorder(preorderId)
-- countActivePreorders()
-TransactionRepository
-- getTransactions(monthFilter)
-- getMonthlySummary(monthFilter)
-- saveTransaction(transaction)
-- deleteTransaction(id)
-EventRepository
-- getUpcomingEvents(limit)
-- getEvents(dateRange, type)
-- saveEvent(event)
-- deleteEvent(id)
-SettingsRepository
-- getStorageLocations()
-- saveStorageLocation(location)
-- deleteStorageLocation(id)
-- getAppPreferences()
-- updateAppPreferences(preferences)
-UseCases
-Home
-- GetDashboardSummary
-- GetUpcomingEvents
-- GetRecentActivities
-Collection
-- SearchCollectionItems
-- GetCollectionDetail
-- SaveCollectionItem
-- DeleteCollectionItem
-Preorder
-- GetPreorderList
-- SavePreorder
-- MarkPreorderReceived
-- CancelPreorder
-Transaction
-- GetMonthlyTransactions
-- GetMonthlySpendSummary
-- SaveTransaction
-- DeleteTransaction
-Event
-- GetEventList
-- SaveEvent
-- DeleteEvent
-Transactional Rules
-- MarkPreorderReceived는 preorder 상태 변경, item 생성, transaction 확정 반영을 하나의 트랜잭션으로 처리한다.
-- SavePreorder는 발매일/결제일 기반 이벤트 생성 또는 갱신을 선택적으로 수행한다.
-- DeleteCollectionItem는 연결 거래가 있을 경우 경고를 반환하거나 선행 정리 절차를 요구한다.
-Error Handling
-- repository는 Result 타입 또는 domain error sealed class를 반환한다.
-- 폼 저장 실패는 사용자에게 재시도 가능한 메시지로 변환한다.
-- DB 제약 조건 실패는 개발 로그와 사용자 메시지를 분리한다.
+Repository interfaces live in pure domain feature packages; implementations live in data. Collection, Event and Settings contracts expose observable reads and suspend commands. SQL rows, SDK types and platform errors never cross that boundary.
+
+Simple CRUD calls repositories directly from feature StateHolders. Use cases own actual validation, state transitions and aggregation. Do not create SaveX/GetX forwarding classes for every operation.
+
+## Business Operations
+
+MarkPreorderReceivedUseCase validates receipt and delegates its atomic persistence primitive to the repository. The same entry ID and reservation metadata survive. Already received is a no-op; absent is not-found; canceled cannot be received. Datasources do not decide business rules.
+
+Cancel archives the reservation outside active collection UI. Permanent deletion removes collection data and clears links on retained events atomically. No transaction-ledger entry or automatic event is created; those original product goals are deferred.
+
+## Preserved Amount Semantics
+
+The pre-rebuild GetDashboardSummaryUseCase uses these rules, which the unified model must reproduce:
+
+- Non-reservation purchases contribute purchasePrice (null = zero) on purchaseDate; missing dates do not contribute.
+- Every reservation contributes totalPrice (null = zero) on orderDate; missing dates do not contribute. Status, including cancellation or receipt, does not suppress this record.
+- A received purchase linked to an existing reservation is excluded from purchase contributions, preventing double counting. The unified row therefore contributes its reservation total once, including after receipt.
+- Deposit, remaining balance and shipping do not add separate amounts. Quantity does not multiply the stored amount.
+- Month totals select the record's calendar month. Current month is derived through the injected clock and explicit time-zone conversion; stored purchase/order dates are date-only.
+- Previous month uses calendar arithmetic, including year boundaries.
+- The chart has nine buckets: days 1-3, 4-6, 7-9, 10-12, 13-15, 16-18, 19-21, 22-24, and 25 through month end.
+
+| Example in October | Contribution |
+| --- | --- |
+| Purchase 20,000 on October 2 | 20,000 in bucket 1 |
+| Reservation total 50,000 ordered October 5, deposit 10,000 | 50,000 in bucket 2, not 10,000 |
+| That reservation received in November | October remains 50,000; no November duplicate |
+| That reservation canceled | Archived outside active UI; October total still includes 50,000 |
+| Missing purchase/order date | No monthly contribution |
+| Purchase on October 31 | Bucket 9 |
+| Previous month of January 2027 | December 2026 |
+
+These totals are purchase/reservation amounts, not actual payments or refunds. Changing that meaning requires a separate product decision. Do not silently change it while refactoring.
+
+Owned count is the number of visible OWNED entries, not summed quantity. Active preorder count is the number of RESERVED entries with canceledAt == null. ReservationDetails.receivedAt records receipt; canceledAt records archival cancellation. The new storage has no ACTIVE/PAYMENT_PENDING/RECEIVED/CANCELED enum. Recent collection display uses stable entry IDs and update time; the unified row must not produce duplicate cards for receipt. UI localization belongs in presentation, not aggregation.
+
+## Errors and Future Remote Data
+
+Expected validation/absence/no-op returns focused results. Infrastructure errors are translated at data boundaries with causes preserved. Cancellation propagates. Retrying a draft reuses its ID; successful writes are not replayed because observation later failed.
+
+Firebase/Supabase SDKs, empty remote adapters and generic CloudClient wrappers are not introduced now. Later remote work separately defines authentication, ownership, account isolation, pending writes, revision conflicts, deletion propagation and file lifetime. Local-first boundaries alone are not completed sync.

@@ -23,11 +23,13 @@ If a task spans multiple areas, read every relevant rule file. These linked file
 
 - Keep the target architecture as a single `:composeApp` KMP module with package-based Clean Architecture.
 - Keep dependency direction as `presentation -> domain` and `data -> domain`.
+- Keep feature state in consistent Route/Screen/StateHolder/UiState boundaries; the shell owns navigation and overlay identifiers only.
 - Use Koin Annotations with KSP and do not reintroduce `AppContainer`.
 - Keep `DatabaseDriverFactory` and platform DI in the existing `expect/actual` structure.
 - Keep datasources persistence-only and keep business orchestration in use cases or repositories according to the detailed rules.
 - Do not create pass-through use cases for simple repository operations.
 - Do not edit generated KSP or SQLDelight files directly.
 - Do not hardcode current production dates or months.
+- Production storage starts empty; sample data is explicit demo/test data. Data owns injected execution contexts and lifecycle owners cancel feature scopes.
 - Keep production Kotlin files at 600 lines or fewer and split them by responsibility.
 - Preserve existing user changes and do not perform Git finalization actions unless explicitly requested.

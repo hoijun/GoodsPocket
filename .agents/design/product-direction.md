@@ -31,8 +31,8 @@ The current redesign target is the saved generated image set:
 - Design system: common palette, cards, buttons, badges, tab bar, and sheet language.
 - Home: `GoodsPocket` header, hero banner, collection summary, recent goods, spending, upcoming schedule.
 - Collection: title-centered app bar, segmented status filter, search bar, 3-column goods grid, bottom status summary, bottom navigation.
-- Events: title-centered app bar, upcoming/past segmented filter, monthly calendar, upcoming schedule cards, bottom navigation.
-- My: profile hero, collection statistics, interested goods carousel, recent activity, settings list, bottom navigation.
+- Events: title-centered app bar, month overview, event-type filters, featured event and timeline, bottom navigation; follow `events.md` rather than the exploratory calendar reference.
+- My: local profile, collection summary and informational management rows with Settings entry; follow `my.md`, without interested goods or recent activity sections.
 - Settings: settings list in the same rounded-card system, reached from My.
 - Collection Detail Sheet: large goods image, metadata, status, price, notes, action buttons.
 - Collection Edit Sheet: image change, form fields, status selection, price/date fields, primary save button.
@@ -53,7 +53,7 @@ Match these images as closely as Compose allows before introducing alternate lay
 
 ## Scope Guardrails
 
-- Preserve existing domain models, state, repositories, and event callbacks during visual work.
+- During visual-only work preserve domain behavior and callbacks. The approved rebuild may replace internal models and state ownership while preserving the screen contracts and supported behavior.
 - Keep the app focused on personal collection tracking and planning.
 - Do not make the app look like an online store, resale marketplace, social feed, or finance dashboard.
 - Do not revive stale screens or routes solely because an older reference mentions them; confirm current product structure first.

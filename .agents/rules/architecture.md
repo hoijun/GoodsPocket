@@ -11,7 +11,7 @@
 
 ```text
 Compose UI
-    -> GoodsPocketAppStateHolder
+    -> Feature Route and StateHolder
         -> Domain Repository for simple operations
         -> UseCase for business operations
             -> Domain Repository
@@ -22,6 +22,10 @@ Compose UI
 ```
 
 ## Repository Map
+
+- Group domain and presentation code by collection, event/events, settings, dashboard/home, and my responsibility; use consistent `Route`, `Screen`, `StateHolder`, and `UiState` names per feature.
+- The shell owns destinations and overlay kind/target ID only, never feature data snapshots or business mutations.
+- Scope creation and cancellation have an explicit lifecycle owner. Tab state belongs to the host session; editor state belongs to the overlay.
 
 - `composeApp/src/commonMain/kotlin/goods/pocket/app/domain`: domain models, repository contracts, services, and use cases
 - `composeApp/src/commonMain/kotlin/goods/pocket/app/data`: repository implementations, local persistence, runtime values, and DI

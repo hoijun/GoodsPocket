@@ -4,7 +4,7 @@ Read [Product Direction](product-direction.md), [Foundations](foundations.md), [
 
 ## Shared Migration Rules
 
-- Preserve domain models, state, repositories, state transitions, and event callbacks.
+- During visual-only changes preserve domain behavior and callbacks. The approved rebuild can replace internal implementation while retaining approved screen behavior.
 - Create presentation models only when a real visual mapping is required.
 - Reuse verified colors, surface behavior, typography weights, media fallback, and shared navigation.
 - Measure each screen's card width, height, padding, type size, and row rhythm from its own reference.
@@ -28,14 +28,14 @@ Rules:
 
 ## Events
 
-Reference: `/Users/Hoijun/Downloads/ChatGPT Image 2026년 4월 26일 오후 08_56_28.png`
+Reference: `design/references/events/default.png`; read [Events Image-Locked Contract](events.md).
 
 Rules:
 
 - Reuse the schedule badge colors, muted date typography, low-contrast dividers, and gray media fallback.
-- Measure calendar cell size, month controls, segmented filter, event-card geometry, and list rhythm from the Events reference.
-- Do not stretch Home schedule rows into calendar cells.
-- Keep calendar selection and event handlers operational.
+- Measure type filters, featured-card geometry and timeline rhythm from the current Events reference.
+- Do not restore the exploratory calendar, month-navigation controls or date selection.
+- Keep event-type filtering and event click handlers operational.
 
 ## My
 

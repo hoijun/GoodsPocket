@@ -12,7 +12,7 @@ Use warm off-white cards, low-contrast dividers, and restrained accent colors. E
 
 Collection UI should feel organized and collectible. Prioritize item name, series or character context, category, quantity, and storage location.
 
-The visual target uses a 3-column goods grid with large thumbnails, status chips, and favorite affordances. Reserved or arrival-planned goods belong inside Collection as a status or segment, not as a separate top-level tab.
+The visual target uses a 3-column goods grid with large thumbnails and status chips, without favorite affordances. Reserved or arrival-planned goods belong inside Collection as a status or segment, not as a separate top-level tab.
 
 A list fallback may exist for accessibility or dense data, but it does not replace the reference grid when implementing the image-locked screen.
 
@@ -29,6 +29,8 @@ Make date and state immediately visible. Use compact chips, badges, and date lab
 Place D-day, due date, and state labels near the top of the information cluster. Use hierarchy instead of aggressive warning colors. Preorder cards belong in Collection when they represent future collection items. Event cards remain in Events when they represent popups, fairs, applications, visits, or calendar commitments.
 
 ## Transaction Surfaces
+
+Transaction-ledger UI is deferred; this guidance is not authorization to introduce a transaction route during the rebuild.
 
 Spending history should feel structured and calm. Amount, transaction type, and date must be immediately scannable.
 

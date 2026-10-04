@@ -1,44 +1,31 @@
-This is a Kotlin Multiplatform project targeting Android, iOS.
+# GoodsPocket
 
-Project documents used as implementation references are in [docs/README.md](./docs/README.md).
+A Kotlin Multiplatform goods collection and schedule app for Android and iOS.
 
-### Current App Navigation
+## Product
 
-- Bottom tabs: `Home`, `Collection`, `Preorders`, `My`
-- Secondary screens: `Transactions`, `Events`
-- `Settings` is nested under `My` and is no longer exposed as a global app-bar action
-- Detail and edit flows are primarily presented as bottom sheets instead of standalone pages
+Primary tabs are Home, Collection, Events and My. Owned and reserved goods share Collection. Settings opens from My without bottom navigation. Collection/event registration, detail and editing use sheets.
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+The approved rebuild preserves the image-locked design while using feature-owned state, pure domain contracts, unified local collection storage and an empty production database. Development and validation status must be reported separately from this target contract.
 
-* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+Payment-ledger features, automatic reservation events, photos, authentication and Firebase/Supabase synchronization are deferred. Their original product intent remains documented.
 
-### Build and Run Android Application
+## Structure
 
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
+- composeApp: one KMP module containing common UI/domain/data and Android/iOS platform integration.
+- iosApp: native iOS host and configuration.
+- [Documentation](docs/README.md): product and architecture contracts.
+- [Development rules](AGENTS.md): rule router.
+- [Design rules](DESIGN.md): approved screen references and visual verification.
 
-### Build and Run iOS Application
+Koin Annotations + KSP, SQLDelight and Coroutines/Flow remain the core implementation stack.
 
-To build and run the development version of the iOS app, use the run configuration from the run widget
-in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+## Build
 
----
+```sh
+bash ./gradlew :composeApp:assembleDebug
+bash ./gradlew :composeApp:allTests
+bash ./gradlew :composeApp:ktlintCheck :composeApp:checkArchitecture
+```
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+Open iosApp in Xcode to select an available simulator and build/run the native host. Follow the repository validation rules for the actual scope of each change; documentation edits alone do not require Gradle.

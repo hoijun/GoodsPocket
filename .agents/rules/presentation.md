@@ -2,12 +2,17 @@
 
 ## State Ownership
 
-- Keep application state in `GoodsPocketAppStateHolder` and expose immutable `StateFlow`.
+- Keep each feature's state in its own StateHolder and expose immutable `StateFlow`.
+- Use consistent feature `Route`, `Screen`, `StateHolder`, and `UiState` boundaries. Route collects and connects; Screen renders; StateHolder owns feature operations.
+- Keep shell state limited to navigation and overlay kind/target ID; no writable all-screen compatibility snapshot.
 - Keep mutable flows private, using `_state` for the mutable property and `state` for the public immutable view.
 - Use a single immutable UI state model for related screen state.
 - Keep persistent domain state separate from temporary UI state such as search input, selected filters, sheets, dialogs, details, and editors.
 - Avoid reloading unrelated data after a focused mutation when a targeted refresh is sufficient.
 - Represent loading, failure, and retry state when an asynchronous operation can fail.
+- Editors own explicit drafts and saving state. Initial observation fills the draft once; later updates must not overwrite unsaved edits.
+- Preserve fields absent from the editor. Failed saves retain the draft and stable command ID; observer failures after save must not replay writes.
+- Give tab and overlay state explicit host/overlay lifetimes. Cancel scopes and observers on owner disposal.
 
 ## Compose Boundaries
 
