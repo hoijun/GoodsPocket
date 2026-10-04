@@ -1,4 +1,4 @@
-package goods.pocket.app.presentation.screen
+package goods.pocket.app.presentation.my
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
@@ -30,10 +30,7 @@ import goodspocket.composeapp.generated.resources.my_utility_sync_backup_subtitl
 import goodspocket.composeapp.generated.resources.nav_my
 
 @Composable
-fun MyScreen(
-    myPage: MyPageUiModel,
-    onOpenSettings: () -> Unit,
-) {
+fun MyScreen(myPage: MyPageUiModel, onOpenSettings: () -> Unit) {
     val displayName = myPage.displayName.ifBlank { tr(Res.string.my_local_profile_label) }
     val syncStatus = myPage.syncStatusLabel.ifBlank { tr(Res.string.my_sync_not_connected) }
     val summaryItems = listOf(
@@ -92,7 +89,7 @@ fun MyScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(GoodsPocketVisualTokens.Background)),
+            .background(Color(GoodsPocketVisualTokens.BACKGROUND)),
         contentPadding = PaddingValues(bottom = MyReferenceMetrics.BottomContentPadding),
     ) {
         item {

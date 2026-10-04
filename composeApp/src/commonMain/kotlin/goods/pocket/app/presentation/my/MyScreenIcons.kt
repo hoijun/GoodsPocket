@@ -1,4 +1,4 @@
-package goods.pocket.app.presentation.screen
+package goods.pocket.app.presentation.my
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
@@ -66,9 +66,33 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawCollectionIcon(
         close()
     }
     drawPath(cube, color, style = stroke)
-    drawLine(color, Offset(size.width * 0.16f, size.height * 0.30f), Offset(size.width * 0.50f, size.height * 0.48f), stroke.width)
-    drawLine(color, Offset(size.width * 0.84f, size.height * 0.30f), Offset(size.width * 0.50f, size.height * 0.48f), stroke.width)
-    drawLine(color, Offset(size.width * 0.50f, size.height * 0.48f), Offset(size.width * 0.50f, size.height * 0.88f), stroke.width)
+    drawLine(
+        color,
+        Offset(size.width * 0.16f, size.height * 0.30f),
+        Offset(
+            size.width * 0.50f,
+            size.height * 0.48f,
+        ),
+        stroke.width,
+    )
+    drawLine(
+        color,
+        Offset(size.width * 0.84f, size.height * 0.30f),
+        Offset(
+            size.width * 0.50f,
+            size.height * 0.48f,
+        ),
+        stroke.width,
+    )
+    drawLine(
+        color,
+        Offset(size.width * 0.50f, size.height * 0.48f),
+        Offset(
+            size.width * 0.50f,
+            size.height * 0.88f,
+        ),
+        stroke.width,
+    )
 }
 
 private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawCalendarIcon(
@@ -82,9 +106,33 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawCalendarIcon(
         cornerRadius = CornerRadius(size.width * 0.08f),
         style = stroke,
     )
-    drawLine(color, Offset(size.width * 0.18f, size.height * 0.40f), Offset(size.width * 0.82f, size.height * 0.40f), stroke.width)
-    drawLine(color, Offset(size.width * 0.34f, size.height * 0.12f), Offset(size.width * 0.34f, size.height * 0.30f), stroke.width)
-    drawLine(color, Offset(size.width * 0.66f, size.height * 0.12f), Offset(size.width * 0.66f, size.height * 0.30f), stroke.width)
+    drawLine(
+        color,
+        Offset(size.width * 0.18f, size.height * 0.40f),
+        Offset(
+            size.width * 0.82f,
+            size.height * 0.40f,
+        ),
+        stroke.width,
+    )
+    drawLine(
+        color,
+        Offset(size.width * 0.34f, size.height * 0.12f),
+        Offset(
+            size.width * 0.34f,
+            size.height * 0.30f,
+        ),
+        stroke.width,
+    )
+    drawLine(
+        color,
+        Offset(size.width * 0.66f, size.height * 0.12f),
+        Offset(
+            size.width * 0.66f,
+            size.height * 0.30f,
+        ),
+        stroke.width,
+    )
 }
 
 private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawSpendingIcon(
@@ -119,14 +167,59 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawSyncIcon(
 ) {
     val cloud = Path().apply {
         moveTo(size.width * 0.27f, size.height * 0.66f)
-        cubicTo(size.width * 0.08f, size.height * 0.65f, size.width * 0.08f, size.height * 0.39f, size.width * 0.29f, size.height * 0.36f)
-        cubicTo(size.width * 0.37f, size.height * 0.13f, size.width * 0.70f, size.height * 0.17f, size.width * 0.74f, size.height * 0.39f)
-        cubicTo(size.width * 0.94f, size.height * 0.42f, size.width * 0.91f, size.height * 0.66f, size.width * 0.74f, size.height * 0.66f)
+        cubicTo(
+            size.width * 0.08f,
+            size.height * 0.65f,
+            size.width * 0.08f,
+            size.height * 0.39f,
+            size.width * 0.29f,
+            size.height * 0.36f,
+        )
+        cubicTo(
+            size.width * 0.37f,
+            size.height * 0.13f,
+            size.width * 0.70f,
+            size.height * 0.17f,
+            size.width * 0.74f,
+            size.height * 0.39f,
+        )
+        cubicTo(
+            size.width * 0.94f,
+            size.height * 0.42f,
+            size.width * 0.91f,
+            size.height * 0.66f,
+            size.width * 0.74f,
+            size.height * 0.66f,
+        )
     }
     drawPath(cloud, color, style = stroke)
-    drawLine(color, Offset(size.width * 0.50f, size.height * 0.82f), Offset(size.width * 0.50f, size.height * 0.43f), stroke.width)
-    drawLine(color, Offset(size.width * 0.50f, size.height * 0.43f), Offset(size.width * 0.38f, size.height * 0.55f), stroke.width)
-    drawLine(color, Offset(size.width * 0.50f, size.height * 0.43f), Offset(size.width * 0.62f, size.height * 0.55f), stroke.width)
+    drawLine(
+        color,
+        Offset(size.width * 0.50f, size.height * 0.82f),
+        Offset(
+            size.width * 0.50f,
+            size.height * 0.43f,
+        ),
+        stroke.width,
+    )
+    drawLine(
+        color,
+        Offset(size.width * 0.50f, size.height * 0.43f),
+        Offset(
+            size.width * 0.38f,
+            size.height * 0.55f,
+        ),
+        stroke.width,
+    )
+    drawLine(
+        color,
+        Offset(size.width * 0.50f, size.height * 0.43f),
+        Offset(
+            size.width * 0.62f,
+            size.height * 0.55f,
+        ),
+        stroke.width,
+    )
 }
 
 private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawBellIcon(
@@ -135,13 +228,42 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawBellIcon(
 ) {
     val bell = Path().apply {
         moveTo(size.width * 0.24f, size.height * 0.68f)
-        cubicTo(size.width * 0.34f, size.height * 0.57f, size.width * 0.30f, size.height * 0.42f, size.width * 0.34f, size.height * 0.30f)
-        cubicTo(size.width * 0.41f, size.height * 0.10f, size.width * 0.59f, size.height * 0.10f, size.width * 0.66f, size.height * 0.30f)
-        cubicTo(size.width * 0.70f, size.height * 0.42f, size.width * 0.66f, size.height * 0.57f, size.width * 0.76f, size.height * 0.68f)
+        cubicTo(
+            size.width * 0.34f,
+            size.height * 0.57f,
+            size.width * 0.30f,
+            size.height * 0.42f,
+            size.width * 0.34f,
+            size.height * 0.30f,
+        )
+        cubicTo(
+            size.width * 0.41f,
+            size.height * 0.10f,
+            size.width * 0.59f,
+            size.height * 0.10f,
+            size.width * 0.66f,
+            size.height * 0.30f,
+        )
+        cubicTo(
+            size.width * 0.70f,
+            size.height * 0.42f,
+            size.width * 0.66f,
+            size.height * 0.57f,
+            size.width * 0.76f,
+            size.height * 0.68f,
+        )
         close()
     }
     drawPath(bell, color, style = stroke)
-    drawLine(color, Offset(size.width * 0.43f, size.height * 0.78f), Offset(size.width * 0.57f, size.height * 0.78f), stroke.width)
+    drawLine(
+        color,
+        Offset(size.width * 0.43f, size.height * 0.78f),
+        Offset(
+            size.width * 0.57f,
+            size.height * 0.78f,
+        ),
+        stroke.width,
+    )
 }
 
 private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawSettingsIcon(

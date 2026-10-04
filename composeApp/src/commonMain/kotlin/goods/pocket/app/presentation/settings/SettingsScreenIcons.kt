@@ -1,4 +1,4 @@
-package goods.pocket.app.presentation.screen
+package goods.pocket.app.presentation.settings
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable

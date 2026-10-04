@@ -189,7 +189,10 @@
     <string name="dialog_delete_item_body_linked">이 굿즈에는 연결된 거래가 %1$s건 있어요. 그래도 삭제할까요?</string>
     <string name="dialog_delete_item_body">이 작업은 컬렉션에서 굿즈를 영구적으로 삭제합니다.</string>
     <string name="dialog_cancel_preorder_title">예약을 취소할까요?</string>
-    <string name="dialog_cancel_preorder_body">예약 상태가 취소로 변경되고 예약 목록에는 남아 있어요.</string>
+    <string name="dialog_cancel_preorder_body">예약이 취소되고 컬렉션 목록에서 숨겨져요.</string>
+    <string name="activity_added">컬렉션 굿즈 추가</string>
+    <string name="activity_reserved">%1$s 예약 추적</string>
+    <string name="activity_received">예약 굿즈 수령</string>
     <string name="dialog_delete_event_title">이벤트를 삭제할까요?</string>
     <string name="dialog_delete_event_body">이 작업은 이벤트를 영구적으로 삭제합니다.</string>
 

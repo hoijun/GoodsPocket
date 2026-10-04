@@ -1,23 +1,17 @@
-package goods.pocket.app.presentation.screen
+package goods.pocket.app.presentation.home
 
-import kotlinx.datetime.LocalDate
 import kotlin.math.round
 import kotlin.math.roundToInt
+import kotlinx.datetime.LocalDate
 
-internal data class HomeMonth(
-    val year: Int,
-    val month: Int,
-)
+internal data class HomeMonth(val year: Int, val month: Int)
 
 internal fun homeMonth(currentDate: String): HomeMonth? {
     val date = runCatching { LocalDate.parse(currentDate) }.getOrNull() ?: return null
     return HomeMonth(year = date.year, month = date.month.ordinal + 1)
 }
 
-internal fun dDayLabel(
-    today: String,
-    targetDate: String,
-): String? {
+internal fun dDayLabel(today: String, targetDate: String): String? {
     val current = runCatching { LocalDate.parse(today) }.getOrNull() ?: return null
     val target = runCatching { LocalDate.parse(targetDate) }.getOrNull() ?: return null
     val distance = target.toEpochDays() - current.toEpochDays()
@@ -28,10 +22,7 @@ internal fun dDayLabel(
     }
 }
 
-internal fun spendingChangePercent(
-    current: Long,
-    previous: Long,
-): Int? {
+internal fun spendingChangePercent(current: Long, previous: Long): Int? {
     if (previous <= 0L) return null
     return (((current - previous).toDouble() / previous.toDouble()) * 100).roundToInt()
 }

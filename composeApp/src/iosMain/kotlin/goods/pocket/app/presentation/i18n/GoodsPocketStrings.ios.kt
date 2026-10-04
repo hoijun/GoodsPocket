@@ -5,13 +5,11 @@ import androidx.compose.runtime.remember
 import platform.Foundation.NSUserDefaults
 
 @Composable
-actual fun ApplyAppLanguage(languageCode: String): String {
-    return remember(languageCode) {
-        NSUserDefaults.standardUserDefaults.setObject(
-            value = listOf(languageCode),
-            forKey = "AppleLanguages",
-        )
-        NSUserDefaults.standardUserDefaults.synchronize()
-        languageCode
-    }
+actual fun ApplyAppLanguage(languageCode: String): String = remember(languageCode) {
+    NSUserDefaults.standardUserDefaults.setObject(
+        value = listOf(languageCode),
+        forKey = "AppleLanguages",
+    )
+    NSUserDefaults.standardUserDefaults.synchronize()
+    languageCode
 }

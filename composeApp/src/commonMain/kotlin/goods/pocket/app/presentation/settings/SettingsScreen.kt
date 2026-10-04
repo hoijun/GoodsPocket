@@ -1,4 +1,4 @@
-package goods.pocket.app.presentation.screen
+package goods.pocket.app.presentation.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
@@ -7,7 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import goods.pocket.app.domain.model.AppPreference
+import goods.pocket.app.domain.settings.AppPreference
 import goods.pocket.app.presentation.designsystem.GoodsPocketVisualTokens
 import goods.pocket.app.presentation.i18n.AppLanguage
 import goods.pocket.app.presentation.i18n.tr
@@ -27,6 +27,7 @@ fun SettingsScreen(
     appPreferences: AppPreference,
     onLanguageChange: (String) -> Unit,
     onBack: () -> Unit,
+    isEnabled: Boolean = true,
 ) {
     val koreanCode = AppLanguage.KOREAN.code
     val englishCode = AppLanguage.ENGLISH.code
@@ -34,7 +35,7 @@ fun SettingsScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(GoodsPocketVisualTokens.Background)),
+            .background(Color(GoodsPocketVisualTokens.BACKGROUND)),
         contentPadding = PaddingValues(bottom = SettingsReferenceMetrics.BottomContentPadding),
     ) {
         item {
@@ -59,6 +60,7 @@ fun SettingsScreen(
                 koreanCode = koreanCode,
                 englishCode = englishCode,
                 onLanguageChange = onLanguageChange,
+                isEnabled = isEnabled,
             )
         }
         item {

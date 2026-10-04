@@ -1,4 +1,4 @@
-package goods.pocket.app.presentation.screen
+package goods.pocket.app.presentation.home
 
 sealed interface HomeAction {
     data object OpenScheduleOverview : HomeAction

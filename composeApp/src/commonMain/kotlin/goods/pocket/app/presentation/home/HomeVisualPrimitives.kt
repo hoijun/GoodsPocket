@@ -1,4 +1,4 @@
-package goods.pocket.app.presentation.screen
+package goods.pocket.app.presentation.home
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
@@ -19,9 +19,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 
 @Composable
-internal fun HomeBellGlyph(
-    modifier: Modifier = Modifier,
-) {
+internal fun HomeBellGlyph(modifier: Modifier = Modifier) {
     val color = MaterialTheme.colorScheme.onSurfaceVariant
     Canvas(modifier = modifier.size(30.dp)) {
         val stroke = Stroke(width = 3.1f)
@@ -66,9 +64,7 @@ internal fun HomeBellGlyph(
 }
 
 @Composable
-internal fun HomeHeroMediaPlaceholder(
-    modifier: Modifier = Modifier,
-) {
+internal fun HomeHeroMediaPlaceholder(modifier: Modifier = Modifier) {
     Canvas(modifier = modifier) {
         drawRect(
             color = Color(0xFFD7D2CC),
@@ -78,9 +74,7 @@ internal fun HomeHeroMediaPlaceholder(
 }
 
 @Composable
-internal fun HomeRecentGoodsMediaPlaceholder(
-    modifier: Modifier = Modifier,
-) {
+internal fun HomeRecentGoodsMediaPlaceholder(modifier: Modifier = Modifier) {
     Canvas(modifier = modifier) {
         drawRoundRect(
             color = Color(0xFFD7D2CC),
@@ -90,9 +84,7 @@ internal fun HomeRecentGoodsMediaPlaceholder(
 }
 
 @Composable
-internal fun HomeScheduleMediaPlaceholder(
-    modifier: Modifier = Modifier,
-) {
+internal fun HomeScheduleMediaPlaceholder(modifier: Modifier = Modifier) {
     Canvas(modifier = modifier) {
         drawRoundRect(
             color = Color(0xFFD7D2CC),
@@ -102,9 +94,7 @@ internal fun HomeScheduleMediaPlaceholder(
 }
 
 @Composable
-internal fun HomeViewAllChevron(
-    modifier: Modifier = Modifier,
-) {
+internal fun HomeViewAllChevron(modifier: Modifier = Modifier) {
     Canvas(modifier = modifier) {
         val strokeWidth = 1.3f
         drawLine(
@@ -123,10 +113,7 @@ internal fun HomeViewAllChevron(
 }
 
 @Composable
-internal fun HomeSpendingBars(
-    fractions: List<Float>,
-    modifier: Modifier = Modifier,
-) {
+internal fun HomeSpendingBars(fractions: List<Float>, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .width(HomeReferenceMetrics.SpendingChartWidth)

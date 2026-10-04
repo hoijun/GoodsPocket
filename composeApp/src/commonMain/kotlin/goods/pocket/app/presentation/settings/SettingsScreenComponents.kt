@@ -1,4 +1,4 @@
-package goods.pocket.app.presentation.screen
+package goods.pocket.app.presentation.settings
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -35,11 +35,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
-internal fun SettingsPageHeader(
-    title: String,
-    backLabel: String,
-    onBack: () -> Unit,
-) {
+internal fun SettingsPageHeader(title: String, backLabel: String, onBack: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -75,10 +71,7 @@ internal fun SettingsPageHeader(
 }
 
 @Composable
-internal fun SettingsSectionHeader(
-    title: String,
-    topSpacing: Dp,
-) {
+internal fun SettingsSectionHeader(title: String, topSpacing: Dp) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Spacer(modifier = Modifier.height(topSpacing))
         Text(
@@ -104,6 +97,7 @@ internal fun SettingsLanguageCard(
     koreanCode: String,
     englishCode: String,
     onLanguageChange: (String) -> Unit,
+    isEnabled: Boolean,
 ) {
     SettingsReferenceSurface(
         modifier = Modifier.height(SettingsReferenceMetrics.LanguageCardHeight),
@@ -133,6 +127,7 @@ internal fun SettingsLanguageCard(
                 koreanCode = koreanCode,
                 englishCode = englishCode,
                 onLanguageChange = onLanguageChange,
+                isEnabled = isEnabled,
             )
         }
     }
@@ -146,6 +141,7 @@ private fun SettingsLanguageSegment(
     koreanCode: String,
     englishCode: String,
     onLanguageChange: (String) -> Unit,
+    isEnabled: Boolean,
 ) {
     val shape = RoundedCornerShape(SettingsReferenceMetrics.LanguageSegmentRadius)
     Box(
@@ -179,12 +175,14 @@ private fun SettingsLanguageSegment(
                 label = koreanLabel,
                 selected = selectedLanguageCode == koreanCode,
                 onClick = { onLanguageChange(koreanCode) },
+                isEnabled = isEnabled,
                 modifier = Modifier.weight(1f),
             )
             SettingsLanguageOptionTouchTarget(
                 label = englishLabel,
                 selected = selectedLanguageCode == englishCode,
                 onClick = { onLanguageChange(englishCode) },
+                isEnabled = isEnabled,
                 modifier = Modifier.weight(1f),
             )
         }
@@ -192,11 +190,7 @@ private fun SettingsLanguageSegment(
 }
 
 @Composable
-private fun SettingsLanguageOptionVisual(
-    label: String,
-    selected: Boolean,
-    modifier: Modifier,
-) {
+private fun SettingsLanguageOptionVisual(label: String, selected: Boolean, modifier: Modifier) {
     Box(
         modifier = modifier
             .fillMaxHeight()
@@ -205,7 +199,11 @@ private fun SettingsLanguageOptionVisual(
     ) {
         Text(
             text = label,
-            color = if (selected) SettingsReferenceColors.SelectedContent else SettingsReferenceColors.Muted,
+            color = if (selected) {
+                SettingsReferenceColors.SelectedContent
+            } else {
+                SettingsReferenceColors.Muted
+            },
             fontSize = SettingsReferenceMetrics.LanguageSegmentFontSize,
             lineHeight = SettingsReferenceMetrics.LanguageSegmentLineHeight,
             fontWeight = FontWeight.SemiBold,
@@ -220,12 +218,14 @@ private fun SettingsLanguageOptionTouchTarget(
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier,
+    isEnabled: Boolean,
 ) {
     Box(
         modifier = modifier
             .fillMaxHeight()
             .selectable(
                 selected = selected,
+                enabled = isEnabled,
                 role = Role.RadioButton,
                 onClick = onClick,
             )
@@ -234,10 +234,7 @@ private fun SettingsLanguageOptionTouchTarget(
 }
 
 @Composable
-internal fun SettingsFormatCard(
-    currency: String,
-    dateFormat: String,
-) {
+internal fun SettingsFormatCard(currency: String, dateFormat: String) {
     SettingsReferenceSurface(
         modifier = Modifier.height(SettingsReferenceMetrics.FormatCardHeight),
     ) {
@@ -257,11 +254,7 @@ internal fun SettingsFormatCard(
 }
 
 @Composable
-private fun SettingsFormatRow(
-    text: String,
-    icon: SettingsLineIconKind,
-    showDivider: Boolean,
-) {
+private fun SettingsFormatRow(text: String, icon: SettingsLineIconKind, showDivider: Boolean) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -315,10 +308,7 @@ private fun SettingsFormatRow(
 }
 
 @Composable
-private fun SettingsReferenceSurface(
-    modifier: Modifier,
-    content: @Composable () -> Unit,
-) {
+private fun SettingsReferenceSurface(modifier: Modifier, content: @Composable () -> Unit) {
     Surface(
         modifier = modifier
             .fillMaxWidth()

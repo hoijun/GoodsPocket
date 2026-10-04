@@ -1,4 +1,4 @@
-package goods.pocket.app.presentation.screen
+package goods.pocket.app.presentation.my
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -70,11 +70,7 @@ internal fun MyPageHeader(title: String) {
 }
 
 @Composable
-internal fun MyProfileCard(
-    displayName: String,
-    syncStatus: String,
-    hint: String,
-) {
+internal fun MyProfileCard(displayName: String, syncStatus: String, hint: String) {
     MyReferenceSurface(
         modifier = Modifier.height(MyReferenceMetrics.ProfileCardHeight),
         radius = MyReferenceMetrics.ProfileCardRadius,
@@ -137,11 +133,7 @@ internal fun MyProfileCard(
 }
 
 @Composable
-internal fun MySectionHeader(
-    title: String,
-    topSpacing: Dp,
-    bottomSpacing: Dp,
-) {
+internal fun MySectionHeader(title: String, topSpacing: Dp, bottomSpacing: Dp) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Spacer(modifier = Modifier.height(topSpacing))
         Text(
@@ -195,10 +187,7 @@ internal fun MySummaryCard(items: List<MySummaryItem>) {
 }
 
 @Composable
-private fun MySummaryCell(
-    item: MySummaryItem,
-    modifier: Modifier = Modifier,
-) {
+private fun MySummaryCell(item: MySummaryItem, modifier: Modifier = Modifier) {
     val colors = item.tone.colors()
     Row(
         modifier = modifier
@@ -243,10 +232,7 @@ private fun MySummaryCell(
 }
 
 @Composable
-internal fun MyManagementCard(
-    items: List<MyManagementItem>,
-    onOpenSettings: () -> Unit,
-) {
+internal fun MyManagementCard(items: List<MyManagementItem>, onOpenSettings: () -> Unit) {
     require(items.size == 3)
 
     MyReferenceSurface(
@@ -266,11 +252,7 @@ internal fun MyManagementCard(
 }
 
 @Composable
-private fun MyManagementRow(
-    item: MyManagementItem,
-    showDivider: Boolean,
-    onClick: (() -> Unit)?,
-) {
+private fun MyManagementRow(item: MyManagementItem, showDivider: Boolean, onClick: (() -> Unit)?) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -340,11 +322,7 @@ private fun MyManagementRow(
 }
 
 @Composable
-private fun MyReferenceSurface(
-    modifier: Modifier,
-    radius: Dp,
-    content: @Composable () -> Unit,
-) {
+private fun MyReferenceSurface(modifier: Modifier, radius: Dp, content: @Composable () -> Unit) {
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -359,22 +337,20 @@ private fun MyReferenceSurface(
 }
 
 @Composable
-private fun MySummaryTone.colors(): MyToneColors {
-    return when (this) {
-        MySummaryTone.Owned -> MyToneColors(MyColors.OwnedContainer, MyColors.Owned)
-        MySummaryTone.Reserved -> MyToneColors(MyColors.ReservedContainer, MyColors.Reserved)
-        MySummaryTone.Spending -> MyToneColors(MyColors.SpendingContainer, MyColors.Primary)
-        MySummaryTone.Upcoming -> MyToneColors(MyColors.UpcomingContainer, MyColors.Warning)
-    }
+private fun MySummaryTone.colors(): MyToneColors = when (this) {
+    MySummaryTone.Owned -> MyToneColors(MyColors.OwnedContainer, MyColors.Owned)
+    MySummaryTone.Reserved -> MyToneColors(MyColors.ReservedContainer, MyColors.Reserved)
+    MySummaryTone.Spending -> MyToneColors(MyColors.SpendingContainer, MyColors.Primary)
+    MySummaryTone.Upcoming -> MyToneColors(MyColors.UpcomingContainer, MyColors.Warning)
 }
 
 private object MyColors {
-    val Primary = Color(GoodsPocketVisualTokens.Primary)
-    val Owned = Color(GoodsPocketVisualTokens.Secondary)
-    val Reserved = Color(GoodsPocketVisualTokens.Tertiary)
-    val Warning = Color(GoodsPocketVisualTokens.Warning)
-    val Ink = Color(GoodsPocketVisualTokens.Ink)
-    val Muted = Color(GoodsPocketVisualTokens.MutedInk)
+    val Primary = Color(GoodsPocketVisualTokens.PRIMARY)
+    val Owned = Color(GoodsPocketVisualTokens.SECONDARY)
+    val Reserved = Color(GoodsPocketVisualTokens.TERTIARY)
+    val Warning = Color(GoodsPocketVisualTokens.WARNING)
+    val Ink = Color(GoodsPocketVisualTokens.INK)
+    val Muted = Color(GoodsPocketVisualTokens.MUTED_INK)
     val Card = Color(0xFFFEFBF8)
     val Outline = Color(0xFFEFEDEC)
     val Avatar = Color(0xFFD7D2CC)
@@ -386,7 +362,4 @@ private object MyColors {
     val UpcomingContainer = Color(0xFFFFF4DE)
 }
 
-private data class MyToneColors(
-    val container: Color,
-    val content: Color,
-)
+private data class MyToneColors(val container: Color, val content: Color)

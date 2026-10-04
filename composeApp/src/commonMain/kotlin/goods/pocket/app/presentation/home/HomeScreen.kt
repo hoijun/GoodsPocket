@@ -1,4 +1,4 @@
-package goods.pocket.app.presentation.screen
+package goods.pocket.app.presentation.home
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -30,11 +30,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import goods.pocket.app.domain.model.Event
-import goods.pocket.app.domain.model.HomeSummary
+import androidx.compose.ui.unit.sp
+import goods.pocket.app.domain.dashboard.HomeSummary
+import goods.pocket.app.domain.event.Event
 import goods.pocket.app.presentation.designsystem.GoodsPocketVisualTokens
 import goods.pocket.app.presentation.designsystem.goodsPocketScreenModifier
 import goods.pocket.app.presentation.i18n.tr
@@ -47,11 +47,11 @@ import goodspocket.composeapp.generated.resources.home_summary_reserved
 import goodspocket.composeapp.generated.resources.home_summary_total_goods
 import goodspocket.composeapp.generated.resources.home_today_summary_title
 
-internal val HomeOrange = Color(GoodsPocketVisualTokens.Primary)
-internal val HomeGreen = Color(GoodsPocketVisualTokens.Secondary)
-internal val HomePurple = Color(GoodsPocketVisualTokens.Tertiary)
-internal val HomeInk = Color(GoodsPocketVisualTokens.Ink)
-internal val HomeMuted = Color(GoodsPocketVisualTokens.MutedInk)
+internal val HomeOrange = Color(GoodsPocketVisualTokens.PRIMARY)
+internal val HomeGreen = Color(GoodsPocketVisualTokens.SECONDARY)
+internal val HomePurple = Color(GoodsPocketVisualTokens.TERTIARY)
+internal val HomeInk = Color(GoodsPocketVisualTokens.INK)
+internal val HomeMuted = Color(GoodsPocketVisualTokens.MUTED_INK)
 internal val HomeCardSurface = Color(0xFFFEFBF8)
 internal val HomeHeroSurface = Color(0xFFFEF9F5)
 internal val HomeCardBorder = Color(0xFFEFEDEC)
@@ -106,10 +106,7 @@ fun HomeScreen(
 }
 
 @Composable
-private fun HomeBrandHeader(
-    showNotificationDot: Boolean,
-    onNotificationsClick: () -> Unit,
-) {
+private fun HomeBrandHeader(showNotificationDot: Boolean, onNotificationsClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -175,9 +172,7 @@ private fun HomeBellButton(
 }
 
 @Composable
-private fun HomeHeroCard(
-    onClick: () -> Unit,
-) {
+private fun HomeHeroCard(onClick: () -> Unit) {
     Surface(
         onClick = onClick,
         modifier = Modifier
@@ -228,10 +223,7 @@ private fun HomeHeroCard(
 }
 
 @Composable
-private fun HomeTodaySummaryCard(
-    dashboardSummary: HomeSummary,
-    onAction: (HomeAction) -> Unit,
-) {
+private fun HomeTodaySummaryCard(dashboardSummary: HomeSummary, onAction: (HomeAction) -> Unit) {
     HomeWhiteCard(
         modifier = Modifier
             .offset(y = (-5).dp)
@@ -253,7 +245,8 @@ private fun HomeTodaySummaryCard(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                val totalCount = dashboardSummary.ownedItemCount + dashboardSummary.activePreorderCount
+                val totalCount =
+                    dashboardSummary.ownedItemCount + dashboardSummary.activePreorderCount
                 HomeCollectionMetric(
                     label = tr(Res.string.home_summary_total_goods),
                     value = totalCount.toString(),

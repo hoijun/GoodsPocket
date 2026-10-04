@@ -189,7 +189,10 @@
     <string name="dialog_delete_item_body_linked">This item has %1$s linked transactions. Delete anyway?</string>
     <string name="dialog_delete_item_body">This action permanently removes the item from your collection.</string>
     <string name="dialog_cancel_preorder_title">Cancel preorder?</string>
-    <string name="dialog_cancel_preorder_body">The preorder status will change to canceled and remain in the preorder list.</string>
+    <string name="dialog_cancel_preorder_body">The reservation will be canceled and hidden from your collection.</string>
+    <string name="activity_added">Collection item added</string>
+    <string name="activity_reserved">Preorder tracked at %1$s</string>
+    <string name="activity_received">Reserved item received</string>
     <string name="dialog_delete_event_title">Delete event?</string>
     <string name="dialog_delete_event_body">This action permanently removes the event.</string>
 

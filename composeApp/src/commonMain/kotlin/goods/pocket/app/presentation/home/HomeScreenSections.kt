@@ -1,4 +1,4 @@
-package goods.pocket.app.presentation.screen
+package goods.pocket.app.presentation.home
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -25,21 +25,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import goods.pocket.app.domain.model.ActivityRecord
-import goods.pocket.app.domain.model.Event
-import goods.pocket.app.domain.model.EventType
-import goods.pocket.app.domain.model.HomeSummary
+import goods.pocket.app.domain.dashboard.ActivityKind
+import goods.pocket.app.domain.dashboard.ActivityRecord
+import goods.pocket.app.domain.dashboard.HomeSummary
+import goods.pocket.app.domain.event.Event
+import goods.pocket.app.domain.event.EventType
 import goods.pocket.app.presentation.designsystem.GoodsPocketBadgeTone
 import goods.pocket.app.presentation.i18n.formatCurrency
 import goods.pocket.app.presentation.i18n.localizedLabel
 import goods.pocket.app.presentation.i18n.tr
 import goodspocket.composeapp.generated.resources.Res
+import goodspocket.composeapp.generated.resources.activity_added
+import goodspocket.composeapp.generated.resources.activity_received
+import goodspocket.composeapp.generated.resources.activity_reserved
 import goodspocket.composeapp.generated.resources.home_monthly_spend_basis
 import goodspocket.composeapp.generated.resources.home_monthly_spend_change
 import goodspocket.composeapp.generated.resources.home_monthly_spend_title
@@ -65,9 +68,10 @@ internal fun HomeRecentGoodsCarousel(
         } else {
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(
-                    items = activities.take(8).map(ActivityRecord::toRecentGoodsCardModel),
-                    key = RecentGoodsCardModel::id,
-                ) { model ->
+                    items = activities.take(8),
+                    key = ActivityRecord::id,
+                ) { activity ->
+                    val model = activity.toRecentGoodsCardModel()
                     HomeRecentGoodsCard(
                         model = model,
                         onClick = { onEntryClick(model.id) },
@@ -79,10 +83,7 @@ internal fun HomeRecentGoodsCarousel(
 }
 
 @Composable
-private fun HomeRecentGoodsCard(
-    model: RecentGoodsCardModel,
-    onClick: () -> Unit,
-) {
+private fun HomeRecentGoodsCard(model: RecentGoodsCardModel, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
         modifier = Modifier
@@ -139,10 +140,7 @@ private fun HomeRecentGoodsCard(
 }
 
 @Composable
-internal fun HomeMonthlySpendCard(
-    dashboardSummary: HomeSummary,
-    currentDate: String,
-) {
+internal fun HomeMonthlySpendCard(dashboardSummary: HomeSummary, currentDate: String) {
     val month = homeMonth(currentDate)
     val changePercent = spendingChangePercent(
         current = dashboardSummary.monthlySpend,
@@ -191,7 +189,13 @@ internal fun HomeMonthlySpendCard(
                     fontWeight = FontWeight.Bold,
                 )
                 if (changePercent != null) {
-                    val signedPercent = if (changePercent >= 0) "+$changePercent%" else "$changePercent%"
+                    val signedPercent = if (changePercent >=
+                        0
+                    ) {
+                        "+$changePercent%"
+                    } else {
+                        "$changePercent%"
+                    }
                     val changeText = tr(Res.string.home_monthly_spend_change, signedPercent)
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(
@@ -277,10 +281,7 @@ internal fun HomeUpcomingScheduleCard(
 }
 
 @Composable
-private fun HomeScheduleRow(
-    row: HomeScheduleRowModel,
-    onClick: () -> Unit,
-) {
+private fun HomeScheduleRow(row: HomeScheduleRowModel, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -351,10 +352,7 @@ private fun HomeScheduleRow(
 }
 
 @Composable
-private fun HomeScheduleBadge(
-    text: String,
-    tone: GoodsPocketBadgeTone,
-) {
+private fun HomeScheduleBadge(text: String, tone: GoodsPocketBadgeTone) {
     val isEventTone = tone == GoodsPocketBadgeTone.Event
     Surface(
         shape = CircleShape,
@@ -379,10 +377,7 @@ private fun HomeScheduleBadge(
 }
 
 @Composable
-private fun HomeSectionHeader(
-    title: String,
-    onViewAll: () -> Unit,
-) {
+private fun HomeSectionHeader(title: String, onViewAll: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -419,11 +414,7 @@ private fun HomeSectionHeader(
     }
 }
 
-private data class RecentGoodsCardModel(
-    val id: String,
-    val title: String,
-    val subtitle: String,
-)
+private data class RecentGoodsCardModel(val id: String, val title: String, val subtitle: String)
 
 private data class HomeScheduleRowModel(
     val badge: String,
@@ -433,19 +424,19 @@ private data class HomeScheduleRowModel(
     val tone: GoodsPocketBadgeTone,
 )
 
-private fun ActivityRecord.toRecentGoodsCardModel(): RecentGoodsCardModel {
-    return RecentGoodsCardModel(
-        id = id,
-        title = title,
-        subtitle = subtitle,
-    )
-}
+@Composable
+private fun ActivityRecord.toRecentGoodsCardModel(): RecentGoodsCardModel = RecentGoodsCardModel(
+    id = id,
+    title = title,
+    subtitle = when (kind) {
+        ActivityKind.ADDED -> tr(Res.string.activity_added)
+        ActivityKind.RESERVED -> tr(Res.string.activity_reserved, storeName.orEmpty())
+        ActivityKind.RECEIVED -> tr(Res.string.activity_received)
+    },
+)
 
 @Composable
-private fun Event.toHomeScheduleRowModel(
-    index: Int,
-    currentDate: String,
-): HomeScheduleRowModel {
+private fun Event.toHomeScheduleRowModel(index: Int, currentDate: String): HomeScheduleRowModel {
     val tone = if (eventType == EventType.OFFLINE_EVENT || index == 0) {
         GoodsPocketBadgeTone.Event
     } else {
@@ -468,10 +459,7 @@ private fun String.toHomeDateLabel(): String {
 }
 
 @Composable
-private fun EmptyStateLine(
-    text: String,
-    onClick: () -> Unit,
-) {
+private fun EmptyStateLine(text: String, onClick: () -> Unit) {
     HomeWhiteCard(
         containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
         contentPadding = 0.dp,
@@ -481,10 +469,7 @@ private fun EmptyStateLine(
 }
 
 @Composable
-private fun HomeEmptyStateContent(
-    text: String,
-    onClick: () -> Unit,
-) {
+private fun HomeEmptyStateContent(text: String, onClick: () -> Unit) {
     Text(
         text = text,
         modifier = Modifier
