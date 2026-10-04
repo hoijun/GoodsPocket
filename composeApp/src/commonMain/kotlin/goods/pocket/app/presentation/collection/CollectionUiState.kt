@@ -14,6 +14,7 @@ data class CollectionUiState(
     val savedEntry: CollectionEntry? = null,
     val receiptRefresh: CommandState = CommandState(),
     val receiptPendingId: String? = null,
+    val hasLoaded: Boolean = false,
 ) {
     fun canEdit(id: String): Boolean = receiptPendingId != id && !command.isRunning
 

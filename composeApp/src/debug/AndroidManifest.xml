@@ -1,0 +1,6 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <!-- Empty host for isolated Compose instrumentation; never opens the app database. -->
+        <activity android:name="androidx.activity.ComponentActivity" android:exported="false" />
+    </application>
+</manifest>

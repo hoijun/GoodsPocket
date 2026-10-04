@@ -63,6 +63,7 @@ class CollectionStateHolder(
             saved?.value,
             operations.receiptRead,
             operations.receiptId,
+            hasLoaded = data.hasLoaded,
         )
     }.stateIn(scope, SharingStarted.Eagerly, CollectionUiState())
     private var newEntryId: String? = null

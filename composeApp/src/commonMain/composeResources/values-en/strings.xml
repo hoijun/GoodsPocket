@@ -222,4 +222,8 @@
     <string name="event_type_offline_event">Offline Event</string>
     <string name="error_operation_failed">The operation could not be completed. Please try again.</string>
     <string name="action_retry">Retry</string>
+    <string name="collection_load_failed">Couldn’t load your collection</string>
+    <string name="collection_loading">Loading your collection</string>
+    <string name="collection_loading_hint">Please wait a moment.</string>
+    <string name="collection_retry_hint">Please try again in a moment.</string>
 </resources>

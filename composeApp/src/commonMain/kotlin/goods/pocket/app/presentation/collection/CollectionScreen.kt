@@ -13,12 +13,18 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import goods.pocket.app.domain.collection.CollectionEntry
 import goods.pocket.app.domain.collection.CollectionEntryStatus
 import goods.pocket.app.presentation.designsystem.GoodsPocketVisualTokens
@@ -46,6 +52,10 @@ fun CollectionScreen(
     entries: List<CollectionEntry>,
     selectedSegment: CollectionSegment,
     query: String,
+    isLoading: Boolean,
+    hasLoadFailure: Boolean,
+    hasLoaded: Boolean,
+    onRetry: () -> Unit,
     onSegmentChange: (CollectionSegment) -> Unit,
     onQueryChange: (String) -> Unit,
     onEntryClick: (String) -> Unit,
@@ -54,6 +64,14 @@ fun CollectionScreen(
         visibleCollectionEntries(entries, query, selectedSegment)
     }
     val summary = remember(entries) { collectionSummary(entries) }
+    val density = LocalDensity.current
+    var headerHeight by remember { mutableStateOf(0.dp) }
+    val hasFeedback = isLoading || hasLoadFailure
+    val contentTop = if (hasLoaded) {
+        maxOf(CollectionReferenceMetrics.GridTop, headerHeight + 12.dp)
+    } else {
+        headerHeight + 16.dp
+    }
 
     Box(
         modifier = Modifier
@@ -66,8 +84,12 @@ fun CollectionScreen(
                 .fillMaxSize()
                 .padding(horizontal = CollectionReferenceMetrics.ScreenHorizontalPadding)
                 .padding(
-                    top = CollectionReferenceMetrics.GridTop,
-                    bottom = CollectionReferenceMetrics.GridBottomClearance,
+                    top = contentTop,
+                    bottom = if (hasLoaded) {
+                        CollectionReferenceMetrics.GridBottomClearance
+                    } else {
+                        16.dp
+                    },
                 )
                 .clipToBounds(),
             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(
@@ -77,7 +99,12 @@ fun CollectionScreen(
                 CollectionReferenceMetrics.GridSpacing,
             ),
         ) {
-            if (visibleEntries.isEmpty()) {
+            if (hasFeedback) {
+                item(key = "collection-load-feedback", span = { GridItemSpan(maxLineSpan) }) {
+                    CollectionLoadFeedback(isLoading = isLoading, onRetry = onRetry)
+                }
+            }
+            if (hasLoaded && !hasFeedback && visibleEntries.isEmpty()) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     Box(
                         modifier = Modifier
@@ -126,26 +153,34 @@ fun CollectionScreen(
             selectedSegmentIndex = CollectionSegment.entries.indexOf(selectedSegment),
             query = query,
             searchPlaceholder = tr(Res.string.collection_search_placeholder),
-            resultCount = tr(Res.string.collection_result_count, visibleEntries.size),
+            resultCount = if (hasLoaded) {
+                tr(Res.string.collection_result_count, visibleEntries.size)
+            } else {
+                null
+            },
             onSegmentChange = { index -> onSegmentChange(CollectionSegment.entries[index]) },
             onQueryChange = onQueryChange,
-            modifier = Modifier.align(Alignment.TopCenter),
+            modifier = Modifier.align(Alignment.TopCenter).onSizeChanged {
+                headerHeight = with(density) { it.height.toDp() }
+            },
         )
 
-        CollectionSummaryBand(
-            ownedLabel = tr(Res.string.collection_segment_owned),
-            ownedValue = summary.ownedCount.toString(),
-            reservedLabel = tr(Res.string.collection_segment_reserved),
-            reservedValue = summary.reservedCount.toString(),
-            amountLabel = tr(Res.string.collection_metric_monthly_spend),
-            amountValue = formatCurrency(summary.totalPurchaseAmount),
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(
-                    horizontal = CollectionReferenceMetrics.ScreenHorizontalPadding,
-                    vertical = CollectionReferenceMetrics.SummaryBottomPadding,
-                ),
-        )
+        if (hasLoaded) {
+            CollectionSummaryBand(
+                ownedLabel = tr(Res.string.collection_segment_owned),
+                ownedValue = summary.ownedCount.toString(),
+                reservedLabel = tr(Res.string.collection_segment_reserved),
+                reservedValue = summary.reservedCount.toString(),
+                amountLabel = tr(Res.string.collection_metric_monthly_spend),
+                amountValue = formatCurrency(summary.totalPurchaseAmount),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(
+                        horizontal = CollectionReferenceMetrics.ScreenHorizontalPadding,
+                        vertical = CollectionReferenceMetrics.SummaryBottomPadding,
+                    ),
+            )
+        }
     }
 }
 

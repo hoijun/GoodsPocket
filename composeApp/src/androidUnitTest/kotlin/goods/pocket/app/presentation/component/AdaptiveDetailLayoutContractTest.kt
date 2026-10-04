@@ -46,7 +46,12 @@ class AdaptiveDetailLayoutContractTest {
     @Test
     fun `collection grid reserves footer space in its viewport not scroll content`() {
         val source = presentationSource("collection/CollectionScreen.kt")
-        assertTrue(source.contains("bottom = CollectionReferenceMetrics.GridBottomClearance"))
+        assertTrue(
+            source.contains(
+                "bottom = if (hasLoaded) {\n" +
+                    "                        CollectionReferenceMetrics.GridBottomClearance",
+            ),
+        )
         assertFalse(source.contains("contentPadding = PaddingValues(bottom ="))
         assertTrue(source.contains(".clipToBounds()"))
     }

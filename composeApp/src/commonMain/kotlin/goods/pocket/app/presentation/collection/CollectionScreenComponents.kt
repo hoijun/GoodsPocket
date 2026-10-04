@@ -47,7 +47,7 @@ internal fun CollectionHeader(
     selectedSegmentIndex: Int,
     query: String,
     searchPlaceholder: String,
-    resultCount: String,
+    resultCount: String?,
     onSegmentChange: (Int) -> Unit,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -80,14 +80,16 @@ internal fun CollectionHeader(
             onValueChange = onQueryChange,
             placeholder = searchPlaceholder,
         )
-        Spacer(modifier = Modifier.height(CollectionReferenceMetrics.SearchToCountSpacing))
-        Text(
-            text = resultCount,
-            color = Color(GoodsPocketVisualTokens.INK),
-            fontSize = CollectionReferenceMetrics.ResultCountFontSize,
-            lineHeight = CollectionReferenceMetrics.ResultCountLineHeight,
-            fontWeight = FontWeight.SemiBold,
-        )
+        if (resultCount != null) {
+            Spacer(modifier = Modifier.height(CollectionReferenceMetrics.SearchToCountSpacing))
+            Text(
+                text = resultCount,
+                color = Color(GoodsPocketVisualTokens.INK),
+                fontSize = CollectionReferenceMetrics.ResultCountFontSize,
+                lineHeight = CollectionReferenceMetrics.ResultCountLineHeight,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
     }
 }
 
