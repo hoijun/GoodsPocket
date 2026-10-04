@@ -1,4 +1,4 @@
-package goods.pocket.app.presentation.screen
+package goods.pocket.app.presentation.events
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,8 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import goods.pocket.app.domain.model.Event
-import goods.pocket.app.domain.model.EventType
+import goods.pocket.app.domain.event.Event
+import goods.pocket.app.domain.event.EventType
 import goods.pocket.app.presentation.designsystem.GoodsPocketVisualTokens
 import goods.pocket.app.presentation.i18n.formatDate
 import goods.pocket.app.presentation.i18n.localizedLabel
@@ -50,7 +50,7 @@ fun EventsScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(GoodsPocketVisualTokens.Background)),
+            .background(Color(GoodsPocketVisualTokens.BACKGROUND)),
         contentPadding = PaddingValues(bottom = EventsReferenceMetrics.BottomContentPadding),
     ) {
         item {

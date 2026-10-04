@@ -1,4 +1,4 @@
-package goods.pocket.app.presentation.screen
+package goods.pocket.app.presentation.events
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -25,8 +25,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import goods.pocket.app.domain.model.Event
-import goods.pocket.app.domain.model.EventType
+import goods.pocket.app.domain.event.Event
+import goods.pocket.app.domain.event.EventType
 import goods.pocket.app.presentation.designsystem.GoodsPocketVisualTokens
 import goods.pocket.app.presentation.i18n.formatDate
 import goods.pocket.app.presentation.i18n.localizedLabel
@@ -69,11 +69,7 @@ internal fun EventsHeader(
 }
 
 @Composable
-private fun EventsOverview(
-    monthLabel: String,
-    overviewTitle: String,
-    count: String,
-) {
+private fun EventsOverview(monthLabel: String, overviewTitle: String, count: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -127,11 +123,7 @@ private fun EventsOverview(
 }
 
 @Composable
-private fun EventsFilterRow(
-    labels: List<String>,
-    selectedIndex: Int,
-    onSelected: (Int) -> Unit,
-) {
+private fun EventsFilterRow(labels: List<String>, selectedIndex: Int, onSelected: (Int) -> Unit) {
     val weights = listOf(60f, 59f, 74f, 59f, 85f)
     Row(
         modifier = Modifier
@@ -218,7 +210,9 @@ internal fun EventsFeaturedCard(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
-            Spacer(modifier = Modifier.height(EventsReferenceMetrics.FeaturedTitleToLocationSpacing))
+            Spacer(
+                modifier = Modifier.height(EventsReferenceMetrics.FeaturedTitleToLocationSpacing),
+            )
             Text(
                 text = location,
                 color = EventsColors.Muted,
@@ -265,7 +259,9 @@ internal fun EventsTimelineSection(
         Spacer(modifier = Modifier.height(EventsReferenceMetrics.FeaturedToTimelineTitleSpacing))
         Text(
             text = title,
-            modifier = Modifier.padding(horizontal = EventsReferenceMetrics.ScreenHorizontalPadding),
+            modifier = Modifier.padding(
+                horizontal = EventsReferenceMetrics.ScreenHorizontalPadding,
+            ),
             color = EventsColors.Ink,
             fontSize = EventsReferenceMetrics.SectionTitleFontSize,
             lineHeight = EventsReferenceMetrics.SectionTitleLineHeight,
@@ -384,16 +380,18 @@ private fun EventsTimelineRow(
 }
 
 @Composable
-private fun EventsTypeBadge(
-    eventType: EventType,
-    label: String,
-    featured: Boolean,
-) {
+private fun EventsTypeBadge(eventType: EventType, label: String, featured: Boolean) {
     val colors = when (eventType) {
-        EventType.PAYMENT_DUE -> EventsBadgeColors(EventsColors.PaymentContainer, EventsColors.Primary)
+        EventType.PAYMENT_DUE -> EventsBadgeColors(
+            EventsColors.PaymentContainer,
+            EventsColors.Primary,
+        )
         EventType.RELEASE -> EventsBadgeColors(EventsColors.EventContainer, EventsColors.Event)
         EventType.DELIVERY -> EventsBadgeColors(EventsColors.SuccessContainer, EventsColors.Success)
-        EventType.OFFLINE_EVENT -> EventsBadgeColors(EventsColors.EventContainer, EventsColors.Event)
+        EventType.OFFLINE_EVENT -> EventsBadgeColors(
+            EventsColors.EventContainer,
+            EventsColors.Event,
+        )
     }
     Surface(
         modifier = Modifier.height(
@@ -427,11 +425,11 @@ private fun EventsTypeBadge(
 }
 
 private object EventsColors {
-    val Primary = Color(GoodsPocketVisualTokens.Primary)
-    val Success = Color(GoodsPocketVisualTokens.Secondary)
-    val Event = Color(GoodsPocketVisualTokens.Tertiary)
-    val Ink = Color(GoodsPocketVisualTokens.Ink)
-    val Muted = Color(GoodsPocketVisualTokens.MutedInk)
+    val Primary = Color(GoodsPocketVisualTokens.PRIMARY)
+    val Success = Color(GoodsPocketVisualTokens.SECONDARY)
+    val Event = Color(GoodsPocketVisualTokens.TERTIARY)
+    val Ink = Color(GoodsPocketVisualTokens.INK)
+    val Muted = Color(GoodsPocketVisualTokens.MUTED_INK)
     val Card = Color(0xFFFEFBF8)
     val Outline = Color(0xFFEFEDEC)
     val CountContainer = Color(0xFFF3F0ED)
@@ -440,7 +438,4 @@ private object EventsColors {
     val SuccessContainer = Color(0xFFE5F8ED)
 }
 
-private data class EventsBadgeColors(
-    val container: Color,
-    val content: Color,
-)
+private data class EventsBadgeColors(val container: Color, val content: Color)

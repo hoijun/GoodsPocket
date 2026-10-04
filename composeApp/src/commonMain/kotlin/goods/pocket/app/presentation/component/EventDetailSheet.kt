@@ -41,9 +41,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import goods.pocket.app.domain.model.CollectionEntry
-import goods.pocket.app.domain.model.Event
-import goods.pocket.app.domain.model.EventType
+import goods.pocket.app.domain.collection.CollectionEntry
+import goods.pocket.app.domain.event.Event
+import goods.pocket.app.domain.event.EventType
 import goods.pocket.app.presentation.i18n.formatDate
 import goods.pocket.app.presentation.i18n.localizedLabel
 import goods.pocket.app.presentation.i18n.tr
@@ -84,8 +84,17 @@ fun EventDetailSheet(
     ) {
         Column(Modifier.fillMaxWidth().height(428.dp).navigationBarsPadding()) {
             EventDetailHandle(onDismiss)
-            Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 22.dp)) {
-                Text(event.title, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Bold)
+            Column(
+                Modifier.weight(
+                    1f,
+                ).verticalScroll(rememberScrollState()).padding(horizontal = 22.dp),
+            ) {
+                Text(
+                    event.title,
+                    fontSize = 22.sp,
+                    lineHeight = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                )
                 Spacer(Modifier.height(10.dp))
                 val accent = when (event.eventType) {
                     EventType.PAYMENT_DUE -> EventDetailOrange
@@ -111,13 +120,30 @@ fun EventDetailSheet(
                 Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 10.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Button(onClick = onEdit, modifier = Modifier.weight(1f).height(46.dp),
-                    shape = RoundedCornerShape(10.dp), colors = ButtonDefaults.buttonColors(containerColor = EventDetailOrange)) {
-                    Text(tr(Res.string.action_edit), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                Button(
+                    onClick = onEdit,
+                    modifier = Modifier.weight(1f).height(46.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = EventDetailOrange),
+                ) {
+                    Text(
+                        tr(Res.string.action_edit),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
                 }
-                OutlinedButton(onClick = onDelete, modifier = Modifier.weight(1f).height(46.dp),
-                    shape = RoundedCornerShape(10.dp), border = BorderStroke(1.dp, EventDetailOrange)) {
-                    Text(tr(Res.string.action_delete), color = EventDetailOrange, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                OutlinedButton(
+                    onClick = onDelete,
+                    modifier = Modifier.weight(1f).height(46.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    border = BorderStroke(1.dp, EventDetailOrange),
+                ) {
+                    Text(
+                        tr(Res.string.action_delete),
+                        color = EventDetailOrange,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
                 }
             }
         }
@@ -128,13 +154,30 @@ fun EventDetailSheet(
 private fun EventDetailHandle(onDismiss: () -> Unit) {
     val closeLabel = tr(Res.string.action_close)
     Box(Modifier.fillMaxWidth().height(54.dp)) {
-        Box(Modifier.align(Alignment.TopCenter).padding(top = 11.dp).width(40.dp).height(5.dp)
-            .clip(RoundedCornerShape(3.dp)).background(Color(0xFFC8C9CC)))
-        IconButton(onClick = onDismiss, modifier = Modifier.align(Alignment.TopEnd).padding(end = 8.dp, top = 6.dp)
-            .semantics { contentDescription = closeLabel }) {
+        Box(
+            Modifier.align(Alignment.TopCenter).padding(top = 11.dp).width(40.dp).height(5.dp)
+                .clip(RoundedCornerShape(3.dp)).background(Color(0xFFC8C9CC)),
+        )
+        IconButton(
+            onClick = onDismiss,
+            modifier = Modifier.align(Alignment.TopEnd).padding(end = 8.dp, top = 6.dp)
+                .semantics { contentDescription = closeLabel },
+        ) {
             Canvas(Modifier.size(20.dp)) {
-                drawLine(EventDetailMuted, Offset.Zero, Offset(size.width, size.height), 1.5.dp.toPx(), StrokeCap.Round)
-                drawLine(EventDetailMuted, Offset(size.width, 0f), Offset(0f, size.height), 1.5.dp.toPx(), StrokeCap.Round)
+                drawLine(
+                    EventDetailMuted,
+                    Offset.Zero,
+                    Offset(size.width, size.height),
+                    1.5.dp.toPx(),
+                    StrokeCap.Round,
+                )
+                drawLine(
+                    EventDetailMuted,
+                    Offset(size.width, 0f),
+                    Offset(0f, size.height),
+                    1.5.dp.toPx(),
+                    StrokeCap.Round,
+                )
             }
         }
     }
@@ -149,10 +192,32 @@ private fun EventDetailMetadata(field: EventDetailField, isFirst: Boolean) {
         EventDetailFieldKind.LOCATION -> Res.string.detail_location
         EventDetailFieldKind.MEMO -> Res.string.field_note
     }
-    Row(Modifier.fillMaxWidth().heightIn(min = if (isFirst) 42.dp else 46.dp).padding(vertical = 9.dp), verticalAlignment = Alignment.Top) {
-        Text(tr(label), Modifier.width(115.dp), color = EventDetailMuted, fontSize = 12.sp,
-            lineHeight = 20.sp, fontWeight = FontWeight.SemiBold)
-        Text(if (field.kind == EventDetailFieldKind.TARGET_DATE) formatDate(field.value) else field.value,
-            Modifier.weight(1f), color = EventDetailInk, fontSize = 14.sp, lineHeight = 20.sp)
+    Row(
+        Modifier.fillMaxWidth().heightIn(
+            min = if (isFirst) 42.dp else 46.dp,
+        ).padding(vertical = 9.dp),
+        verticalAlignment = Alignment.Top,
+    ) {
+        Text(
+            tr(label),
+            Modifier.width(115.dp),
+            color = EventDetailMuted,
+            fontSize = 12.sp,
+            lineHeight = 20.sp,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Text(
+            if (field.kind ==
+                EventDetailFieldKind.TARGET_DATE
+            ) {
+                formatDate(field.value)
+            } else {
+                field.value
+            },
+            Modifier.weight(1f),
+            color = EventDetailInk,
+            fontSize = 14.sp,
+            lineHeight = 20.sp,
+        )
     }
 }
