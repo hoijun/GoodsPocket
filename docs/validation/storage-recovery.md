@@ -19,7 +19,9 @@
 | `failedDeleteRollsBackEventUnlinkAndSuccessfulRetryPersistsAfterReopen` | 컬렉션과 연결 이벤트를 실제 DB에 저장한다. DELETE trigger가 이벤트 연결 해제 이후 삭제를 실패시키면 컬렉션과 이벤트 연결 모두 원래 값으로 rollback되는지 확인한다. trigger 제거 후 재시도하고 driver 재연결 뒤 컬렉션 삭제 및 이벤트 보존·연결 해제를 확인한다. |
 | `androidSQLiteRejectsMissingCollectionRelationship` | 없는 컬렉션 ID를 참조하는 이벤트를 저장하면 원인을 보존한 `RepositoryFailure(WRITE)`가 발생하고 이벤트가 남지 않는지 확인한다. |
 
-각 테스트는 별도의 `instrumentation-*.db`를 사용하고 종료 시 해당 파일을 정리한다. 운영 파일 `GoodsPocket-v2.db`는 열거나 삭제하지 않는다. coroutine scope의 작업과 관찰자를 종료한 뒤 driver를 닫는다.
+테스트 코드 자체는 별도의 `instrumentation-*.db`를 사용하고 종료 시 해당 파일을 정리하며, `GoodsPocket-v2.db`를 직접 열거나 삭제하지 않는다. coroutine scope의 작업과 관찰자를 종료한 뒤 driver를 닫는다.
+
+단, Gradle connected runner의 설치·정리 수명주기는 테스트 코드의 DB 접근 범위와 별개다. 이번 실행 후 대상 앱이 제거되어 `adb am start`가 Activity 부재를 보고했고, 이후 앱을 다시 설치했다. 앱 제거는 해당 앱의 데이터도 지울 수 있으므로 운영 DB 보존을 보장하는 실행으로 취급하면 안 된다. 재실행에는 보존할 앱 데이터가 없는 전용 에뮬레이터를 사용한다. 이번 에뮬레이터의 데이터는 재생성 가능한 smoke-test 데이터였다.
 
 ## 검증 범위의 한계
 
@@ -38,7 +40,7 @@ bash ./gradlew :composeApp:connectedDebugAndroidTest \
   -Pandroid.testInstrumentationRunnerArguments.class=goods.pocket.app.data.AndroidStorageRecoveryTest
 ```
 
-위 세 작업을 성공적으로 실행했다. connected 테스트 중에는 같은 에뮬레이터에서 수동 UI 조작이나 다른 instrumentation을 동시에 실행하지 않는다.
+위 세 작업을 성공적으로 실행했다. connected 테스트는 보존할 앱 데이터가 없는 전용 에뮬레이터에서 실행한다. 실행 중에는 같은 에뮬레이터에서 수동 UI 조작이나 다른 instrumentation을 동시에 실행하지 않는다. 종료 후 대상 앱의 설치 상태를 확인하고, 필요한 경우 앱과 테스트 데이터를 다시 준비한다.
 
 ## 소스와 실행 산출물
 
