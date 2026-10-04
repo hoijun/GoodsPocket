@@ -1,4 +1,4 @@
-package goods.pocket.app.presentation.screen
+package goods.pocket.app.presentation.home
 
 import java.io.File
 import kotlin.test.Test
@@ -10,9 +10,9 @@ class HomeInteractionContractTest {
     fun `home exposes one explicit action contract without empty callback defaults`() {
         val moduleDirectory = interactionModuleDirectory()
         val actionSource = moduleDirectory
-            .resolve("src/commonMain/kotlin/goods/pocket/app/presentation/screen/HomeAction.kt")
+            .resolve("src/commonMain/kotlin/goods/pocket/app/presentation/home/HomeAction.kt")
         val screenSource = moduleDirectory
-            .resolve("src/commonMain/kotlin/goods/pocket/app/presentation/screen/HomeScreen.kt")
+            .resolve("src/commonMain/kotlin/goods/pocket/app/presentation/home/HomeScreen.kt")
             .readText()
         val appSource = moduleDirectory
             .resolve("src/commonMain/kotlin/goods/pocket/app/presentation/GoodsPocketApp.kt")

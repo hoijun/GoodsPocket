@@ -1,4 +1,4 @@
-package goods.pocket.app.presentation.screen
+package goods.pocket.app.presentation.home
 
 import java.io.File
 import kotlin.test.Test
@@ -9,7 +9,9 @@ class HomeRecentGoodsVisualContractTest {
     fun `recent goods cards do not show unsupported favorite affordances`() {
         val module = moduleDirectory()
         val source = module
-            .resolve("src/commonMain/kotlin/goods/pocket/app/presentation/screen/HomeScreenSections.kt")
+            .resolve(
+                "src/commonMain/kotlin/goods/pocket/app/presentation/home/HomeScreenSections.kt",
+            )
             .readText()
         val artworkFile = module.resolve(
             "src/commonMain/kotlin/goods/pocket/app/presentation/designsystem/" +

@@ -1,4 +1,4 @@
-package goods.pocket.app.presentation.screen
+package goods.pocket.app.presentation.home
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

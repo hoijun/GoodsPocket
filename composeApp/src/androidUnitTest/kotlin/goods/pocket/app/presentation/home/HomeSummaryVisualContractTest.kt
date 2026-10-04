@@ -1,4 +1,4 @@
-package goods.pocket.app.presentation.screen
+package goods.pocket.app.presentation.home
 
 import java.io.File
 import kotlin.test.Test
@@ -10,10 +10,12 @@ class HomeSummaryVisualContractTest {
     fun `home major sections use the locked sixteen dp spacing`() {
         val moduleDirectory = homeModuleDirectory()
         val screenSource = moduleDirectory
-            .resolve("src/commonMain/kotlin/goods/pocket/app/presentation/screen/HomeScreen.kt")
+            .resolve("src/commonMain/kotlin/goods/pocket/app/presentation/home/HomeScreen.kt")
             .readText()
         val metricsSource = moduleDirectory
-            .resolve("src/commonMain/kotlin/goods/pocket/app/presentation/screen/HomeReferenceMetrics.kt")
+            .resolve(
+                "src/commonMain/kotlin/goods/pocket/app/presentation/home/HomeReferenceMetrics.kt",
+            )
             .readText()
 
         assertTrue(metricsSource.contains("val SectionSpacing = 16.dp"))
@@ -28,7 +30,7 @@ class HomeSummaryVisualContractTest {
     fun `home summary omits the unsupported sale metric`() {
         val moduleDirectory = homeModuleDirectory()
         val screenSource = moduleDirectory
-            .resolve("src/commonMain/kotlin/goods/pocket/app/presentation/screen/HomeScreen.kt")
+            .resolve("src/commonMain/kotlin/goods/pocket/app/presentation/home/HomeScreen.kt")
             .readText()
         val koreanResources = moduleDirectory
             .resolve("src/commonMain/composeResources/values/strings.xml")
@@ -44,7 +46,9 @@ class HomeSummaryVisualContractTest {
         assertFalse(screenSource.contains("home_summary_wishlist"))
         assertTrue(koreanResources.contains("<string name=\"home_summary_reserved\">예약</string>"))
         assertFalse(koreanResources.contains("home_summary_wishlist"))
-        assertTrue(englishResources.contains("<string name=\"home_summary_reserved\">Reserved</string>"))
+        assertTrue(
+            englishResources.contains("<string name=\"home_summary_reserved\">Reserved</string>"),
+        )
         assertFalse(englishResources.contains("home_summary_wishlist"))
     }
 }

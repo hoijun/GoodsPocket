@@ -3,12 +3,12 @@ package goods.pocket.app.presentation.designsystem
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import goods.pocket.app.presentation.screen.CollectionReferenceMetrics
-import goods.pocket.app.presentation.screen.EventsReferenceMetrics
-import goods.pocket.app.presentation.screen.HomeReferenceMetrics
-import goods.pocket.app.presentation.screen.MyReferenceMetrics
-import goods.pocket.app.presentation.screen.SettingsReferenceMetrics
-import goods.pocket.app.presentation.screen.SettingsReferenceColors
+import goods.pocket.app.presentation.collection.CollectionReferenceMetrics
+import goods.pocket.app.presentation.events.EventsReferenceMetrics
+import goods.pocket.app.presentation.home.HomeReferenceMetrics
+import goods.pocket.app.presentation.my.MyReferenceMetrics
+import goods.pocket.app.presentation.settings.SettingsReferenceColors
+import goods.pocket.app.presentation.settings.SettingsReferenceMetrics
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

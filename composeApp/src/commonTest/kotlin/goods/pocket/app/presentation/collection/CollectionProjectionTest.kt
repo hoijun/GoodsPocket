@@ -1,7 +1,7 @@
-package goods.pocket.app.presentation.screen
+package goods.pocket.app.presentation.collection
 
-import goods.pocket.app.domain.model.CollectionEntry
-import goods.pocket.app.domain.model.CollectionEntryStatus
+import goods.pocket.app.domain.collection.CollectionEntry
+import goods.pocket.app.domain.collection.CollectionEntryStatus
 import goods.pocket.app.presentation.state.CollectionSegment
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -98,7 +98,7 @@ class CollectionProjectionTest {
     }
 
     @Test
-    fun `collection summary reflects owned reserved and purchase totals`() {
+    fun `collection summary excludes cleanup from owned count but retains purchase totals`() {
         val entries = listOf(
             entry(
                 id = "item-1",
@@ -128,7 +128,7 @@ class CollectionProjectionTest {
 
         assertEquals(
             CollectionSummary(
-                ownedCount = 2,
+                ownedCount = 1,
                 reservedCount = 1,
                 totalPurchaseAmount = 50_000,
             ),
@@ -186,18 +186,16 @@ private fun entry(
     purchasePrice: Long? = null,
     reservationStore: String? = null,
     releaseDate: String? = null,
-): CollectionEntry {
-    return CollectionEntry(
-        id = id,
-        name = name,
-        category = "goods",
-        status = status,
-        seriesName = series,
-        characterName = character,
-        purchasePrice = purchasePrice,
-        reservationStore = reservationStore,
-        releaseDate = releaseDate,
-        createdAt = "2026-01-01",
-        updatedAt = "2026-01-01",
-    )
-}
+): CollectionEntry = CollectionEntry(
+    id = id,
+    name = name,
+    category = "goods",
+    status = status,
+    seriesName = series,
+    characterName = character,
+    purchasePrice = purchasePrice,
+    reservationStore = reservationStore,
+    releaseDate = releaseDate,
+    createdAt = "2026-01-01",
+    updatedAt = "2026-01-01",
+)

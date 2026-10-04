@@ -1,7 +1,10 @@
-package goods.pocket.app.presentation.screen
+package goods.pocket.app.presentation.events
 
-import goods.pocket.app.domain.model.Event
-import goods.pocket.app.domain.model.EventType
+import goods.pocket.app.domain.event.Event
+import goods.pocket.app.domain.event.EventType
+import goods.pocket.app.presentation.my.MyHubAction
+import goods.pocket.app.presentation.my.MyHubQuickLinkModel
+import goods.pocket.app.presentation.my.buildMyHubQuickLinks
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -78,7 +81,10 @@ class JournalScreenModelsTest {
 
     @Test
     fun `empty and unmatched filters preserve current month`() {
-        for (events in listOf(emptyList(), listOf(event("other", EventType.DELIVERY, "2026-08-01")))) {
+        for (events in listOf(
+            emptyList(),
+            listOf(event("other", EventType.DELIVERY, "2026-08-01")),
+        )) {
             val overview = buildEventJournalOverview(events, EventType.RELEASE, "2026-07-26")
             assertEquals(null, overview.featuredEvent)
             assertEquals(emptyList(), overview.timelineEvents)
@@ -102,11 +108,7 @@ class JournalScreenModelsTest {
         assertEquals(null, links[1].badgeCount)
     }
 
-    private fun event(
-        id: String,
-        type: EventType,
-        date: String,
-    ) = Event(
+    private fun event(id: String, type: EventType, date: String) = Event(
         id = id,
         title = id,
         eventType = type,

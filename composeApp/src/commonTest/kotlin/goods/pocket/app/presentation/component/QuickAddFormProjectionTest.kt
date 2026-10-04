@@ -1,7 +1,7 @@
 package goods.pocket.app.presentation.component
 
-import goods.pocket.app.domain.model.CollectionEntryStatus
-import goods.pocket.app.domain.model.EventType
+import goods.pocket.app.domain.collection.CollectionEntryStatus
+import goods.pocket.app.domain.event.EventType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -17,8 +17,14 @@ class QuickAddFormProjectionTest {
         assertEquals(
             List(8) { "" },
             listOf(
-                draft.name, draft.category, draft.seriesName, draft.characterName,
-                draft.purchaseStore, draft.releaseDate, draft.reservationStore, draft.note,
+                draft.name,
+                draft.category,
+                draft.seriesName,
+                draft.characterName,
+                draft.purchaseStore,
+                draft.releaseDate,
+                draft.reservationStore,
+                draft.note,
             ),
         )
         assertFalse(draft.canSubmit)
@@ -33,7 +39,10 @@ class QuickAddFormProjectionTest {
 
     @Test
     fun `owned and cleanup require only name and category`() {
-        listOf(CollectionEntryStatus.OWNED, CollectionEntryStatus.PLANNED_CLEANUP).forEach { status ->
+        listOf(
+            CollectionEntryStatus.OWNED,
+            CollectionEntryStatus.PLANNED_CLEANUP,
+        ).forEach { status ->
             val draft = CollectionDraft(name = " Stand ", category = " goods ", status = status)
 
             assertTrue(draft.canSubmit)

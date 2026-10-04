@@ -1,9 +1,9 @@
 package goods.pocket.app.presentation.component
 
-import goods.pocket.app.domain.model.CollectionEntry
-import goods.pocket.app.domain.model.CollectionEntryStatus
-import goods.pocket.app.domain.model.Event
-import goods.pocket.app.domain.model.EventType
+import goods.pocket.app.domain.collection.CollectionEntry
+import goods.pocket.app.domain.collection.CollectionEntryStatus
+import goods.pocket.app.domain.event.Event
+import goods.pocket.app.domain.event.EventType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -12,15 +12,17 @@ class EventDetailFieldsTest {
     fun absentOrBlankOptionalValuesLeaveOnlyTargetDate() {
         listOf(null, "", " \t\n").forEach { blank ->
             val event = event().copy(
-                relatedPreorderId = blank,
-                relatedItemId = blank,
+                relatedEntryId = blank,
                 locationOrStore = blank,
                 memo = blank,
             )
 
             val fields = eventDetailFields(event, emptyList())
 
-            assertEquals(listOf(EventDetailField(EventDetailFieldKind.TARGET_DATE, event.targetDate)), fields)
+            assertEquals(
+                listOf(EventDetailField(EventDetailFieldKind.TARGET_DATE, event.targetDate)),
+                fields,
+            )
         }
     }
 
@@ -33,7 +35,10 @@ class EventDetailFieldsTest {
 
     @Test
     fun populatedLocationAndMemoPreserveOriginalText() {
-        val event = event().copy(locationOrStore = "  Store  ", memo = "  Bring receipt\nSecond line  ")
+        val event = event().copy(
+            locationOrStore = "  Store  ",
+            memo = "  Bring receipt\nSecond line  ",
+        )
 
         val fields = eventDetailFields(event, emptyList())
 
@@ -49,15 +54,19 @@ class EventDetailFieldsTest {
 
     @Test
     fun linkedEntriesResolveNamesByIdInMetadataOrder() {
-        val event = event().copy(relatedPreorderId = "preorder", relatedItemId = "item")
-        val entries = listOf(entry("other", "Unrelated"), entry("item", "Item name"), entry("preorder", "Preorder name"))
+        val event = event().copy(relatedEntryId = "item")
+        val entries =
+            listOf(
+                entry("other", "Unrelated"),
+                entry("item", "Item name"),
+                entry("preorder", "Preorder name"),
+            )
 
         val fields = eventDetailFields(event, entries)
 
         assertEquals(
             listOf(
                 EventDetailField(EventDetailFieldKind.TARGET_DATE, event.targetDate),
-                EventDetailField(EventDetailFieldKind.RELATED_PREORDER, "Preorder name"),
                 EventDetailField(EventDetailFieldKind.RELATED_ITEM, "Item name"),
             ),
             fields,
@@ -66,14 +75,13 @@ class EventDetailFieldsTest {
 
     @Test
     fun missingLinkedEntriesFallBackToOriginalIds() {
-        val event = event().copy(relatedPreorderId = " missing-preorder ", relatedItemId = "missing-item")
+        val event = event().copy(relatedEntryId = "missing-item")
 
         val fields = eventDetailFields(event, listOf(entry("other", "Unrelated")))
 
         assertEquals(
             listOf(
                 EventDetailField(EventDetailFieldKind.TARGET_DATE, event.targetDate),
-                EventDetailField(EventDetailFieldKind.RELATED_PREORDER, " missing-preorder "),
                 EventDetailField(EventDetailFieldKind.RELATED_ITEM, "missing-item"),
             ),
             fields,

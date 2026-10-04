@@ -1,9 +1,9 @@
-package goods.pocket.app.i18n
+package goods.pocket.app.presentation.i18n
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class GoodsPocketCopyTest {
+class DisplayFormattingTest {
 
     @Test
     fun `currency formatting honors currency and language preferences`() {

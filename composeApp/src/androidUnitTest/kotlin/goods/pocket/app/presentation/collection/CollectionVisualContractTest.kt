@@ -1,4 +1,4 @@
-package goods.pocket.app.presentation.screen
+package goods.pocket.app.presentation.collection
 
 import java.io.File
 import kotlin.test.Test
@@ -10,11 +10,13 @@ class CollectionVisualContractTest {
     fun `collection keeps accessible native controls and supported actions only`() {
         val moduleDirectory = collectionModuleDirectory()
         val screenSource = moduleDirectory
-            .resolve("src/commonMain/kotlin/goods/pocket/app/presentation/screen/CollectionScreen.kt")
+            .resolve(
+                "src/commonMain/kotlin/goods/pocket/app/presentation/collection/CollectionScreen.kt",
+            )
             .readText()
         val componentsSource = moduleDirectory
             .resolve(
-                "src/commonMain/kotlin/goods/pocket/app/presentation/screen/CollectionScreenComponents.kt",
+                "src/commonMain/kotlin/goods/pocket/app/presentation/collection/CollectionScreenComponents.kt",
             )
             .readText()
 
