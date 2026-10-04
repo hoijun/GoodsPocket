@@ -7,6 +7,16 @@ import kotlin.test.assertTrue
 
 class HomeSummaryVisualContractTest {
     @Test
+    fun `header does not add extra space before the hero`() {
+        val screenSource = homeModuleDirectory()
+            .resolve("src/commonMain/kotlin/goods/pocket/app/presentation/home/HomeScreen.kt")
+            .readText()
+        assertFalse(screenSource.contains(".padding(top = 0.dp, bottom = 3.dp)"))
+        assertTrue(screenSource.contains("PaddingValues(top = 2.dp, bottom = 16.dp)"))
+        assertTrue(screenSource.contains(".size(38.dp)"))
+    }
+
+    @Test
     fun `home major sections use the locked sixteen dp spacing`() {
         val moduleDirectory = homeModuleDirectory()
         val screenSource = moduleDirectory

@@ -7,7 +7,7 @@ internal object CollectionReferenceMetrics {
     val ScreenHorizontalPadding = 16.dp
     val TitleTopPadding = 24.dp
     val TitleLineHeight = 22.sp
-    val TitleToSegmentSpacing = 16.dp
+    val TitleToSegmentSpacing = 18.dp
     val SegmentHeight = 38.dp
     val SegmentInnerPadding = 3.dp
     val SegmentFontSize = 13.sp
@@ -16,7 +16,7 @@ internal object CollectionReferenceMetrics {
     val SearchHeight = 39.dp
     val SearchFontSize = 13.sp
     val SearchLineHeight = 17.sp
-    val SearchToCountSpacing = 19.dp
+    val SearchToCountSpacing = 17.dp
     val ResultCountFontSize = 12.sp
     val ResultCountLineHeight = 15.sp
     val GridTop = 201.dp

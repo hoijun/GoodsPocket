@@ -43,10 +43,15 @@ class ImageLockedMetricsContractTest {
     @Test
     fun `collection owned reference metrics keep the approved grid geometry`() {
         assertEquals(16.dp, CollectionReferenceMetrics.ScreenHorizontalPadding)
-        assertEquals(16.dp, CollectionReferenceMetrics.TitleToSegmentSpacing)
+        assertEquals(18.dp, CollectionReferenceMetrics.TitleToSegmentSpacing)
         assertEquals(38.dp, CollectionReferenceMetrics.SegmentHeight)
         assertEquals(39.dp, CollectionReferenceMetrics.SearchHeight)
-        assertEquals(19.dp, CollectionReferenceMetrics.SearchToCountSpacing)
+        assertEquals(17.dp, CollectionReferenceMetrics.SearchToCountSpacing)
+        assertEquals(
+            35.dp,
+            CollectionReferenceMetrics.TitleToSegmentSpacing +
+                CollectionReferenceMetrics.SearchToCountSpacing,
+        )
         assertEquals(10.dp, CollectionReferenceMetrics.GridSpacing)
         assertEquals(201.dp, CollectionReferenceMetrics.GridTop)
         assertEquals(222.dp, CollectionReferenceMetrics.GoodsCardHeight)

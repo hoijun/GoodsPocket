@@ -7,6 +7,19 @@ import kotlin.test.assertTrue
 
 class CollectionVisualContractTest {
     @Test
+    fun `controls align without moving the title result count or grid`() {
+        val metricsSource = collectionModuleDirectory()
+            .resolve(
+                "src/commonMain/kotlin/goods/pocket/app/presentation/collection/CollectionReferenceMetrics.kt",
+            )
+            .readText()
+        assertTrue(metricsSource.contains("val TitleToSegmentSpacing = 18.dp"))
+        assertTrue(metricsSource.contains("val SearchToCountSpacing = 17.dp"))
+        assertTrue(metricsSource.contains("val TitleTopPadding = 24.dp"))
+        assertTrue(metricsSource.contains("val GridTop = 201.dp"))
+    }
+
+    @Test
     fun `collection keeps accessible native controls and supported actions only`() {
         val moduleDirectory = collectionModuleDirectory()
         val screenSource = moduleDirectory

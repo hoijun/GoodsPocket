@@ -11,6 +11,15 @@ class FontScalingContractTest {
     }
 
     @Test
+    fun settingsHeaderKeepsReferenceHeightAtDefaultFontScale() {
+        val source = source("settings/SettingsScreenComponents.kt")
+
+        assertTrue(source.contains("LocalDensity.current.fontScale > 1f"))
+        assertTrue(source.contains("Modifier.height(SettingsReferenceMetrics.HeaderHeight)"))
+        assertTrue(source.contains(".then(headerHeight)"))
+    }
+
+    @Test
     fun settingsTextContainersCanGrowWithFontScale() {
         val source = source("settings/SettingsScreenComponents.kt")
 

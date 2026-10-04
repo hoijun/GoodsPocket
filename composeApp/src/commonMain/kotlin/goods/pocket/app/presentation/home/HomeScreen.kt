@@ -110,9 +110,7 @@ fun HomeScreen(
 @Composable
 private fun HomeBrandHeader(showNotificationDot: Boolean, onNotificationsClick: () -> Unit) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 0.dp, bottom = 3.dp),
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {

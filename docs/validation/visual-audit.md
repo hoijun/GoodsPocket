@@ -2,15 +2,16 @@
 
 2026-10-04. 승인된 edge-to-edge 수정 이후 기본 화면 5개의 저장된 캡처를 검사했다. **일부 기하 표본은 일치하지만 전체 1px 시각 검증은 완료되지 않았다.** 이 보고서는 새 참조 승인이나 UI 변경 요청을 대신하지 않는다.
 
-아래 입력 캡처는 후속 확대 글꼴/상세 시트 수정 이전의 edge-to-edge 빌드다. 최종 빌드 전체의 픽셀 검증으로 재사용하지 않는다. 후속 런타임 검증 범위는 [adaptive-layout.md](adaptive-layout.md)에 구분했다.
+이번 최종 재측정은 Home header 하단3dp 제거, Collection 간격18/17dp, Settings 기본 header22dp 복원 이후 새 Xcode 빌드와 Maestro 5개 화면 확인으로 전달된 최신 기본 배율 캡처를 사용했다. 확대 글꼴/상세 시트의 기능 검증은 [adaptive-layout.md](adaptive-layout.md)에 구분했다. PNG 자체에는 빌드 식별자가 없으므로 아래 입력 해시가 재현 기준이다.
 
 ## Inputs and Method
 
 - 참조: `design/references/home/default.png`, `collection/owned.png`, `events/default.png`, `my/default.png`, `settings/default.png`.
-- 현재: `/tmp/gp-edge-ios-home.png`는 `1179 x 2556`, 나머지 `/tmp/goodspocket-final-{collection,events,my,settings}.png`는 `1178 x 2556`이다.
+- 현재: `/tmp/goodspocket-final-{home,collection,events,my,settings}.png`, 모두 `1178 x 2556`이다.
 - Pillow Lanczos로 양쪽을 `393 x 852` RGB로 정규화했다. Home 참조는 `853 x 1844`, 나머지 저장소 참조는 이미 정규화된 이미지다.
 - 재현 산출물: 무시된 `build/visual-comparison/remaining/`의 `measure.py`, `measurements.json`, 화면별 `*-reference.png`, `*-current.png`, `*-pair.png`. JSON에 입력 경로, 원본 크기와 SHA-256을 기록했다. `python3 build/visual-comparison/remaining/measure.py`로 재실행하며 Pillow와 NumPy가 필요하다. 원본 임시 캡처도 필요하다.
 - 표의 bounds는 양 끝을 포함한다. 주황 영역은 RGB `R>=245, 90<=G<=140, B<=100`의 4방향 연결요소로 측정했다. 긴 outline 행은 `#EFEDEC`와 채널별 차이 5 이하인 픽셀이 `x=20..374`에서 220개를 초과한 행이다. 단색 마스크 경계는 Compose layout bounds와 같다고 가정하지 않는다.
+- 흐린 테두리는 지정한 좁은 y 구간에서 `x=30..362`의 `#EFEDEC` 최대 채널 차이 중앙값이 가장 낮은 행을 별도 추출했다. `edgeProbes`에 상위 3행과 차이 8 이하 픽셀 수를 남긴다. 이 행은 그림자/안티앨리어싱을 포함할 수 있어 문서의 layout 좌표와 별도로 표시한다.
 
 ## Inset Interpretation
 
@@ -22,16 +23,32 @@
 | --- | --- | --- | --- |
 | Events featured card 수평 outline 행 | top 223, bottom 388..389 | top 255, bottom 420..421 | **통과: 이 표본만** +32 보정 후 일치 |
 | My profile 수평 outline 행 | 90, 209 | 122, 241 | **통과: 이 표본만** +32 보정 후 일치, 외곽 높이 120px |
-| Settings language/format 카드 top | 142, 272 | 142, 272 | **통과: 이 표본만** 같은 행 |
-| Settings 카드 bottom | 212, 392 | 213, 391 | **통과: 이 표본만** 최대 1px 차이 |
-| Settings 선택 주황 마스크 | (195,164)..(277,191) | (195,164)..(276,191) | **통과: 이 마스크만** 오른쪽 1px 차이 |
-| Collection 선택 주황 마스크 | (20,93)..(134,126) | (19,125)..(136,156) | **미통과: 마스크 표본** +32 보정 후 오른쪽/하단 2px 차이. layout와 raster 경계를 추가 구분해야 함 |
+| Settings language/format 카드 top | 142, 272 | 142, 272 | **통과: 이 표본만** 각각 일치 |
+| Settings 카드 bottom | 212, 392 | 213, 391 | **통과: 이 표본만** 각각 +1/-1px |
+| Settings 선택 주황 마스크 | (195,164)..(277,191) | (195,164)..(276,191) | **통과: 이 마스크만** 오른쪽 -1px, y 일치 |
+| Collection 선택 주황 마스크 | (20,93)..(134,126) | (19,127)..(136,158) | **미통과: 마스크 표본** +32 보정 후 top/right +2px, bottom 일치. 외곽 layout와 선택 paint를 구분해야 함 |
 | Events 전체 필터 주황 마스크 | (19,179)..(77,206) | (19,211)..(78,240) | **미통과: 마스크 표본** +32 보정 후 하단 2px 차이. 전체 필터 기하 실패로 확대하지 않음 |
-| Home hero outline 행 | 84, 204 | 113, 232 | **미통과: 위치 표본** +25 보정 뒤 top 4px/bottom 3px 잔여. 크기는 약 120px; 해당 위치 차이의 별도 승인 근거는 확인하지 못함 |
+| Home hero outline 행 | 84, 204 | 110, 229 | **통과: 이 표본만** +25 보정 뒤 top +1px/bottom 0px |
 | Collection 첫 미디어 단색 영역 | 참조 gradient로 동일 마스크 불가 | (17,261)..(127,394) | **미검증** 구조상 3열 첫 카드 유지. 참조 gradient와 native flat gray 차이는 승인된 제외 |
-| My summary/management 전체 bounds | 참조 border가 단색 임계값에서 연속 추출되지 않음 | 일부 border만 추출 | **미검증** 육안으로 그룹 구조는 유지되나 모든 경계 1px 판정 불가 |
+| My summary top/bottom, 흐린 outline probe | 268 / 458..459 | 300..301 / 490..491 | **통과: 행 표본만** +32 보정 후 최대 1px. 문서 layout top269와 현재301은 정확히 +32 |
+| My management top/bottom, 흐린 outline probe | 514 / 724..725 | 548 / 757 또는759 | **미검증: raw 외곽 전체** top은 +32 보정 뒤 +2px지만 문서 layout top515 기준 +1px. bottom759는 그림자 후보이므로 확정 경계로 사용하지 않음 |
+| Collection segment 외곽 top/bottom | 흐린 outline91 / 129, 문서 layout top92 | 124 / 161 | **통과: 행 표본** +32 보정 후 raw top +1px/bottom 0px. 문서 layout 원점과 일치 |
+| Collection search top/bottom | 흐린 outline145..146 / 184..185 | 178 / 216 | **통과: 행 표본** +32 보정 후 top 0..+1px, bottom -1..0px. 문서 layout top146과 일치 |
+| Collection summary top/bottom | 693 / 758 | 685 / 750 | **부분 확인** 모두 -8px 이동, 외곽 길이66px 유지. 하단 navigation에 고정되므로 상단 +32 보정을 적용하지 않음 |
 
-Home 후속 섹션에는 기존에 승인된 16dp 주간격이 적용되어 있어 raw 생성 이미지와 전체 y 이동량이 일정하지 않다. 이를 새 inset 회귀나 추가 허용 오차로 임의 분류하지 않았다. Home hero 위치 잔여와 선택 필터 마스크 잔여는 확인 가능한 차이로 남기며, 전체 경계 재측정 또는 명시적 처리 없이 일치로 표시하지 않는다.
+Home 후속 섹션에는 기존에 승인된 16dp 주간격이 적용되어 있어 raw 생성 이미지와 전체 y 이동량이 일정하지 않다. Summary 외곽은 참조215..312, 현재246..343으로 높이98px는 같지만 +31px 이동한다. 최근 미디어는 현재96dp 계약을 유지하고, Spending 외곽은 현재548..650 부근이다. 원본 Home에는 네 개 summary 지표와 더 짧은 섹션 간격이 있어 모든 후속 y 차이를 하나의 inset 이동으로 제거할 수 없다. 현재 세 지표는 승인된 제품 계약이고 원본의 희망/판매 지표 복원은 수정 대상이 아니다.
+
+## Applied Corrections and Evidence
+
+- **Settings 기본 배율 복원 확인:** `SettingsPageHeader`를 기본 배율에서 고정22dp, 확대 배율에서는 최소22dp로 분리한 후 language/format top은143/273에서142/272로 이동했다. Language bottom214에서213으로 돌아와 참조 대비+1px다. 카드72dp 자체는 줄이지 않았다.
+- **Home header 수정 확인:** Header bottom padding3dp 제거 후 Hero113..232가110..229로 정확히3px 이동했다. 참조+25인109..229 대비+1/0px다. Brand bounds는 수정 전후 모두 y74..91로 유지되어 참조50..65+25 대비-1/+1px다. top padding2dp, bell38dp, 주간격16dp, Hero/summary offset -5dp를 유지했다. 해당 위치 표본은 통과하며 전체 Home 픽셀 통과로 확대하지 않는다.
+- **선택영역 마스크만으로 총크기 변경 금지:** Collection은 `SegmentHeight=38dp`, `SegmentInnerPadding=3dp`여서 paint 높이32dp가 의도대로 나온다. Events는 `FilterHeight=31dp`이고 round-corner raster의 paint 행이 참조보다2px 더 길다. 참조 마스크34px/28px에 맞추려고 각각 컨트롤38dp/31dp를 바꾸면 잠긴 구조와 충돌한다. layout bounds가 먼저이며 마스크 잔여는 미해결 표본으로 남긴다.
+- **My 누적 오차는 실패 확정 아님:** summary/management 문서 원점269/515와 흐린 원본 테두리268/514가 이미1px 다르다. 현재301/548은 문서 원점에 +32를 적용하면0/+1px다. 관리 카드 height210dp를 줄이는 근거는 없다.
+- **Collection 간격 상쇄 수정 확인:** `TitleToSegmentSpacing=16 -> 18dp`, `SearchToCountSpacing=19 -> 17dp` 적용 후 segment 외곽122..159가124..161, search176..214가178..216으로 정확히2px 이동했다. 문서 원점92/146+32와 일치한다. Count glyph는236..246, title glyph는86..101로 수정 전후 동일하며 각각 참조+32 대비0/+1px, -1/-1px다. 독립 grid 원점과38dp/39dp 높이는 유지했다. 선택 paint 마스크 차이는 여전히 별도 잔여다.
+
+## Meaning of the 1px Target
+
+문서에 지정된 layout box는 고정 viewport에서 1px 수준으로 비교할 수 있다. 그러나 생성 참조의 anti-aliased edge, 그림자, 비균일한 필터 paint와 Compose 도형의 모든 픽셀을 동시에1px로 일치시키는 것은 현재 증거로 보장할 수 없다. 예를 들어 My 문서 top515와 원본의 가장 진한 edge514가 다르다. 이것은 임의 오차 확대 승인이 아니라 **layout 계약과 raster 측정의 구분이 필요하다는 증거**다. 안정적으로 정의한 bounds만 항목별 통과로 표시하고 나머지는 미통과/미검증으로 유지한다.
 
 ## Exclusions and Remaining Work
 
@@ -41,3 +58,10 @@ Home 후속 섹션에는 기존에 승인된 16dp 주간격이 적용되어 있�
 - 공통 navigation은 실제 safe area 안에 위치하고 Settings에는 표시되지 않는다. 아이콘/label/quick-add 각각의 전면적인 픽셀 비교는 미검증이다.
 - 시트·다이얼로그, reserved 상태 전체, 다중 행 timeline, 긴 번역·글자 확대·다른 화면 크기의 모든 시각 상태는 이번 5개 캡처에 포함되지 않았다.
 - 실제 장치 조작 없이 기존 PNG를 분석했다. UI 소스·기준 PNG·승인 기록은 변경하지 않았다. 전체 1px 통과나 신규 시각 승인을 선언하지 않는다.
+
+## Final Verification
+
+- 이 감사에서 `measure.py`를 최신 5개 PNG로 재실행하고 모든 side-by-side 산출물을 직접 확인했다. `git diff --check -- docs/validation/visual-audit.md`는 통과했다.
+- 통합 담당자의 최종 실행 결과: `bash ./gradlew :composeApp:allTests`는 Android debug 103개, release 103개, iOS 70개 통과. `:composeApp:ktlintCheck`, `:composeApp:checkArchitecture`, `:composeApp:assembleDebug`도 통과했다.
+- 통합 담당자의 새 Xcode 빌드 및 iOS Maestro Home/Collection/Events/My/Settings 5개 화면 smoke가 통과했고, 이 실행에서 전달된 캡처가 본문의 최종 측정 입력이다. 회전 검증 작업은 `afaa0d4`에 기록되었다. 빌드/기능 테스트 성공을 픽셀 일치의 대체 근거로 사용하지 않았다.
+- 결론: 수정 대상으로 확정한 Home Hero 원점, Collection segment/search 외곽, Settings 기본 배율 카드 원점은 최신 측정 표본에서 1px 목표를 만족한다. 선택 paint 마스크2px, My 흐린 외곽 판정, 전체 icon/glyph/시트/다중 데이터 상태는 별도 미완료 범위로 남는다.

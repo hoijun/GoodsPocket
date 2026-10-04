@@ -39,10 +39,15 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 internal fun SettingsPageHeader(title: String, backLabel: String, onBack: () -> Unit) {
+    val headerHeight = if (LocalDensity.current.fontScale > 1f) {
+        Modifier.heightIn(min = SettingsReferenceMetrics.HeaderHeight)
+    } else {
+        Modifier.height(SettingsReferenceMetrics.HeaderHeight)
+    }
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = SettingsReferenceMetrics.HeaderHeight),
+            .then(headerHeight),
     ) {
         Text(
             text = title,
