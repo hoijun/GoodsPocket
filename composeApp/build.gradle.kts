@@ -1,4 +1,3 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -8,6 +7,13 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.sqldelight)
+    alias(libs.plugins.ktlint)
+}
+
+ktlint {
+    filter {
+        exclude { it.file.path.contains("/build/") }
+    }
 }
 
 ksp {
@@ -32,10 +38,10 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     listOf(
         iosArm64(),
-        iosSimulatorArm64()
+        iosSimulatorArm64(),
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
@@ -44,7 +50,7 @@ kotlin {
             linkerOpts("-lsqlite3")
         }
     }
-    
+
     sourceSets {
         androidMain.dependencies {
             implementation(libs.androidx.activity)
@@ -68,10 +74,14 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.datetime)
             implementation(libs.sqldelight.runtime)
+            implementation(libs.sqldelight.coroutines)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation(libs.kotlinx.coroutines.test)
+        }
+        androidUnitTest.dependencies {
+            implementation(libs.sqldelight.sqlite.driver)
         }
         val iosArm64Main by getting {
             dependencies {
@@ -125,6 +135,73 @@ dependencies {
     debugImplementation(libs.compose.uiTooling)
 }
 
-tasks.matching { it.name.startsWith("ksp") && it.name != "kspCommonMainKotlinMetadata" }.configureEach {
+tasks.matching {
+    it.name.startsWith("ksp") && it.name != "kspCommonMainKotlinMetadata"
+}.configureEach {
     dependsOn("kspCommonMainKotlinMetadata")
 }
+
+abstract class CheckArchitecture : DefaultTask() {
+    @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val sources: DirectoryProperty
+
+    @TaskAction
+    fun checkSources() {
+        val root = sources.get().asFile
+        val violations = mutableListOf<String>()
+        val importPattern = Regex("^import\\s+([\\w.*]+)")
+        root.walkTopDown().filter { it.extension == "kt" }.forEach { file ->
+            val path = file.relativeTo(root).invariantSeparatorsPath
+            val lines = file.readLines()
+            if (lines.size > 600) violations += "$path exceeds 600 lines (${lines.size})"
+            lines.forEachIndexed { index, line ->
+                val dependency =
+                    importPattern.find(line)?.groupValues?.get(1) ?: return@forEachIndexed
+                val forbidden = when {
+                    path.startsWith("domain/") -> listOf(
+                        "goods.pocket.app.data.",
+                        "goods.pocket.app.presentation.",
+                        "goods.pocket.app.di.",
+                        "goods.pocket.app.db.",
+                        "goods.pocket.app.i18n.",
+                        "android.",
+                        "androidx.",
+                        "platform.",
+                        "app.cash.sqldelight.",
+                        "org.koin.",
+                        "com.google.firebase.",
+                        "io.github.jan.supabase.",
+                    )
+                    path.startsWith("presentation/") -> listOf(
+                        "goods.pocket.app.data.",
+                        "goods.pocket.app.db.",
+                        "app.cash.sqldelight.",
+                    )
+                    path.startsWith("data/") -> listOf("goods.pocket.app.presentation.")
+                    else -> emptyList()
+                }
+                if (forbidden.any(dependency::startsWith)) {
+                    violations += "$path:${index + 1}: forbidden dependency $dependency"
+                }
+            }
+        }
+        check(violations.isEmpty()) { violations.joinToString("\n") }
+    }
+}
+
+val checkArchitecture by tasks.registering(CheckArchitecture::class) {
+    group = "verification"
+    description = "Checks shared Kotlin layer imports and production file sizes."
+    sources.set(layout.projectDirectory.dir("src/commonMain/kotlin/goods/pocket/app"))
+}
+
+tasks.named("check") {
+    dependsOn(checkArchitecture)
+}
+
+// KSP's manually registered source root still participates in Gradle input validation.
+tasks.matching { it.name.startsWith("runKtlint") && it.name.endsWith("CommonMainSourceSet") }
+    .configureEach {
+        dependsOn("kspCommonMainKotlinMetadata")
+    }
