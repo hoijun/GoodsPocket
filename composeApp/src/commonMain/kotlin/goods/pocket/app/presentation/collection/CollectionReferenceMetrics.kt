@@ -5,7 +5,6 @@ import androidx.compose.ui.unit.sp
 
 internal object CollectionReferenceMetrics {
     val ScreenHorizontalPadding = 16.dp
-    val TopInsetReduction = 32.dp
     val TitleTopPadding = 24.dp
     val TitleLineHeight = 22.sp
     val TitleToSegmentSpacing = 16.dp

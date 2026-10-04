@@ -2,6 +2,10 @@
 
 Read [Product Direction](product-direction.md), [Foundations](foundations.md), [Shared Components](components.md), and [Visual Verification](verification.md) with this file.
 
+## Current Inset Override
+
+The [shared edge-to-edge policy](components.md#current-edge-to-edge-policy) supersedes absolute screen origins and the historical navigation `y=770` lock. Preserve all card/text/internal spacing values; accommodate real safeDrawing insets without claiming a new pixel-verification pass.
+
 ## Approved Reference
 
 - Default local-profile state: `design/references/my/default.png`
@@ -40,9 +44,9 @@ Do not add profile editing, avatar upload, login or account-connect CTA, interes
 | Management title-to-card spacing | `8dp` |
 | Management card | `363 x 210px`, visible top near `515px` |
 | Management row | `70px` high |
-| Bottom-navigation border | shared locked position at `y=770` |
+| Bottom-navigation border | Device-inset-aware; `y=770` is a historical reference measurement |
 
-Content can scroll above the fixed bottom navigation. The Scaffold keeps the bottom inset and reduces only the My top inset by `32dp`.
+Content scrolls above inset-aware bottom navigation. Scaffold preserves safeDrawing insets on all sides and applies/consumes innerPadding once. The former `32dp` top reduction is superseded.
 
 ## Styling And Type
 
@@ -70,11 +74,13 @@ Content can scroll above the fixed bottom navigation. The Scaffold keeps the bot
 - Dynamic profile and summary values, including localized currency punctuation.
 - Non-geometric font rasterization.
 - The generated avatar gradient; the approved implementation uses the required flat `#D7D2CC` placeholder.
-- The generated image places navigation slightly above the shared lock; `y=770` remains authoritative.
+- The generated image's absolute navigation position is historical; current runtime position follows real device insets.
 
 Card grouping, heights, widths, dividers, icon-container types, type hierarchy, shadows, and action affordances are not excluded.
 
-## Verification Evidence
+## Historical Verification Evidence
+
+These captures and results predate the current inset correction. They remain evidence for the earlier implementation and do not certify the corrected screen's absolute positions or pixel tolerance.
 
 - Final iPhone 16 capture normalized to `393 x 852`: `build/visual-comparison/my-final-393x852.png`.
 - Side-by-side reference comparison: `build/visual-comparison/my-final-side-by-side.png`.

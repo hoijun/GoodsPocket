@@ -4,6 +4,10 @@ Read [Product Direction](product-direction.md), [Foundations](foundations.md), [
 
 This document locks the approved Collection references. The owned reference defines shared geometry; the reserved reference defines only state-specific visual content.
 
+## Current Inset Override
+
+Apply the [shared edge-to-edge policy](components.md#current-edge-to-edge-policy). Absolute screen origins and the historical `y=770` navigation measurement yield to real safeDrawing and navigation insets. Grid, card, text and internal spacing contracts are unchanged. This correction has not established a new full pixel-verification pass.
+
 ## Approved Reference
 
 - Owned state: `design/references/collection/owned.png`
@@ -45,7 +49,7 @@ All values below are measured in the normalized `393 x 852` reference. A `1px` m
 | First-row media height | `135px` |
 | Grid row gap | `11px` |
 | Summary band | `16, 694, 361 x 66` |
-| Bottom navigation top border | `770px` |
+| Bottom navigation top border | Device-inset-aware; `770px` is a historical reference measurement |
 | Bottom navigation | `82px` high including home-indicator region |
 | Center quick-add | approximately `40px` diameter at `176, 776` |
 
@@ -121,7 +125,9 @@ Letter spacing is `0` for every Collection text style.
 
 Card bounds, grid tracks, search and segment geometry, summary position, type size, line height, borders, shadows, and bottom-navigation position are not excluded.
 
-## Verification Evidence
+## Historical Verification Evidence
+
+These measurements predate the current inset correction. Keep them as previous comparison evidence, not a universal positioning requirement or validation of the corrected layout.
 
 The owned and reserved implementations were captured from the fixed iPhone 16 simulator and normalized to `393 x 852`.
 

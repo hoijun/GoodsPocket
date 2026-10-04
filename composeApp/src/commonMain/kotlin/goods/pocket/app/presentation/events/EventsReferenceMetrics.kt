@@ -6,7 +6,6 @@ import androidx.compose.ui.unit.sp
 internal object EventsReferenceMetrics {
     val ScreenHorizontalPadding = 19.dp
     val FilterEndPadding = 10.dp
-    val TopInsetReduction = 32.dp
     val PageTitleTopPadding = 29.dp
     val PageTitleFontSize = 18.sp
     val PageTitleLineHeight = 22.sp

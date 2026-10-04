@@ -5,7 +5,6 @@ import androidx.compose.ui.unit.sp
 
 internal object MyReferenceMetrics {
     val ScreenHorizontalPadding = 15.dp
-    val TopInsetReduction = 32.dp
     val PageTitleTopPadding = 27.dp
     val PageTitleFontSize = 18.sp
     val PageTitleLineHeight = 22.sp

@@ -35,7 +35,7 @@ class ImageLockedMetricsContractTest {
         assertEquals(38.dp, ImageLockedNavigationMetrics.QuickAddDiameter)
         assertEquals(4.dp, ImageLockedNavigationMetrics.QuickAddTopPadding)
         assertEquals(0.5.dp, ImageLockedNavigationMetrics.QuickAddShadowElevation)
-        assertEquals((-13).dp, ImageLockedNavigationMetrics.ItemVerticalOffset)
+        assertEquals(56.dp, ImageLockedNavigationMetrics.ContentMinHeight)
         assertEquals(9.sp, ImageLockedNavigationMetrics.LabelFontSize)
         assertEquals(24.dp, ImageLockedNavigationMetrics.IconSize)
     }
@@ -43,7 +43,6 @@ class ImageLockedMetricsContractTest {
     @Test
     fun `collection owned reference metrics keep the approved grid geometry`() {
         assertEquals(16.dp, CollectionReferenceMetrics.ScreenHorizontalPadding)
-        assertEquals(32.dp, CollectionReferenceMetrics.TopInsetReduction)
         assertEquals(16.dp, CollectionReferenceMetrics.TitleToSegmentSpacing)
         assertEquals(38.dp, CollectionReferenceMetrics.SegmentHeight)
         assertEquals(39.dp, CollectionReferenceMetrics.SearchHeight)
@@ -82,7 +81,6 @@ class ImageLockedMetricsContractTest {
     @Test
     fun `my reference metrics keep the approved profile and summary geometry`() {
         assertEquals(15.dp, MyReferenceMetrics.ScreenHorizontalPadding)
-        assertEquals(32.dp, MyReferenceMetrics.TopInsetReduction)
         assertEquals(27.dp, MyReferenceMetrics.PageTitleTopPadding)
         assertEquals(13.dp, MyReferenceMetrics.TitleToProfileSpacing)
         assertEquals(120.dp, MyReferenceMetrics.ProfileCardHeight)

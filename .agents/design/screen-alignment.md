@@ -8,7 +8,7 @@ Read [Product Direction](product-direction.md), [Foundations](foundations.md), [
 - Create presentation models only when a real visual mapping is required.
 - Reuse verified colors, surface behavior, typography weights, media fallback, and shared navigation.
 - Measure each screen's card width, height, padding, type size, and row rhythm from its own reference.
-- Do not apply Home's destination-specific top inset or glyph transforms to other screens.
+- Use the shared real-device inset policy for every screen; do not restore historical destination-specific top reductions. Do not copy Home's glyph transforms to other screens.
 - Keep primary workflows operational while changing visual composition.
 
 ## Collection

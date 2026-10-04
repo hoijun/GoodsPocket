@@ -2,6 +2,10 @@
 
 Read [Product Direction](product-direction.md), [Foundations](foundations.md), [Shared Components](components.md), and [Visual Verification](verification.md) with this file.
 
+## Current Inset Override
+
+The [shared edge-to-edge policy](components.md#current-edge-to-edge-policy) supersedes absolute screen origins and historical navigation `y=770`. Preserve internal card/filter/timeline/text metrics while respecting real safeDrawing insets. This source-policy correction does not establish a new pixel-verification pass.
+
 ## Approved Reference
 
 - Default state: `design/references/events/default.png`
@@ -35,7 +39,7 @@ Do not add calendar navigation or grid, search, sort, favorite, RSVP, notificati
 | Timeline title | starts at `19, 416` |
 | Timeline card | `19, 441, 355 x 132` |
 | Timeline row | `66px` high |
-| Bottom-navigation border | shared locked position at `y=770` |
+| Bottom-navigation border | Device-inset-aware; `y=770` is a historical reference measurement |
 | Center quick add | shared `38px` action at about `176, 776` |
 
 Additional domain rows scroll above the fixed bottom navigation.
@@ -67,11 +71,13 @@ Additional domain rows scroll above the fixed bottom navigation.
 - Status-bar glyph rasterization and Dynamic Island.
 - Dynamic domain copy, count, month, and date formatting.
 - Non-geometric font rasterization.
-- The generated Events image placed shared navigation `10px` too high; the approved shared Home/Collection navigation geometry is authoritative.
+- The generated Events image placed shared navigation `10px` above the historical Home/Collection baseline. Current navigation placement follows the shared device-inset policy, not either absolute y coordinate.
 
-Card bounds, filter geometry, type scale, padding, dividers, borders, shadows, and navigation position are not excluded.
+Card bounds, filter geometry, type scale, internal padding, dividers, borders and shadows remain comparison targets. Record the device-inset coordinate adjustment separately when evaluating absolute screen and navigation positions.
 
-## Verification Evidence
+## Historical Verification Evidence
+
+The following captures and measurements predate the current inset correction. Their absolute y positions are historical and do not certify the corrected layout's pixel tolerance.
 
 The final implementation was captured from the fixed iPhone 16 simulator and normalized to `393 x 852`.
 

@@ -46,6 +46,7 @@
 - Reuse design-system colors, typography, shapes, spacing, layouts, and components instead of duplicating values.
 - Keep reusable UI primitives in `presentation/designsystem` or `presentation/component` according to responsibility.
 - Do not mix feature-specific business behavior into design-system components.
+- Preserve root Scaffold safeDrawing insets on all sides and apply/consume innerPadding once. Bottom navigation draws its background edge-to-edge while keeping interactive content inside actual system-bar/cutout insets. Do not restore fixed device-specific top reductions or navigation offsets from historical captures.
 
 ## Localization
 

@@ -10,13 +10,20 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -191,24 +198,26 @@ fun GoodsPocketImageLockedBottomBar(
     onSelectDestination: (AppDestination) -> Unit,
     onQuickAdd: () -> Unit,
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(81.dp),
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(0.dp),
+        color = Color(GoodsPocketVisualTokens.BACKGROUND),
+        tonalElevation = 0.dp,
+        shadowElevation = 0.dp,
+        border = BorderStroke(1.dp, Color(0xFFF3F0EE)),
     ) {
-        Surface(
+        // Paint behind the system bars, but keep every control inside the safe area.
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(81.dp)
-                .align(Alignment.BottomCenter),
-            shape = RoundedCornerShape(0.dp),
-            color = Color(GoodsPocketVisualTokens.BACKGROUND),
-            tonalElevation = 0.dp,
-            shadowElevation = 0.dp,
-            border = BorderStroke(1.dp, Color(0xFFF3F0EE)),
+                .windowInsetsPadding(
+                    WindowInsets.systemBars.union(WindowInsets.displayCutout)
+                        .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),
+                ),
         ) {
             Row(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxWidth()
+                    .heightIn(min = ImageLockedNavigationMetrics.ContentMinHeight),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 AppDestination.primaryDestinations.forEachIndexed { index, destination ->
@@ -225,13 +234,13 @@ fun GoodsPocketImageLockedBottomBar(
                     )
                 }
             }
+            GoodsPocketCenteredQuickAddButton(
+                onClick = onQuickAdd,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = ImageLockedNavigationMetrics.QuickAddTopPadding),
+            )
         }
-        GoodsPocketCenteredQuickAddButton(
-            onClick = onQuickAdd,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = ImageLockedNavigationMetrics.QuickAddTopPadding),
-        )
     }
 }
 
@@ -274,10 +283,7 @@ private fun RowScope.GoodsPocketImageLockedBottomBarItem(
     Column(
         modifier = Modifier
             .weight(1f)
-            .offset(
-                x = destination.referenceBottomNavOffset(),
-                y = ImageLockedNavigationMetrics.ItemVerticalOffset,
-            )
+            .offset(x = destination.referenceBottomNavOffset())
             .selectable(
                 selected = selected,
                 onClick = onClick,

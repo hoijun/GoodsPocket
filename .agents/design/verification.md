@@ -10,6 +10,8 @@ Use this process for every screen that has a saved reference image.
 - System status-bar differences, Dynamic Island, dynamic domain values, and intentionally gray media placeholders may be excluded only when explicitly documented.
 - All other geometry has a target tolerance of `1px` after normalization.
 
+The user-approved [edge-to-edge policy](components.md#current-edge-to-edge-policy) supersedes historical absolute viewport positions. Record actual safeDrawing and bottom-navigation insets for each capture and distinguish the resulting coordinate translation from changes to card/text/internal geometry. Do not force `y=770`, a fixed `81dp` bottom bar, negative top padding, or a `-13dp` navigation offset to match an old capture. Unchanged source values alone do not prove the corrected layout passes the `1px` target.
+
 ## Iteration Process
 
 1. Capture the current screen in the same simulator and normalize it to `393 x 852`.
@@ -43,4 +45,4 @@ Do not redesign from memory. Do not copy Home dimensions blindly to another scre
 - Recent image area is `96dp` high.
 - Spending chart normalized bounding box matches the reference within `1px`.
 - Schedule second row and bottom border are visible above bottom navigation.
-- Shared bottom navigation starts at the same normalized y coordinate as the reference.
+- Shared bottom navigation keeps interactive content clear of actual system bars/cutouts. Compare internal navigation metrics separately from the documented device-inset difference in its absolute y position.

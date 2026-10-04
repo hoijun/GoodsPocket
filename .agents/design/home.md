@@ -4,6 +4,10 @@ This document records the values verified against the Home reference. It overrid
 
 Reference: `/Users/Hoijun/Downloads/ChatGPT Image 2026년 4월 19일 오후 11_37_28.png`
 
+## Current Inset Override
+
+Apply the [shared edge-to-edge policy](components.md#current-edge-to-edge-policy). Historical absolute positions below do not override real safe areas. Internal card/text metrics and colors remain unchanged; screen translation caused by correct device insets is intentional. This source-policy correction is not a new pixel-verification pass.
+
 Read [Visual Verification](verification.md) before comparing or declaring Home complete.
 
 ## Locked Colors
@@ -57,11 +61,11 @@ Never use the old `3dp` or `4dp` card elevation on Home. Do not stack a border, 
 | Schedule thumbnail | `40dp`, `10dp` radius |
 | Schedule content | `7 + 40 + 14 + 40 + 7dp` vertical rhythm |
 | Schedule horizontal padding | `11dp` |
-| Bottom navigation | `81dp` high |
+| Bottom navigation | Interactive content at least `56dp`, plus real system/cutout bottom inset |
 | Bottom nav icon canvas | `24dp` |
 | Center quick-add | `38dp` diameter |
 
-The Home Scaffold keeps its bottom inset unchanged and reduces only the Home top inset by `25dp`. This is destination-specific. Collection, Events, My, and Settings retain their own insets until measured against their references.
+Home preserves Scaffold safeDrawing insets on all sides and applies/consumes innerPadding once. The former `25dp` top reduction is superseded. Bottom navigation uses the shared inset-aware sizing policy rather than a fixed total height.
 
 The `16dp` main spacing is the approved Home adjustment between top-level sections. Keep section-internal title-to-content spacing at `8dp`; do not apply the `16dp` value inside cards or section components, and do not copy it to other screens without measuring their references.
 

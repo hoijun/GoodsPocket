@@ -1,9 +1,11 @@
 package goods.pocket.app.presentation
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -13,21 +15,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import goods.pocket.app.domain.collection.CollectionEntryStatus
-import goods.pocket.app.presentation.collection.CollectionReferenceMetrics
 import goods.pocket.app.presentation.collection.CollectionRoute
 import goods.pocket.app.presentation.designsystem.GoodsPocketImageLockedBottomBar
 import goods.pocket.app.presentation.designsystem.goodsPocketChromeFor
-import goods.pocket.app.presentation.events.EventsReferenceMetrics
 import goods.pocket.app.presentation.events.EventsRoute
 import goods.pocket.app.presentation.home.HomeAction
 import goods.pocket.app.presentation.home.HomeRoute
 import goods.pocket.app.presentation.i18n.ProvideLocalizedResources
-import goods.pocket.app.presentation.my.MyReferenceMetrics
 import goods.pocket.app.presentation.my.MyRoute
 import goods.pocket.app.presentation.navigation.AppDestination
 import goods.pocket.app.presentation.settings.SettingsRoute
@@ -59,6 +57,7 @@ fun GoodsPocketApp(factory: PresentationSessionFactory = koinInject()) {
         val chrome = goodsPocketChromeFor(shell.destination)
         Scaffold(
             containerColor = MaterialTheme.colorScheme.background,
+            contentWindowInsets = WindowInsets.safeDrawing,
             bottomBar = {
                 if (chrome.showBottomBar) {
                     GoodsPocketImageLockedBottomBar(
@@ -88,7 +87,11 @@ fun GoodsPocketApp(factory: PresentationSessionFactory = koinInject()) {
                 }
             },
         ) { innerPadding ->
-            Box(Modifier.fillMaxSize().padding(screenPadding(shell.destination, innerPadding))) {
+            Box(
+                Modifier.fillMaxSize()
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding),
+            ) {
                 when (shell.destination) {
                     AppDestination.Home -> HomeRoute(session.home) { session.handleHomeAction(it) }
                     AppDestination.Collection -> CollectionRoute(session.collection) {
@@ -106,20 +109,6 @@ fun GoodsPocketApp(factory: PresentationSessionFactory = koinInject()) {
         }
         GoodsPocketOverlays(session)
     }
-}
-
-private fun screenPadding(destination: AppDestination, inner: PaddingValues): PaddingValues {
-    val reduction = when (destination) {
-        AppDestination.Home -> 25.dp
-        AppDestination.Collection -> CollectionReferenceMetrics.TopInsetReduction
-        AppDestination.Events -> EventsReferenceMetrics.TopInsetReduction
-        AppDestination.My -> MyReferenceMetrics.TopInsetReduction
-        AppDestination.Settings -> return inner
-    }
-    return PaddingValues(
-        top = (inner.calculateTopPadding() - reduction).coerceAtLeast(0.dp),
-        bottom = inner.calculateBottomPadding(),
-    )
 }
 
 private fun PresentationSession.handleHomeAction(action: HomeAction) {

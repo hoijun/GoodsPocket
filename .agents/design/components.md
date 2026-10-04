@@ -68,6 +68,14 @@ For a `View all` action, use text plus a separate thin chevron icon rather than 
 
 ## Navigation
 
+### Current Edge-to-Edge Policy
+
+The user-approved inset correction supersedes historical absolute screen coordinates and device-specific inset reductions. Root Scaffold uses `WindowInsets.safeDrawing` on all sides; content applies and consumes its `innerPadding` once. Do not subtract `25dp` or `32dp` from the top inset.
+
+The custom bottom Surface draws its background edge-to-edge. Its interactive content has a minimum height of `56dp` plus the real horizontal/bottom insets from `systemBars.union(displayCutout)`. Do not restore a fixed `81dp` total height or the old `-13dp` vertical content offset. Keep icons, labels and quick-add clear of system gestures and cutouts.
+
+Cards, text, colors and screen-internal metrics retain their contracts. The screen's absolute position and navigation border can shift with real device insets; historical `y=770` measurements are not universal runtime coordinates. Existing reference approvals and captures remain historical evidence, not proof that the new inset policy has passed pixel comparison.
+
 Bottom navigation must feel stable, simple, and obvious. Use legible rounded line icons or simple filled symbols with labels.
 
 Keep one centered orange quick-add action. It may be slightly more playful than surrounding controls, but must retain the same visual system. Avoid oversized FABs, competing floating actions, or commerce-style promotional treatment.

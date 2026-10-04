@@ -2,6 +2,10 @@
 
 Read [Product Direction](product-direction.md), [Foundations](foundations.md), [Shared Components](components.md), and [Visual Verification](verification.md) with this file.
 
+## Current Inset Override
+
+Apply the [shared edge-to-edge policy](components.md#current-edge-to-edge-policy): preserve and consume Scaffold safeDrawing padding on all sides. Settings still has no bottom navigation; its content must nevertheless respect the real bottom and horizontal safe areas. Internal card/text metrics are unchanged. Absolute reference positions are historical, not a new pixel-verification claim.
+
 ## Approved Reference
 
 - Default Korean-preference state: `design/references/settings/default.png`
@@ -39,7 +43,7 @@ Do not add notifications, marketing consent, backup, restore, reset, theme, font
 | Format icon container | `31px`, starts near `32px` layout x |
 | Format row text | visual x near `81px` |
 
-Settings uses the normal Scaffold top inset and has no bottom bar inset. Content can scroll when localization or font scaling requires it.
+Settings uses normal Scaffold safeDrawing insets on all sides and has no bottom-navigation height added. Content can scroll when localization or font scaling requires it.
 
 ## Styling And Type
 
@@ -70,7 +74,9 @@ Settings uses the normal Scaffold top inset and has no bottom bar inset. Content
 
 App-bar structure, grouped-card bounds, segmented-control bounds, row heights, divider placement, icon-container type, card shadow, outlines, and action affordances are not excluded.
 
-## Verification Evidence
+## Historical Verification Evidence
+
+These captures and results predate the current inset correction and do not certify its absolute positions or pixel tolerance.
 
 - Final iPhone 16 capture normalized to `393 x 852`: `build/visual-comparison/settings-final-393x852.png`.
 - Side-by-side comparison: `build/visual-comparison/settings-final-side-by-side.png`.
