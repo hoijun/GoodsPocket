@@ -34,12 +34,24 @@ class FontScalingContractTest {
     fun formActionsAndHeadersDoNotClipScaledText() {
         listOf(
             "QuickAddReferenceComponents.kt" to 46,
-            "CollectionEntryEditorSheet.kt" to 44,
-            "EventEditorSheet.kt" to 44,
+            "CollectionEntryEditorSheet.kt" to 42,
+            "EventEditorSheet.kt" to 42,
         ).forEach { (file, height) ->
             val source = source("component/$file")
             assertTrue(source.contains(".heightIn(min = $height.dp)"), file)
             assertFalse(source.contains("Box(Modifier.fillMaxWidth().height("), file)
+        }
+    }
+
+    @Test
+    fun editorActionPaintKeepsReferenceSpacingWithoutDisablingMinimumTouchTargets() {
+        listOf(
+            "CollectionEntryEditorSheet.kt" to 11,
+            "EventEditorSheet.kt" to 21,
+        ).forEach { (file, bottomPadding) ->
+            val source = source("component/$file")
+            assertTrue(source.contains("bottom = $bottomPadding.dp"), file)
+            assertFalse(source.contains("LocalMinimumInteractiveComponentSize"), file)
         }
     }
 

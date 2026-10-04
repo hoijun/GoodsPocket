@@ -237,8 +237,8 @@ fun EventEditorSheet(
                     start = 20.dp,
                     end = 20.dp,
                     top = 8.dp,
-                    bottom = 23.dp,
-                ).heightIn(min = 44.dp),
+                    bottom = 21.dp,
+                ).heightIn(min = 42.dp),
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = EventEditorOrange,

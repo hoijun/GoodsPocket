@@ -4,14 +4,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 internal object CollectionDetailReferenceMetrics {
-    val SheetHeight = 606.dp
+    val SheetHeight = 602.dp
     val SheetCornerRadius = 24.dp
     val HeaderHeight = 40.dp
     val CloseIconSize = 16.dp
-    val HorizontalPadding = 28.dp
+    val HorizontalPadding = 29.dp
     val MediaHeight = 257.dp
     val MediaCornerRadius = 8.dp
-    val MediaContentGap = 12.dp
+    val MediaContentGap = 8.dp
     val BadgeTitleGap = 10.dp
     val TitleSubtitleGap = 3.dp
     val TitleMetadataGap = 15.dp

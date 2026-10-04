@@ -22,10 +22,10 @@ class CollectionDetailVisualContractTest {
             )
             .readText()
 
-        assertTrue(metricsSource.contains("SheetHeight = 606.dp"))
-        assertTrue(metricsSource.contains("HorizontalPadding = 28.dp"))
+        assertTrue(metricsSource.contains("SheetHeight = 602.dp"))
+        assertTrue(metricsSource.contains("HorizontalPadding = 29.dp"))
         assertTrue(metricsSource.contains("MediaHeight = 257.dp"))
-        assertTrue(metricsSource.contains("MediaContentGap = 12.dp"))
+        assertTrue(metricsSource.contains("MediaContentGap = 8.dp"))
         assertTrue(metricsSource.contains("CloseIconSize = 16.dp"))
         assertTrue(metricsSource.contains("BadgeTitleGap = 10.dp"))
         assertTrue(metricsSource.contains("TitleSubtitleGap = 3.dp"))

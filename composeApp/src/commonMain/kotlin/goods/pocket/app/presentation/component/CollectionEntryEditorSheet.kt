@@ -267,8 +267,8 @@ fun CollectionEntryEditorSheet(
                     start = 20.dp,
                     end = 20.dp,
                     top = 8.dp,
-                    bottom = 13.dp,
-                ).heightIn(min = 44.dp),
+                    bottom = 11.dp,
+                ).heightIn(min = 42.dp),
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = EditorOrange,
