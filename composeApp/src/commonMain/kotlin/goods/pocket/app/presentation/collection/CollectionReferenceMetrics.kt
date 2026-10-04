@@ -10,6 +10,8 @@ internal object CollectionReferenceMetrics {
     val TitleToSegmentSpacing = 18.dp
     val SegmentHeight = 38.dp
     val SegmentInnerPadding = 3.dp
+    val SelectionPaintHorizontalInset = 1.5.dp
+    val SelectionPaintVerticalInset = 2.dp
     val SegmentFontSize = 13.sp
     val SegmentLineHeight = 16.sp
     val SegmentToSearchSpacing = 16.dp

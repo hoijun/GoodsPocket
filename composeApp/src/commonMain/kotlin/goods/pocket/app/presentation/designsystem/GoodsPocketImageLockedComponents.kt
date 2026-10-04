@@ -40,6 +40,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -337,12 +338,13 @@ private fun GoodsPocketBottomNavIcon(destination: AppDestination, selected: Bool
     } else {
         MaterialTheme.colorScheme.onSurfaceVariant
     }
-    val stroke = Stroke(width = 3.2f)
     Canvas(
         modifier = Modifier
             .offset(y = destination.referenceBottomNavIconOffset())
             .size(ImageLockedNavigationMetrics.IconSize),
     ) {
+        val strokeWidth = NavigationIconDrawingMetrics.StrokeWidth.toPx()
+        val stroke = Stroke(width = strokeWidth)
         when (destination) {
             AppDestination.Home -> {
                 val roof = Path().apply {
@@ -380,19 +382,19 @@ private fun GoodsPocketBottomNavIcon(destination: AppDestination, selected: Bool
                     color = color,
                     start = Offset(size.width * 0.18f, size.height * 0.30f),
                     end = Offset(size.width * 0.50f, size.height * 0.47f),
-                    strokeWidth = 3.2f,
+                    strokeWidth = strokeWidth,
                 )
                 drawLine(
                     color = color,
                     start = Offset(size.width * 0.82f, size.height * 0.30f),
                     end = Offset(size.width * 0.50f, size.height * 0.47f),
-                    strokeWidth = 3.2f,
+                    strokeWidth = strokeWidth,
                 )
                 drawLine(
                     color = color,
                     start = Offset(size.width * 0.50f, size.height * 0.47f),
                     end = Offset(size.width * 0.50f, size.height * 0.86f),
-                    strokeWidth = 3.2f,
+                    strokeWidth = strokeWidth,
                 )
             }
             AppDestination.Events -> {
@@ -400,51 +402,72 @@ private fun GoodsPocketBottomNavIcon(destination: AppDestination, selected: Bool
                     color = color,
                     topLeft = Offset(size.width * 0.18f, size.height * 0.24f),
                     size = Size(size.width * 0.64f, size.height * 0.58f),
-                    cornerRadius = CornerRadius(5f, 5f),
+                    cornerRadius = CornerRadius(NavigationIconDrawingMetrics.CornerRadius.toPx()),
                     style = stroke,
                 )
                 drawLine(
                     color = color,
                     start = Offset(size.width * 0.18f, size.height * 0.42f),
                     end = Offset(size.width * 0.82f, size.height * 0.42f),
-                    strokeWidth = 3.2f,
+                    strokeWidth = strokeWidth,
                 )
                 drawLine(
                     color = color,
                     start = Offset(size.width * 0.34f, size.height * 0.14f),
                     end = Offset(size.width * 0.34f, size.height * 0.30f),
-                    strokeWidth = 3.2f,
+                    strokeWidth = strokeWidth,
                 )
                 drawLine(
                     color = color,
                     start = Offset(size.width * 0.66f, size.height * 0.14f),
                     end = Offset(size.width * 0.66f, size.height * 0.30f),
-                    strokeWidth = 3.2f,
+                    strokeWidth = strokeWidth,
                 )
             }
             AppDestination.My -> {
+                val headCenter = if (selected) Offset(0.44f, 0.39f) else Offset(0.50f, 0.28f)
+                val headRadius = if (selected) 0.175f else 0.16f
                 drawCircle(
                     color = color,
-                    radius = size.minDimension * 0.16f,
-                    center = Offset(size.width * 0.50f, size.height * 0.28f),
-                    style = stroke,
+                    radius = size.minDimension * headRadius,
+                    center = Offset(size.width * headCenter.x, size.height * headCenter.y),
+                    style = if (selected) Fill else stroke,
                 )
                 val shoulders = Path().apply {
-                    moveTo(size.width * 0.22f, size.height * 0.84f)
-                    cubicTo(
-                        size.width * 0.28f,
-                        size.height * 0.60f,
-                        size.width * 0.72f,
-                        size.height * 0.60f,
-                        size.width * 0.78f,
-                        size.height * 0.84f,
-                    )
+                    if (selected) {
+                        moveTo(size.width * 0.125f, size.height * 0.96f)
+                        cubicTo(
+                            size.width * 0.125f,
+                            size.height * 0.52f,
+                            size.width * 0.75f,
+                            size.height * 0.52f,
+                            size.width * 0.75f,
+                            size.height * 0.96f,
+                        )
+                    } else {
+                        moveTo(size.width * 0.22f, size.height * 0.84f)
+                        cubicTo(
+                            size.width * 0.28f,
+                            size.height * 0.60f,
+                            size.width * 0.72f,
+                            size.height * 0.60f,
+                            size.width * 0.78f,
+                            size.height * 0.84f,
+                        )
+                    }
+                    if (selected) close()
                 }
-                drawPath(path = shoulders, color = color, style = stroke)
+                drawPath(path = shoulders, color = color, style = if (selected) Fill else stroke)
             }
             AppDestination.Settings -> Unit
         }
     }
+}
+
+internal object NavigationIconDrawingMetrics {
+    // Preserve the approved 3x capture while keeping logical widths stable on other displays.
+    val StrokeWidth = (3.2f / 3f).dp
+    val CornerRadius = (5f / 3f).dp
 }
 
 @Composable

@@ -109,7 +109,7 @@ private fun CollectionSegmentedControl(
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(CollectionReferenceMetrics.SegmentInnerPadding),
+                .padding(horizontal = CollectionReferenceMetrics.SegmentInnerPadding),
         ) {
             options.forEachIndexed { index, option ->
                 val selected = selectedIndex == index
@@ -118,16 +118,6 @@ private fun CollectionSegmentedControl(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
-                        .clip(RoundedCornerShape(CollectionReferenceMetrics.SelectedSegmentRadius))
-                        .background(
-                            if (selected) {
-                                Color(
-                                    GoodsPocketVisualTokens.PRIMARY,
-                                )
-                            } else {
-                                Color.Transparent
-                            },
-                        )
                         .selectable(
                             selected = selected,
                             onClick = { onSelectedIndexChange(index) },
@@ -137,6 +127,22 @@ private fun CollectionSegmentedControl(
                         ),
                     contentAlignment = Alignment.Center,
                 ) {
+                    if (selected) {
+                        Surface(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .padding(
+                                    horizontal =
+                                    CollectionReferenceMetrics.SelectionPaintHorizontalInset,
+                                    vertical =
+                                    CollectionReferenceMetrics.SelectionPaintVerticalInset,
+                                ),
+                            shape = RoundedCornerShape(
+                                CollectionReferenceMetrics.SelectedSegmentRadius,
+                            ),
+                            color = Color(GoodsPocketVisualTokens.PRIMARY),
+                        ) {}
+                    }
                     Text(
                         text = option,
                         color = if (selected) Color.White else Color(GoodsPocketVisualTokens.INK),

@@ -141,13 +141,35 @@ private fun EventsFilterRow(labels: List<String>, selectedIndex: Int, onSelected
                 modifier = Modifier
                     .weight(weights.getOrElse(index) { 60f })
                     .height(EventsReferenceMetrics.FilterHeight),
-                shape = RoundedCornerShape(16.dp),
-                color = if (selected) EventsColors.Primary else EventsColors.Card,
+                shape = if (selected) {
+                    RoundedCornerShape(EventsReferenceMetrics.SelectionPaintRadius)
+                } else {
+                    RoundedCornerShape(16.dp)
+                },
+                color = if (selected) Color.Transparent else EventsColors.Card,
                 contentColor = if (selected) Color.White else EventsColors.Muted,
                 border = if (selected) null else BorderStroke(1.dp, EventsColors.Outline),
-                shadowElevation = EventsReferenceMetrics.CardShadowElevation,
+                shadowElevation = if (selected) {
+                    0.dp
+                } else {
+                    EventsReferenceMetrics.CardShadowElevation
+                },
             ) {
                 Box(contentAlignment = Alignment.Center) {
+                    if (selected) {
+                        Surface(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .padding(
+                                    horizontal =
+                                    EventsReferenceMetrics.SelectionPaintHorizontalInset,
+                                    vertical = EventsReferenceMetrics.SelectionPaintVerticalInset,
+                                ),
+                            shape = RoundedCornerShape(EventsReferenceMetrics.SelectionPaintRadius),
+                            color = EventsColors.Primary,
+                            shadowElevation = EventsReferenceMetrics.CardShadowElevation,
+                        ) {}
+                    }
                     Text(
                         text = label,
                         fontSize = EventsReferenceMetrics.FilterFontSize,

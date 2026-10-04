@@ -23,6 +23,9 @@ internal object EventsReferenceMetrics {
     val CountLineHeight = 15.sp
     val OverviewToFilterSpacing = 23.dp
     val FilterHeight = 31.dp
+    val SelectionPaintHorizontalInset = 0.5.dp
+    val SelectionPaintVerticalInset = 1.dp
+    val SelectionPaintRadius = 11.5.dp
     val FilterSpacing = 7.dp
     val FilterFontSize = 11.sp
     val FilterLineHeight = 14.sp
