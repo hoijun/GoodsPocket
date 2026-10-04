@@ -32,7 +32,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -74,7 +74,7 @@ fun EventEditorSheet(
     onDismiss: () -> Unit,
     onSave: (String, String, EventType) -> Unit,
 ) {
-    var draft by remember(event.id) {
+    var draft by rememberSaveable(event.id, stateSaver = EventDraftSaver) {
         mutableStateOf(EventDraft(event.title, event.targetDate, event.eventType))
     }
     val density = LocalDensity.current

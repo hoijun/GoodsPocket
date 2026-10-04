@@ -33,7 +33,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -97,7 +97,9 @@ fun CollectionEntryEditorSheet(
         String,
     ) -> Unit,
 ) {
-    var draft by remember(entry.id) { mutableStateOf(collectionEditorDraft(entry)) }
+    var draft by rememberSaveable(entry.id, stateSaver = CollectionDraftSaver) {
+        mutableStateOf(collectionEditorDraft(entry))
+    }
     val density = LocalDensity.current
     val windowHeight = LocalWindowInfo.current.containerSize.height
     val keyboardHeight = WindowInsets.ime.getBottom(density)

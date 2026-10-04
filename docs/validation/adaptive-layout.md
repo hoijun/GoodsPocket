@@ -30,7 +30,7 @@ The iPhone 16 / iOS 18.6 simulator Xcode Debug build also passed (`/tmp/gp-adapt
 
 ## Remaining Issues and Limits
 
-- Rotation recreates the Android Activity and returns navigation to Home. Current session and editor drafts are composition-owned, so unsaved state is not guaranteed across recreation. This is a separate state-restoration issue, not fixed by sizing changes.
+- Rotation state loss was fixed in the subsequent [Activity recreation change](activity-recreation.md), with native tests for navigation, drafts, duplicate writes and final-owner cancellation. Process-death restoration remains outside that change.
 - All combinations of landscape, font scale 2.0, IME, long translations, and every screen/overlay have not been exhausted. The short-window body can be small because header and actions remain fixed outside the scroll area.
 - No physical Android device or iOS storage-failure scenario was exercised. The 320dp test used an emulator display-size override.
 - The [visual audit](visual-audit.md) retains measured differences and unverified areas. This work does not certify full 1px reference alignment.

@@ -17,7 +17,13 @@ Expose immutable StateFlow backed by private mutable state. Do not maintain a wr
 
 ## Lifetimes
 
-Tab StateHolders belong to the host session and survive tab changes. Editors belong to overlays and dispose on close. Scope creation and cancellation have one explicit owner. Host disposal cancels observations and work; no unowned global scope or scope created on each recomposition.
+Tab StateHolders belong to the host session and survive tab changes. A host-scoped `PresentationSessionViewModel` owns that session with `viewModelScope`. Android Activity recreation reuses the owner, preserving navigation, filters, observers and in-flight commands. Final owner clearing cancels the session and closes its local Koin graph. Do not tie this cleanup to composition disposal or introduce an unowned global scope.
+
+App bootstrap creates the annotated dependency graph in the ViewModel initializer, not in screen composables. `GoodsPocketApp` receives the retained session explicitly. The iOS Compose host supplies its own ViewModelStore owner; Android recreation tests do not prove native iOS host-removal behavior.
+
+Editors belong to overlays. Collection and event drafts use explicit saveable representations, keyed by target ID for existing entries, so Android saved-instance restoration retains unsaved fields without moving drafts into the shell. Closing an overlay discards its draft. Initial repository observation must not overwrite a restored draft.
+
+This lifetime contract covers tab changes and Activity configuration recreation, not process-death restoration. The shell destination and overlay are not persisted across a new process; persisted collection/event data remains in the repository.
 
 ## Commands and Failures
 

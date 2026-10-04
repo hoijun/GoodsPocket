@@ -12,8 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -31,13 +29,9 @@ import goods.pocket.app.presentation.navigation.AppDestination
 import goods.pocket.app.presentation.settings.SettingsRoute
 import goods.pocket.app.presentation.state.ActiveDetail
 import goods.pocket.app.presentation.state.CollectionSegment
-import org.koin.compose.koinInject
 
 @Composable
-fun GoodsPocketApp(factory: PresentationSessionFactory = koinInject()) {
-    val parentScope = rememberCoroutineScope()
-    val session = remember(factory, parentScope) { factory.create(parentScope) }
-    DisposableEffect(session) { onDispose { session.close() } }
+fun GoodsPocketApp(session: PresentationSession) {
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     DisposableEffect(lifecycle, session) {
         val observer = LifecycleEventObserver { _, event ->

@@ -87,6 +87,7 @@ kotlin {
             implementation(libs.kotlin.testJunit)
             implementation(libs.androidx.testExt.junit)
             implementation(libs.androidx.test.runner)
+            implementation(libs.androidx.compose.ui.test.junit4)
         }
         val iosArm64Main by getting {
             dependencies {
