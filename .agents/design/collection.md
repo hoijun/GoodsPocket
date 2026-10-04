@@ -1,5 +1,9 @@
 # Collection Image-Locked Contract
 
+## Scroll Viewport
+
+Reserve the summary footer's space in the grid viewport itself and clip scrolling content to that viewport. Scroll-content padding alone does not prevent cards from drawing behind the footer, especially in short landscape windows.
+
 Read [Product Direction](product-direction.md), [Foundations](foundations.md), [Shared Components](components.md), and [Visual Verification](verification.md) with this file.
 
 This document locks the approved Collection references. The owned reference defines shared geometry; the reserved reference defines only state-specific visual content.

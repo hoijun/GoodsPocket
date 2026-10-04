@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -29,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -173,26 +175,35 @@ private fun HomeBellButton(
 
 @Composable
 private fun HomeHeroCard(onClick: () -> Unit) {
+    val isExpandedText = LocalDensity.current.fontScale > 1f
+    val heroHeight = if (isExpandedText) {
+        Modifier.heightIn(min = 120.dp)
+    } else {
+        Modifier.height(120.dp)
+    }
     Surface(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .offset(y = (-5).dp)
-            .height(120.dp),
+            .then(heroHeight),
         shape = RoundedCornerShape(18.dp),
         color = HomeHeroSurface,
         contentColor = HomeInk,
         shadowElevation = 0.dp,
         border = BorderStroke(1.dp, HomeCardBorder),
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = if (isExpandedText) Modifier.fillMaxWidth() else Modifier.fillMaxSize(),
+        ) {
             HomeHeroMediaPlaceholder(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.matchParentSize(),
             )
             Column(
                 modifier = Modifier
                     .align(Alignment.CenterStart)
-                    .padding(start = 18.dp, end = 126.dp),
+                    .padding(start = 18.dp, end = 126.dp)
+                    .padding(vertical = if (isExpandedText) 16.dp else 0.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(
@@ -203,7 +214,7 @@ private fun HomeHeroCard(onClick: () -> Unit) {
                     ),
                     color = HomeInk,
                     fontWeight = FontWeight.Bold,
-                    maxLines = 2,
+                    maxLines = if (isExpandedText) Int.MAX_VALUE else 2,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
@@ -214,7 +225,7 @@ private fun HomeHeroCard(onClick: () -> Unit) {
                     ),
                     color = HomeMuted,
                     fontWeight = FontWeight.Medium,
-                    maxLines = 2,
+                    maxLines = if (isExpandedText) Int.MAX_VALUE else 2,
                     overflow = TextOverflow.Ellipsis,
                 )
             }
@@ -227,7 +238,7 @@ private fun HomeTodaySummaryCard(dashboardSummary: HomeSummary, onAction: (HomeA
     HomeWhiteCard(
         modifier = Modifier
             .offset(y = (-5).dp)
-            .height(98.dp),
+            .heightIn(min = 98.dp),
         contentPadding = 0.dp,
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {

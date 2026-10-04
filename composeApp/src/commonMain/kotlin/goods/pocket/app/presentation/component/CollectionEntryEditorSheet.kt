@@ -119,7 +119,7 @@ fun CollectionEntryEditorSheet(
                 availableHeight.coerceAtMost(648.dp),
             ).navigationBarsPadding(),
         ) {
-            Box(Modifier.fillMaxWidth().height(72.dp)) {
+            Box(Modifier.fillMaxWidth().heightIn(min = 72.dp)) {
                 Box(
                     Modifier.align(Alignment.TopCenter).padding(top = 11.dp)
                         .width(
@@ -128,7 +128,9 @@ fun CollectionEntryEditorSheet(
                 )
                 Text(
                     tr(Res.string.editor_owned_title),
-                    Modifier.align(Alignment.CenterStart).padding(start = 20.dp, top = 24.dp),
+                    Modifier.align(
+                        Alignment.CenterStart,
+                    ).padding(start = 20.dp, end = 58.dp, top = 24.dp),
                     fontSize = 22.sp,
                     lineHeight = 27.sp,
                     fontWeight = FontWeight.Bold,
@@ -264,7 +266,7 @@ fun CollectionEntryEditorSheet(
                     end = 20.dp,
                     top = 8.dp,
                     bottom = 13.dp,
-                ).height(44.dp),
+                ).heightIn(min = 44.dp),
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = EditorOrange,

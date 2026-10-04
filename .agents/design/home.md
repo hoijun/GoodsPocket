@@ -1,5 +1,9 @@
 # Home Image-Locked Contract
 
+## Font Scaling Override
+
+Reference card heights describe the default font scale. At enlarged system fonts, summary and section headers use minimum heights; hero, recent goods, and spending cards may grow to keep text visible. Expanded spending places the chart below the text. Keep default-scale internal geometry unchanged.
+
 This document records the values verified against the Home reference. It overrides looser ranges in shared design documents for the Home screen.
 
 Reference: `/Users/Hoijun/Downloads/ChatGPT Image 2026년 4월 19일 오후 11_37_28.png`

@@ -45,6 +45,8 @@ Do not add notifications, marketing consent, backup, restore, reset, theme, font
 
 Settings uses normal Scaffold safeDrawing insets on all sides and has no bottom-navigation height added. Content can scroll when localization or font scaling requires it.
 
+The locked heights describe the default font scale. Text-bearing headers/cards/rows may grow at larger scales. Above font scale 1.3, place the language label above a full-width segmented control; retain the original horizontal composition at the default scale. Format values may wrap instead of clipping.
+
 ## Styling And Type
 
 - Background `#FFFCF8`, card `#FEFBF8`, card outline `1px #EFEDEC`.

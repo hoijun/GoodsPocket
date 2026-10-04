@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -25,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -84,11 +86,16 @@ internal fun HomeRecentGoodsCarousel(
 
 @Composable
 private fun HomeRecentGoodsCard(model: RecentGoodsCardModel, onClick: () -> Unit) {
+    val cardHeight = if (LocalDensity.current.fontScale > 1f) {
+        Modifier.heightIn(min = 140.dp)
+    } else {
+        Modifier.height(140.dp)
+    }
     Surface(
         onClick = onClick,
         modifier = Modifier
             .width(84.dp)
-            .height(140.dp),
+            .then(cardHeight),
         shape = RoundedCornerShape(8.dp),
         color = HomeCardSurface,
         contentColor = HomeInk,
@@ -141,22 +148,35 @@ private fun HomeRecentGoodsCard(model: RecentGoodsCardModel, onClick: () -> Unit
 
 @Composable
 internal fun HomeMonthlySpendCard(dashboardSummary: HomeSummary, currentDate: String) {
+    val isExpandedText = LocalDensity.current.fontScale > 1f
+    val cardHeight = if (isExpandedText) {
+        Modifier.heightIn(min = 102.dp)
+    } else {
+        Modifier.height(102.dp)
+    }
     val month = homeMonth(currentDate)
     val changePercent = spendingChangePercent(
         current = dashboardSummary.monthlySpend,
         previous = dashboardSummary.previousMonthSpend,
     )
     HomeWhiteCard(
-        modifier = Modifier.height(102.dp),
+        modifier = cardHeight,
         contentPadding = 0.dp,
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = (if (isExpandedText) Modifier.fillMaxWidth() else Modifier.fillMaxSize())
                 .padding(horizontal = 13.dp, vertical = 7.dp),
         ) {
             Column(
-                modifier = Modifier.align(Alignment.TopStart),
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(
+                        bottom = if (isExpandedText) {
+                            HomeReferenceMetrics.SpendingChartHeight + 12.dp
+                        } else {
+                            0.dp
+                        },
+                    ),
                 verticalArrangement = Arrangement.spacedBy(1.dp),
             ) {
                 Text(
@@ -381,7 +401,7 @@ private fun HomeSectionHeader(title: String, onViewAll: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(HomeReferenceMetrics.SectionHeaderHeight)
+            .heightIn(min = HomeReferenceMetrics.SectionHeaderHeight)
             .padding(horizontal = 2.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,

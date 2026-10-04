@@ -39,4 +39,6 @@ Keep important state, due dates, and financial information near the top. Clearly
 
 Sheets and forms must distinguish loading, validation failure, save failure, disabled action, and successful completion without changing the underlying state flow.
 
+Reference sheet heights are upper bounds when the window is shorter: reserve the actual top safe area and IME, and keep content inside horizontal/bottom safeDrawing insets. Form headings and action buttons use minimum heights so scaled text can grow without clipping; the form body remains scrollable.
+
 Use calm, readable inline feedback and one clear recovery action. Do not rely on color alone. Ensure error text, labels, and controls remain legible at system font scales.

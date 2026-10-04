@@ -9,13 +9,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -71,6 +74,7 @@ fun EventDetailSheet(
     entries: List<CollectionEntry> = emptyList(),
 ) {
     val fields = remember(event, entries) { eventDetailFields(event, entries) }
+    val sheetHeight = boundedDetailSheetHeight(428.dp)
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
@@ -82,7 +86,14 @@ fun EventDetailSheet(
         tonalElevation = 0.dp,
         contentWindowInsets = { WindowInsets(0, 0, 0, 0) },
     ) {
-        Column(Modifier.fillMaxWidth().height(428.dp).navigationBarsPadding()) {
+        Column(
+            Modifier.fillMaxWidth().height(sheetHeight)
+                .windowInsetsPadding(
+                    WindowInsets.safeDrawing.only(
+                        WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom,
+                    ),
+                ),
+        ) {
             EventDetailHandle(onDismiss)
             Column(
                 Modifier.weight(
@@ -122,7 +133,7 @@ fun EventDetailSheet(
             ) {
                 Button(
                     onClick = onEdit,
-                    modifier = Modifier.weight(1f).height(46.dp),
+                    modifier = Modifier.weight(1f).heightIn(min = 46.dp),
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = EventDetailOrange),
                 ) {
@@ -134,7 +145,7 @@ fun EventDetailSheet(
                 }
                 OutlinedButton(
                     onClick = onDelete,
-                    modifier = Modifier.weight(1f).height(46.dp),
+                    modifier = Modifier.weight(1f).heightIn(min = 46.dp),
                     shape = RoundedCornerShape(10.dp),
                     border = BorderStroke(1.dp, EventDetailOrange),
                 ) {

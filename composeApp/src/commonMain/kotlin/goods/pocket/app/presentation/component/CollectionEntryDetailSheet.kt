@@ -9,13 +9,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -88,6 +92,7 @@ fun CollectionEntryDetailSheet(
     onMarkReceived: (() -> Unit)? = null,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetHeight = boundedDetailSheetHeight(CollectionDetailReferenceMetrics.SheetHeight)
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -106,8 +111,12 @@ fun CollectionEntryDetailSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(CollectionDetailReferenceMetrics.SheetHeight)
-                .navigationBarsPadding(),
+                .height(sheetHeight)
+                .windowInsetsPadding(
+                    WindowInsets.safeDrawing.only(
+                        WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom,
+                    ),
+                ),
         ) {
             CollectionDetailHeader(onDismiss = onDismiss)
             FeatureFeedback(commandState.isRunning, commandState.hasFailure, onRetry)
@@ -252,7 +261,7 @@ private fun CollectionDetailFooter(
                 enabled = isEnabled,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(CollectionDetailReferenceMetrics.ActionHeight),
+                    .heightIn(min = CollectionDetailReferenceMetrics.ActionHeight),
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
@@ -374,7 +383,7 @@ private fun CollectionMetadataRow(label: String, value: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(CollectionDetailReferenceMetrics.MetadataRowHeight),
+            .heightIn(min = CollectionDetailReferenceMetrics.MetadataRowHeight),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -385,7 +394,6 @@ private fun CollectionMetadataRow(label: String, value: String) {
                 lineHeight = 15.sp,
             ),
             color = DetailInk,
-            maxLines = 1,
         )
         Text(
             text = value,
@@ -395,8 +403,6 @@ private fun CollectionMetadataRow(label: String, value: String) {
                 lineHeight = 15.sp,
             ),
             color = DetailInk,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
         )
     }
 }
@@ -406,7 +412,7 @@ private fun CollectionNote(note: String) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(CollectionDetailReferenceMetrics.NoteHeight)
+            .heightIn(min = CollectionDetailReferenceMetrics.NoteHeight)
             .padding(top = CollectionDetailReferenceMetrics.NoteTopPadding),
         verticalArrangement = Arrangement.spacedBy(CollectionDetailReferenceMetrics.NoteTextGap),
     ) {
@@ -426,8 +432,6 @@ private fun CollectionNote(note: String) {
                 lineHeight = 15.sp,
             ),
             color = DetailInk,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
         )
     }
 }
@@ -443,7 +447,7 @@ private fun CollectionDetailActions(isEnabled: Boolean, onEdit: () -> Unit, onDe
             enabled = isEnabled,
             modifier = Modifier
                 .weight(1f)
-                .height(CollectionDetailReferenceMetrics.ActionHeight),
+                .heightIn(min = CollectionDetailReferenceMetrics.ActionHeight),
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
@@ -462,7 +466,7 @@ private fun CollectionDetailActions(isEnabled: Boolean, onEdit: () -> Unit, onDe
             enabled = isEnabled,
             modifier = Modifier
                 .weight(1f)
-                .height(CollectionDetailReferenceMetrics.ActionHeight),
+                .heightIn(min = CollectionDetailReferenceMetrics.ActionHeight),
             shape = RoundedCornerShape(8.dp),
             border = BorderStroke(1.dp, DetailDanger),
             colors = ButtonDefaults.outlinedButtonColors(

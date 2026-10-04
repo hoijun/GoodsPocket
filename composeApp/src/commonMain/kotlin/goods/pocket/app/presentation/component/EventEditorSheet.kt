@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -97,7 +98,7 @@ fun EventEditorSheet(
                 availableHeight.coerceAtMost(438.dp),
             ).navigationBarsPadding(),
         ) {
-            Box(Modifier.fillMaxWidth().height(79.dp)) {
+            Box(Modifier.fillMaxWidth().heightIn(min = 79.dp)) {
                 Box(
                     Modifier.align(
                         Alignment.TopCenter,
@@ -106,7 +107,9 @@ fun EventEditorSheet(
                 )
                 Text(
                     tr(Res.string.editor_event_heading),
-                    Modifier.align(Alignment.TopStart).padding(start = 20.dp, top = 35.dp),
+                    Modifier.align(
+                        Alignment.TopStart,
+                    ).padding(start = 20.dp, end = 58.dp, top = 35.dp),
                     fontSize = 22.sp,
                     lineHeight = 27.sp,
                     fontWeight = FontWeight.Bold,
@@ -235,7 +238,7 @@ fun EventEditorSheet(
                     end = 20.dp,
                     top = 8.dp,
                     bottom = 23.dp,
-                ).height(44.dp),
+                ).heightIn(min = 44.dp),
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = EventEditorOrange,

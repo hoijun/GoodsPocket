@@ -2,7 +2,6 @@ package goods.pocket.app.presentation.collection
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import goods.pocket.app.domain.collection.CollectionEntry
@@ -65,8 +65,11 @@ fun CollectionScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = CollectionReferenceMetrics.ScreenHorizontalPadding)
-                .padding(top = CollectionReferenceMetrics.GridTop),
-            contentPadding = PaddingValues(bottom = CollectionReferenceMetrics.GridBottomClearance),
+                .padding(
+                    top = CollectionReferenceMetrics.GridTop,
+                    bottom = CollectionReferenceMetrics.GridBottomClearance,
+                )
+                .clipToBounds(),
             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(
                 CollectionReferenceMetrics.GridSpacing,
             ),

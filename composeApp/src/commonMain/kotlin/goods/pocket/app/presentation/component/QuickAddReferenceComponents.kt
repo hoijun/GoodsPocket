@@ -90,7 +90,7 @@ internal fun QuickAddReferenceSheet(
                 availableHeight.coerceAtMost(648.dp),
             ).navigationBarsPadding(),
         ) {
-            Box(Modifier.fillMaxWidth().height(72.dp)) {
+            Box(Modifier.fillMaxWidth().heightIn(min = 72.dp)) {
                 Box(
                     Modifier.align(Alignment.TopCenter).padding(top = 11.dp)
                         .width(
@@ -99,7 +99,9 @@ internal fun QuickAddReferenceSheet(
                 )
                 Text(
                     tr(Res.string.quick_add_title),
-                    Modifier.align(Alignment.CenterStart).padding(start = 19.dp, top = 24.dp),
+                    Modifier.align(
+                        Alignment.CenterStart,
+                    ).padding(start = 19.dp, end = 58.dp, top = 24.dp),
                     fontSize = 22.sp,
                     lineHeight = 27.sp,
                     fontWeight = FontWeight.Bold,
@@ -149,7 +151,7 @@ internal fun QuickAddReferenceSheet(
                 modifier = Modifier.fillMaxWidth().padding(
                     horizontal = 19.dp,
                     vertical = 17.dp,
-                ).height(46.dp),
+                ).heightIn(min = 46.dp),
                 shape = RoundedCornerShape(9.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = QuickAddOrange,
